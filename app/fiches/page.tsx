@@ -20,6 +20,18 @@ export default function PageFiches() {
           statuts={statuts}
         />
       </Suspense>
+      <noscript>
+        <ul className="space-y-1 text-sm">
+          {getIndex().map((fiche) => (
+            <li key={fiche.slug}>
+              <a href={`/fiches/${fiche.slug}`} className="underline">
+                {fiche.terme}
+              </a>{' '}
+              <span className="text-stone-500">— {fiche.resume}</span>
+            </li>
+          ))}
+        </ul>
+      </noscript>
     </div>
   )
 }
