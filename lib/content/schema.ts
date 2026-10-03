@@ -57,3 +57,5 @@ export function creerSchemaFiche(taxonomies: Taxonomies) {
     modifie: z.coerce.date(),
   })
 }
+
+export type FicheIndex = Omit<FicheMeta, 'cree' | 'modifie'>

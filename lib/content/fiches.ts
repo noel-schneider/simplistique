@@ -2,7 +2,7 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import matter from 'gray-matter'
 import { chargerTaxonomies, DOSSIER_CONTENU } from './taxonomies'
-import { creerSchemaFiche, type Fiche, type Taxonomies } from './schema'
+import { creerSchemaFiche, type Fiche, type FicheIndex, type Taxonomies } from './schema'
 
 export { DOSSIER_CONTENU }
 
@@ -47,6 +47,21 @@ export function getFiche(
   taxonomies: Taxonomies = chargerTaxonomies(dossier),
 ): Fiche | null {
   return getFiches(dossier, taxonomies).find((f) => f.slug === slug) ?? null
+}
+
+export function getIndex(
+  dossier: string = DOSSIER_CONTENU,
+  taxonomies: Taxonomies = chargerTaxonomies(dossier),
+): FicheIndex[] {
+  return getFiches(dossier, taxonomies).map((fiche) => ({
+    slug: fiche.slug,
+    terme: fiche.terme,
+    discipline: fiche.discipline,
+    confusion: fiche.confusion,
+    statut: fiche.statut,
+    resume: fiche.resume,
+    suggestions: fiche.suggestions,
+  }))
 }
 
 export function getDocument(
