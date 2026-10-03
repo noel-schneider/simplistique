@@ -6,7 +6,7 @@
 
 **Architecture:** Le contenu vit dans des fichiers markdown et YAML versionnés sous `content/`. Un seul module (`lib/content`) les lit, les valide avec Zod et expose des objets typés ; aucun composant d'affichage ne sait que la source est du markdown. Le filtrage est une fonction pure (`lib/filtrage.ts`) appelée par un composant client qui lit et écrit l'état dans l'URL. Tout est rendu statiquement au build : aucun code ne tourne à l'exécution.
 
-**Tech Stack:** Next.js 16.3.8 (App Router, TypeScript), React 19.3.0, Tailwind CSS 4.3.3, Zod 4.6.5, gray-matter 4.0.3, js-yaml 5.4.2, unified 11 / remark-parse 11 / remark-rehype 11 / rehype-slug 6 / rehype-stringify 10, Vitest 5.0.3 + @testing-library/react 16.3.3 + jsdom 30, déploiement Vercel, CI GitHub Actions.
+**Tech Stack:** Next.js 16.3.8 (App Router), React 19.2.8, TypeScript 5.9.3, Tailwind CSS 4.3.3, Zod 4.6.5, gray-matter 4.0.3, js-yaml 5.4.2, unified 11 / remark-parse 11 / remark-rehype 11 / rehype-slug 6 / rehype-stringify 10, Vitest 5.0.3 + @testing-library/react 16.3.3 + jsdom 30, déploiement Vercel, CI GitHub Actions.
 
 **Spec:** `docs/superpowers/specs/2026-10-03-simplistique-design.md`
 
@@ -63,9 +63,13 @@ cd /Users/noel/Documents/simplistique && rm -rf node_modules package-lock.json
 
 Deux gestes distincts, dans cet ordre.
 
-**a. Figer ce que `create-next-app` a déjà installé.** Ne pas remplacer ces versions : retirer seulement les `^` et les `~` devant chacune, pour satisfaire la contrainte globale. Cela concerne `next`, `react`, `react-dom`, `typescript`, `@types/node`, `@types/react`, `@types/react-dom`, `tailwindcss`, `@tailwindcss/postcss`, `eslint` et `eslint-config-next`. Fixer soi-même `eslint` risquerait un conflit de pairs avec `eslint-config-next` ; l'échafaudage a choisi un couple cohérent, on le garde.
+**a. Figer ce que `create-next-app` a déjà installé.** Garder les versions qu'il a choisies, mais remplacer **tout intervalle par la version exacte réellement installée**, que `npm ls --depth=0` donne. Attention : `create-next-app` n'écrit pas `^20` mais `"20"`, qui est un intervalle (`>=20.0.0 <21.0.0`) tout autant qu'un `^` — il faut donc le remplacer aussi. Cela concerne `next`, `react`, `react-dom`, `typescript`, `@types/react`, `@types/react-dom`, `tailwindcss`, `@tailwindcss/postcss`, `eslint` et `eslint-config-next`.
 
-Vérifier ensuite que les versions obtenues correspondent bien à la pile annoncée (Next 16.3.x, React 19.3.x, Tailwind 4.3.x, TypeScript 7.0.x) et signaler tout écart dans le rapport.
+Ne pas choisir soi-même la version d'`eslint` : un `eslint` fixé à la main risque un conflit de pairs avec `eslint-config-next`, et l'échafaudage a choisi un couple cohérent (eslint 9).
+
+Une exception à « garder ce qu'il a choisi » : **`@types/node` passe à `26.6.4`**. L'échafaudage le fixe en 20.x, ce qui entre en conflit de pairs avec `vitest@5` et ne correspond pas au Node installé (26.x). Masquer ce conflit par un `.npmrc` (`legacy-peer-deps=true`) est interdit : ce réglage serait aussi lu par `npm ci` en intégration continue et éteindrait toutes les alertes de pairs du projet, y compris les vraies.
+
+Vérifier ensuite que les versions obtenues correspondent à la pile annoncée en tête de plan, et signaler tout écart dans le rapport sans le corriger.
 
 **b. Ajouter exactement ces dépendances,** aux versions indiquées, sans intervalle :
 
