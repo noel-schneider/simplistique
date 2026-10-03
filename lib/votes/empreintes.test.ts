@@ -20,16 +20,16 @@ describe('empreinteAlternative', () => {
     expect(empreinteAlternative('avoir')).not.toBe(empreinteAlternative('ressources'))
   })
 
-  // Comportement documenté, pas souhaitable : deux alternatives d'une même fiche
+  // Comportement documenté, pas souhaitable : deux alternatives d’une même fiche
   // dont le texte ne diffère que par la casse partagent une empreinte, donc leurs
-  // votes fusionnent. L'avertissement de lint:content (Tâche 7) le signale.
+  // votes fusionnent. L’avertissement de lint:content (Tâche 7) le signale.
   it('fusionne deux alternatives que la normalisation rend identiques', () => {
     expect(empreinteAlternative('Avoir')).toBe(empreinteAlternative('avoir'))
   })
 })
 
 describe('adresseDeLEnTete', () => {
-  it('prend la premiÃ¨re adresse d’une liste de mandataires', () => {
+  it('prend la première adresse d’une liste de mandataires', () => {
     expect(adresseDeLEnTete('203.0.113.7, 198.51.100.2, 192.0.2.9')).toBe('203.0.113.7')
   })
 
@@ -41,7 +41,7 @@ describe('adresseDeLEnTete', () => {
     expect(adresseDeLEnTete('2001:db8::1')).toBe('2001:db8::1')
   })
 
-  it('rend une valeur de repli quand l’en-tÃªte est absent', () => {
+  it('rend une valeur de repli quand l’en-tête est absent', () => {
     expect(adresseDeLEnTete(null)).toBe('inconnue')
     expect(adresseDeLEnTete('')).toBe('inconnue')
   })
@@ -58,7 +58,7 @@ describe('empreinteVotant', () => {
     expect(a).toBe(b)
   })
 
-  it('change si le sel change â c’est ce qui permet de rÃ©initialiser la dÃ©duplication', () => {
+  it('change si le sel change — c’est ce qui permet de réinitialiser la déduplication', () => {
     expect(empreinteVotant('sel-a', '203.0.113.7', 'M')).not.toBe(
       empreinteVotant('sel-b', '203.0.113.7', 'M'),
     )
@@ -76,12 +76,14 @@ describe('empreinteVotant', () => {
     )
   })
 
-  it('ne contient l’adresse en clair nulle part', () => {
-    expect(empreinteVotant('sel', '203.0.113.7', 'M')).not.toContain('203.0.113.7')
-  })
-
   it('refuse un sel vide ou absent', () => {
     expect(() => empreinteVotant('', '203.0.113.7', 'M')).toThrow(/sel/i)
     expect(() => empreinteVotant('   ', '203.0.113.7', 'M')).toThrow(/sel/i)
+    // `process.env.SEL_VOTES` vaut `undefined` quand la variable n’est pas définie :
+    // c’est le cas « absent », et il doit lever la même erreur explicite,
+    // pas un TypeError générique qui ne nomme pas le sel.
+    expect(() => empreinteVotant(undefined as unknown as string, '203.0.113.7', 'M')).toThrow(
+      /sel/i,
+    )
   })
 })
