@@ -3363,17 +3363,40 @@ Puis remplacer le bloc d'affichage final par :
 
 - [ ] **Step 6: Ajouter les tests de bascule dans `components/corpus.test.tsx`**
 
-Ajouter `afterEach` à l'import de `vitest` en tête de fichier :
+Ajouter `afterEach` à l'import de `vitest`, et `vueParDefaut` à celui de `./corpus` :
 
 ```tsx
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 ```
+```tsx
+import { Corpus, vueParDefaut } from './corpus'
+```
 
-Puis ajouter à la fin du fichier :
+**Attention, point vérifié et contre-intuitif : jsdom ne fournit pas `window.matchMedia` dans ce harnais** (`typeof` vaut `'undefined'`, mesuré). Un `vi.spyOn(window, 'matchMedia')` échoue donc, faute de propriété à espionner. Il faut l'injecter, et la retirer après chaque test pour que les autres continuent d'exercer le repli de `vueParDefaut` — repli qui est le comportement réel de tous les tests du projet, et qu'un stub global dans `vitest.setup.ts` effacerait silencieusement.
+
+Ajouter à la fin du fichier :
 
 ```tsx
+// jsdom ne fournit pas matchMedia : on l'injecte pour les deux tests qui ont
+// besoin d'une largeur d'écran, et on le retire ensuite.
+function simulerGrandEcran(grandEcran: boolean) {
+  Object.defineProperty(window, 'matchMedia', {
+    configurable: true,
+    writable: true,
+    value: (requete: string) => ({ matches: grandEcran, media: requete }) as MediaQueryList,
+  })
+}
+
 afterEach(() => {
   vi.restoreAllMocks()
+  delete (window as { matchMedia?: unknown }).matchMedia
+})
+
+describe('vueParDefaut', () => {
+  it('se replie sur la liste quand matchMedia n’est pas disponible', () => {
+    // C'est l'état par défaut de jsdom, donc celui de tous les autres tests.
+    expect(vueParDefaut()).toBe('liste')
+  })
 })
 
 describe('Corpus — bascule entre les deux vues', () => {
@@ -3391,13 +3414,13 @@ describe('Corpus — bascule entre les deux vues', () => {
   })
 
   it('choisit la liste par défaut sur petit écran', () => {
-    vi.spyOn(window, 'matchMedia').mockReturnValue({ matches: false } as MediaQueryList)
+    simulerGrandEcran(false)
     const { container } = afficher()
     expect(container.querySelector('table')).not.toBeNull()
   })
 
   it('choisit la carte par défaut sur grand écran', () => {
-    vi.spyOn(window, 'matchMedia').mockReturnValue({ matches: true } as MediaQueryList)
+    simulerGrandEcran(true)
     const { container } = afficher()
     expect(container.querySelectorAll('circle').length).toBeGreaterThan(0)
     expect(container.querySelector('table')).toBeNull()
