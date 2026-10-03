@@ -2038,6 +2038,18 @@ describe('EnteteFiche', () => {
     expect(screen.getByText(/aucune alternative/i)).toBeInTheDocument()
   })
 
+  it('met « Suggestion » au singulier quand il n\'y en a qu\'une', () => {
+    render(
+      <EnteteFiche
+        fiche={meta({ statut: 'propose', suggestions: ['avoir'] })}
+        {...libelles}
+        nomStatut="Proposé"
+      />,
+    )
+    expect(screen.getByText(/^Suggestion :$/)).toBeInTheDocument()
+    expect(screen.getByText('avoir')).toBeInTheDocument()
+  })
+
   it('liste les suggestions quand il y en a plusieurs', () => {
     render(
       <EnteteFiche
@@ -2079,7 +2091,7 @@ import type { Statut } from '@/lib/content/schema'
 const CLASSES: Record<Statut, string> = {
   pointe: 'border-amber-500 text-amber-700',
   propose: 'border-emerald-600 text-emerald-700',
-  rejete: 'border-stone-400 text-stone-500',
+  rejete: 'border-stone-400 text-stone-600',
 }
 
 export function BadgeStatut({ statut, nom }: { statut: Statut; nom: string }) {
@@ -2177,6 +2189,13 @@ import { rendreMarkdown } from '@/lib/content/markdown'
 import { chargerTaxonomies } from '@/lib/content/taxonomies'
 
 type Params = { params: Promise<{ slug: string }> }
+
+// Sans cela, `dynamicParams` vaut `true` : un slug absent de la liste ci-dessous
+// déclencherait un rendu de page à la demande côté serveur, qui lirait le disque
+// avant de conclure au 404. À `false`, Next répond 404 sans jamais invoquer la
+// page. C'est ce qu'exigent la contrainte globale « chaque page est générée au
+// build » et la spec §4 « un slug inconnu ne peut pas exister ».
+export const dynamicParams = false
 
 export function generateStaticParams() {
   return getFiches().map((fiche) => ({ slug: fiche.slug }))
