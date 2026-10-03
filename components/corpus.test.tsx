@@ -110,8 +110,12 @@ describe('Corpus — filtres et URL', () => {
 
   it('ignore une vue inconnue dans l’URL et retombe sur un affichage valide', () => {
     recherche = 'vue=licorne'
-    afficher()
+    const { container } = afficher()
     expect(screen.getByText(/3 fiches/)).toBeInTheDocument()
+    // Le compteur s'affiche quelle que soit la vue : la preuve que la vue
+    // invalide a bien été ignorée est la présence du repli (la liste, par
+    // défaut sans matchMedia), pas seulement le compteur.
+    expect(container.querySelector('table')).not.toBeNull()
   })
 
   it('filtre par recherche texte sans tenir compte des accents', async () => {
@@ -255,7 +259,10 @@ describe('Corpus — bascule entre les deux vues', () => {
   it('affiche la carte quand l’URL le demande', () => {
     recherche = 'vue=carte'
     const { container } = afficher()
-    expect(container.querySelectorAll('circle').length).toBeGreaterThan(0)
+    // La légende de la carte dessine déjà trois cercles, quel que soit le
+    // nombre de fiches affichées : compter les cercles ne prouverait rien.
+    // Seuls les points de fiches sont des liens.
+    expect(screen.getAllByRole('link')).toHaveLength(index.length)
     expect(container.querySelector('table')).toBeNull()
   })
 
@@ -274,7 +281,7 @@ describe('Corpus — bascule entre les deux vues', () => {
   it('choisit la carte par défaut sur grand écran', () => {
     simulerGrandEcran(true)
     const { container } = afficher()
-    expect(container.querySelectorAll('circle').length).toBeGreaterThan(0)
+    expect(screen.getAllByRole('link')).toHaveLength(index.length)
     expect(container.querySelector('table')).toBeNull()
   })
 

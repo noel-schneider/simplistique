@@ -4,10 +4,19 @@ const RAYON = 7
 const PAS = 26
 const COLONNES = 8
 
-export function styleStatut(statut: Statut, couleur: string) {
-  if (statut === 'propose') return { fill: couleur, stroke: couleur, fillOpacity: 1 }
-  if (statut === 'rejete') return { fill: couleur, stroke: couleur, fillOpacity: 0.25 }
-  return { fill: 'none', stroke: couleur, fillOpacity: 1 }
+type StyleCercle = { fill: string; stroke: string; fillOpacity: number }
+
+// Comme CLASSES dans badge-statut.tsx : une table exhaustive plutôt qu'une
+// chaîne de `if`, pour qu'un quatrième statut empêche la compilation au lieu
+// de retomber silencieusement sur le style de « pointe ».
+const STYLES: Record<Statut, (couleur: string) => StyleCercle> = {
+  pointe: (couleur) => ({ fill: 'none', stroke: couleur, fillOpacity: 1 }),
+  propose: (couleur) => ({ fill: couleur, stroke: couleur, fillOpacity: 1 }),
+  rejete: (couleur) => ({ fill: couleur, stroke: couleur, fillOpacity: 0.25 }),
+}
+
+export function styleStatut(statut: Statut, couleur: string): StyleCercle {
+  return STYLES[statut](couleur)
 }
 
 function Zone({

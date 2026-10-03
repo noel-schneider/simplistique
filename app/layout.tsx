@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { Navigation } from '@/components/navigation'
 import './globals.css'
 
@@ -16,9 +17,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <main className="mx-auto max-w-3xl px-5 py-10">{children}</main>
         <footer className="mx-auto max-w-3xl px-5 pb-10 text-sm text-stone-500">
           Un corpus ouvert. Les suggestions passent par le dépôt — voir{' '}
-          <a className="underline" href="/contribuer">
+          <Link className="underline" href="/contribuer">
             Contribuer
-          </a>
+          </Link>
           .
         </footer>
       </body>

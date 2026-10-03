@@ -35,4 +35,5 @@ Les valeurs de `discipline` et `confusion` doivent exister dans
 | `npm run dev` | Serveur de développement |
 | `npm run build` | Build statique ; échoue si une fiche est invalide |
 | `npm run test:once` | Toute la suite de tests |
+| `npm run lint` | ESLint, utilisé par l’intégration continue |
 | `npm run lint:content` | Avertissements de cohérence des fiches |

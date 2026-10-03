@@ -88,6 +88,6 @@ export function filtrerFiches(
       libelles?.disciplines.get(fiche.discipline) ?? '',
       libelles?.confusions.get(fiche.confusion) ?? '',
     ]
-    return champs.some((champ) => champ !== '' && normaliser(champ).includes(recherche))
+    return champs.some((champ) => normaliser(champ).includes(recherche))
   })
 }

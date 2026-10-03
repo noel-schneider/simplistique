@@ -54,7 +54,10 @@ export function creerSchemaFiche(taxonomies: Taxonomies) {
     discipline: z.enum(disciplines),
     confusion: z.enum(confusions),
     statut: z.enum(STATUTS),
-    resume: z.string().min(1).max(LONGUEUR_MAX_RESUME),
+    // Les scalaires `>` du YAML gardent un saut de ligne final, qui partirait
+    // tel quel dans <meta name="description"> et consommerait un caractère
+    // du budget de 240 pour rien.
+    resume: z.string().trim().min(1).max(LONGUEUR_MAX_RESUME),
     suggestions: z.array(z.string().min(1)),
     cree: z.coerce.date(),
     modifie: z.coerce.date(),
