@@ -25,3 +25,35 @@ export type Taxonomies = {
   confusions: EntreeTaxonomie[]
   statuts: EntreeTaxonomie[]
 }
+
+export type FicheMeta = {
+  slug: string
+  terme: string
+  discipline: string
+  confusion: string
+  statut: Statut
+  resume: string
+  suggestions: string[]
+  cree: Date
+  modifie: Date
+}
+
+export type Fiche = FicheMeta & { corps: string }
+
+export const LONGUEUR_MAX_RESUME = 240
+
+export function creerSchemaFiche(taxonomies: Taxonomies) {
+  const disciplines = taxonomies.disciplines.map((d) => d.slug) as [string, ...string[]]
+  const confusions = taxonomies.confusions.map((c) => c.slug) as [string, ...string[]]
+
+  return z.object({
+    terme: z.string().min(1),
+    discipline: z.enum(disciplines),
+    confusion: z.enum(confusions),
+    statut: z.enum(STATUTS),
+    resume: z.string().min(1).max(LONGUEUR_MAX_RESUME),
+    suggestions: z.array(z.string().min(1)),
+    cree: z.coerce.date(),
+    modifie: z.coerce.date(),
+  })
+}
