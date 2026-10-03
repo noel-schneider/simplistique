@@ -30,7 +30,11 @@ describe('chargerTaxonomies', () => {
     const t = chargerTaxonomies(DOSSIER_CONTENU)
     expect(t.statuts.map((s) => s.slug)).toEqual(['pointe', 'propose', 'rejete'])
     expect(t.disciplines.map((d) => d.slug)).toContain('theorie-musicale')
-    expect(t.confusions).toHaveLength(5)
+    // confusions.yml est volontairement extensible (spec §3.4, README) :
+    // une borne inférieure plutôt qu'une égalité, pour qu'un sixième type
+    // ajouté au corpus ne casse pas l'intégration continue.
+    expect(t.confusions.length).toBeGreaterThanOrEqual(5)
+    expect(t.confusions.map((c) => c.slug)).toContain('paire-bancale')
   })
 
   it('donne une couleur à chaque discipline réelle', () => {
