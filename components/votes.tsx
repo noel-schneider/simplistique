@@ -10,8 +10,6 @@ type Etat = {
 
 type Alternative = { texte: string; empreinte: string }
 
-const VIDE: Etat = { fiche: 0, alternatives: {}, miens: { fiche: false, alternatives: [] } }
-
 function phraseDuCompte(compte: number): string {
   if (compte === 0) return 'Personne n’a encore été gêné par ce terme.'
   if (compte === 1) return 'Une personne a été gênée par ce terme.'

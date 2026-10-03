@@ -103,6 +103,25 @@ describe('POST /api/votes', () => {
     expect(r.status).toBe(400)
   })
 
+  it('répond 503 sans jamais écrire quand le sel est absent', async () => {
+    // L’invariant central du système : sans sel, un haché d’adresse IP se casse par
+    // force brute en quelques minutes. Le refus doit donc tomber avant l’écriture, et
+    // pas seulement rendre le bon code. Le test du bloc GET ne pouvait pas le prouver :
+    // un GET n’écrit jamais, quoi qu’il arrive.
+    vi.stubEnv('SEL_VOTES', '')
+    const r = await POST(
+      requete('http://x/api/votes', {
+        method: 'POST',
+        body: JSON.stringify({ fiche: 'groupe-mathematiques', alternative: null }),
+      }),
+    )
+    expect(r.status).toBe(503)
+    expect(await depotCourant.compter('groupe-mathematiques')).toEqual({
+      fiche: 0,
+      alternatives: {},
+    })
+  })
+
   it('deux navigateurs différents comptent pour deux votants', async () => {
     const corps = JSON.stringify({ fiche: 'groupe-mathematiques', alternative: null })
     await POST(requete('http://x/api/votes', { method: 'POST', body: corps }))
@@ -141,5 +160,17 @@ describe('DELETE /api/votes', () => {
       }),
     )
     expect(r.status).toBe(409)
+  })
+
+  it('répond 503 sans rien retirer quand le sel est absent', async () => {
+    const corps = JSON.stringify({ fiche: 'groupe-mathematiques', alternative: null })
+    await POST(requete('http://x/api/votes', { method: 'POST', body: corps }))
+    vi.stubEnv('SEL_VOTES', '')
+
+    const r = await DELETE(requete('http://x/api/votes', { method: 'DELETE', body: corps }))
+    expect(r.status).toBe(503)
+    // Le vote déjà posé est toujours là : le refus de configuration ne doit pas non plus
+    // servir de chemin détourné pour effacer des lignes.
+    expect((await depotCourant.compter('groupe-mathematiques')).fiche).toBe(1)
   })
 })
