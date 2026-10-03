@@ -58,6 +58,10 @@ l’hébergement, pas dans le code.
 | `SEL_VOTES` | Une valeur aléatoire de 32 octets, jamais versionnée. |
 | `DATABASE_URL_TEST` | Facultative, pour lancer les tests d’intégration en local. |
 
+La mise en service des votes — créer la base, poser le sel, migrer, déployer — est
+décrite pas à pas dans [docs/mise-en-service-des-votes.md](docs/mise-en-service-des-votes.md),
+avec ce qui casse si une étape manque.
+
 Les deux commandes qui touchent la base — `npm run migrer` et
 `npm run votes:orphelins` — lisent `.env.local` s’il existe. Sans lui, passez la
 variable sur la même ligne : `DATABASE_URL='...' npm run migrer`. Ne collez pas la
