@@ -5,7 +5,9 @@ tout passe par le dépôt, où la discussion reste publique et tracée.
 
 ## Proposer une analyse
 
-Ouvrir une *issue* ou une *pull request* sur `URL-DU-DEPOT`. Une pull request
+Ouvrir une *issue* ou une *pull request* sur
+[github.com/noel-schneider/simplistique](https://github.com/noel-schneider/simplistique).
+Une pull request
 obtient automatiquement une adresse de prévisualisation : la fiche se voit
 rendue avant d’être intégrée.
 
