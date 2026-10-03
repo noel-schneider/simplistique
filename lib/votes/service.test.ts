@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { Fiche } from '../content/schema'
 import { depotEnMemoire, type DepotDeVotes } from './depot'
 import { empreinteAlternative } from './empreintes'
@@ -92,6 +92,7 @@ describe('voter', () => {
     expect(
       await voter(depot, { fiche: 'actif-comptabilite', alternative: INCONNUE }, fiche(), ALICE),
     ).toEqual({ type: 'inconnu' })
+    expect(await depot.compter('licorne')).toEqual({ fiche: 0, alternatives: {} })
   })
 
   it('refuse un second vote identique', async () => {
@@ -112,6 +113,41 @@ describe('voter', () => {
     const cible = { fiche: 'actif-comptabilite', alternative: null }
     expect(await voter(depot, cible, fiche(), ALICE)).toEqual({ type: 'trop' })
     expect((await depot.compter('actif-comptabilite')).fiche).toBe(0)
+  })
+
+  it('ne compte pas dans la limite les votes vieux de plus d’une heure', async () => {
+    // Sans ce test, une fenêtre fausse — `60 * 1000` au lieu de `60 * 60 * 1000`, ou
+    // l'inverse — passerait inaperçue : tous les autres tests de limite posent leurs
+    // votes à l'instant présent, donc aucun n'exerce l'expiration.
+    vi.useFakeTimers()
+    try {
+      vi.setSystemTime(new Date('2026-10-03T10:00:00Z'))
+      for (let i = 0; i < LIMITE_PAR_HEURE; i += 1) {
+        await depot.ajouter({ fiche: `remplissage-${i}`, alternative: null }, ALICE)
+      }
+
+      vi.setSystemTime(new Date('2026-10-03T12:00:00Z'))
+      const cible = { fiche: 'actif-comptabilite', alternative: null }
+      expect((await voter(depot, cible, fiche(), ALICE)).type).toBe('ok')
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('compte dans la limite un vote posé il y a moins d’une heure', async () => {
+    vi.useFakeTimers()
+    try {
+      vi.setSystemTime(new Date('2026-10-03T11:30:00Z'))
+      for (let i = 0; i < LIMITE_PAR_HEURE; i += 1) {
+        await depot.ajouter({ fiche: `remplissage-${i}`, alternative: null }, ALICE)
+      }
+
+      vi.setSystemTime(new Date('2026-10-03T12:00:00Z'))
+      const cible = { fiche: 'actif-comptabilite', alternative: null }
+      expect(await voter(depot, cible, fiche(), ALICE)).toEqual({ type: 'trop' })
+    } finally {
+      vi.useRealTimers()
+    }
   })
 
   it('la limite est par votant, pas globale', async () => {
