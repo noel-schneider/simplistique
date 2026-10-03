@@ -26,7 +26,16 @@ afterEach(() => {
 describe('Votes', () => {
   it('pose la question de la fiche', async () => {
     render(<Votes fiche="f" alternatives={ALTERNATIVES} />)
-    expect(await screen.findByRole('button', { name: /vous a-t-il gêné/i })).toBeInTheDocument()
+    // La question est du texte ordinaire, et le contrôle de vote porte son propre nom
+    // accessible : le libellé seul ne dirait pas à un lecteur d’écran ce que le bouton fait.
+    expect(await screen.findByText('Ce terme vous a-t-il gêné ?')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Ce terme m’a gêné' })).toBeInTheDocument()
+  })
+
+  it('nomme le contrôle d’une alternative par ce qu’il fait, pas par son seul texte', async () => {
+    render(<Votes fiche="f" alternatives={ALTERNATIVES} />)
+    expect(await screen.findByRole('button', { name: 'Je préfère « avoir »' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Je préfère « ressources »' })).toBeInTheDocument()
   })
 
   it('affiche les compteurs reçus', async () => {
@@ -55,7 +64,7 @@ describe('Votes', () => {
         .mockImplementationOnce(() => new Promise<Response>((r) => (resoudre = r))),
     )
     render(<Votes fiche="f" alternatives={ALTERNATIVES} />)
-    await userEvent.click(await screen.findByRole('button', { name: /vous a-t-il gêné/i }))
+    await userEvent.click(await screen.findByRole('button', { name: /gêné/i }))
     expect(await screen.findByText('1')).toBeInTheDocument()
 
     resoudre(
@@ -77,7 +86,7 @@ describe('Votes', () => {
         .mockImplementationOnce(() => Promise.reject(new Error('réseau'))),
     )
     render(<Votes fiche="f" alternatives={ALTERNATIVES} />)
-    const bouton = await screen.findByRole('button', { name: /vous a-t-il gêné/i })
+    const bouton = await screen.findByRole('button', { name: /gêné/i })
     await userEvent.click(bouton)
 
     // On vise le compteur de ce bouton-là : les deux alternatives affichent aussi
@@ -102,7 +111,7 @@ describe('Votes', () => {
         ),
     )
     render(<Votes fiche="f" alternatives={ALTERNATIVES} />)
-    await userEvent.click(await screen.findByRole('button', { name: /vous a-t-il gêné/i }))
+    await userEvent.click(await screen.findByRole('button', { name: /gêné/i }))
     await waitFor(() =>
       expect(screen.getByRole('button', { name: /annuler/i })).toHaveTextContent('7'),
     )
@@ -125,7 +134,7 @@ describe('Votes', () => {
         .mockImplementationOnce(() => reponse(VIDE)),
     )
     render(<Votes fiche="f" alternatives={ALTERNATIVES} />)
-    const bouton = await screen.findByRole('button', { name: /vous a-t-il gêné/i })
+    const bouton = await screen.findByRole('button', { name: /gêné/i })
     await userEvent.click(bouton)
 
     await waitFor(() => expect(bouton).toHaveTextContent('0'))
@@ -146,7 +155,7 @@ describe('Votes', () => {
         .mockImplementationOnce(() => reponse(VIDE)),
     )
     render(<Votes fiche="f" alternatives={ALTERNATIVES} />)
-    await userEvent.click(await screen.findByRole('button', { name: /vous a-t-il gêné/i }))
+    await userEvent.click(await screen.findByRole('button', { name: /gêné/i }))
     expect(
       await screen.findByText('Cette fiche a changé depuis l’ouverture de la page. Rechargez-la.'),
     ).toBeInTheDocument()
@@ -181,13 +190,14 @@ describe('Votes', () => {
 
   it('n’affiche aucune question d’alternative quand la fiche n’en a pas', async () => {
     render(<Votes fiche="f" alternatives={[]} />)
-    expect(await screen.findByRole('button', { name: /vous a-t-il gêné/i })).toBeInTheDocument()
-    expect(screen.queryByText('avoir')).not.toBeInTheDocument()
+    expect(await screen.findByRole('button', { name: /gêné/i })).toBeInTheDocument()
+    expect(screen.queryByText('Quelle alternative préférez-vous ?')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /préfère/i })).not.toBeInTheDocument()
   })
 
   it('annonce poliment un compteur à zéro', async () => {
     render(<Votes fiche="f" alternatives={ALTERNATIVES} />)
-    await screen.findByRole('button', { name: /vous a-t-il gêné/i })
+    await screen.findByRole('button', { name: /gêné/i })
     expect(screen.getByRole('status')).toHaveTextContent('Personne n’a encore été gêné')
   })
 
@@ -199,7 +209,7 @@ describe('Votes', () => {
       ),
     )
     render(<Votes fiche="f" alternatives={ALTERNATIVES} />)
-    await screen.findByRole('button', { name: /vous a-t-il gêné/i })
+    await screen.findByRole('button', { name: /gêné/i })
     expect(screen.getByRole('status')).toHaveTextContent('Une personne a été gênée')
   })
 
@@ -219,7 +229,7 @@ describe('Votes', () => {
         ),
     )
     render(<Votes fiche="f" alternatives={ALTERNATIVES} />)
-    const bouton = await screen.findByRole('button', { name: /vous a-t-il gêné/i })
+    const bouton = await screen.findByRole('button', { name: /gêné/i })
 
     await userEvent.click(bouton)
     await userEvent.click(bouton)

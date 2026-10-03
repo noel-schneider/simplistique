@@ -83,20 +83,22 @@ export function Votes({ fiche, alternatives }: { fiche: string; alternatives: Al
         {phraseDuCompte(etat.fiche)}
       </p>
 
-      <Bouton
-        question="Ce terme vous a-t-il gêné ?"
+      <Ligne
+        libelle="Ce terme vous a-t-il gêné ?"
+        nomDuVote="Ce terme m’a gêné"
         compte={etat.fiche}
         vote={etat.miens.fiche}
         onBascule={() => basculer(null)}
       />
 
       {alternatives.length > 0 && (
-        <div className="space-y-2">
+        <div className="space-y-1">
           <p className="text-sm text-stone-600">Quelle alternative préférez-vous ?</p>
           {alternatives.map((a) => (
-            <Bouton
+            <Ligne
               key={a.empreinte}
-              question={a.texte}
+              libelle={a.texte}
+              nomDuVote={`Je préfère « ${a.texte} »`}
               compte={etat.alternatives[a.empreinte] ?? 0}
               vote={etat.miens.alternatives.includes(a.empreinte)}
               onBascule={() => basculer(a.empreinte)}
@@ -192,28 +194,66 @@ function optimiste(etat: Etat, alternative: string | null, ajoute: boolean): Eta
   }
 }
 
-function Bouton({
-  question,
+/**
+ * Le libellé reste du texte ordinaire ; seul le petit contrôle de droite porte l’état.
+ * La première version faisait de toute la ligne un bouton qui virait au noir une fois
+ * voté : rien sur le web ne se comporte comme ça, et la page prenait l’air d’avoir un
+ * défaut d’affichage. Un chevron et un compteur dans une pastille, c’est le geste que
+ * tout le monde a déjà appris ailleurs.
+ *
+ * Ni ambre ni émeraude : ces deux couleurs désignent les statuts des fiches, et les
+ * reprendre ici ferait lire un vote comme un statut.
+ */
+function Ligne({
+  libelle,
+  nomDuVote,
   compte,
   vote,
   onBascule,
 }: {
-  question: string
+  libelle: string
+  /** Ce qu’un lecteur d’écran annonce : le libellé seul ne dit pas ce que le bouton fait. */
+  nomDuVote: string
   compte: number
   vote: boolean
   onBascule: () => void
 }) {
   return (
-    <button
-      type="button"
-      aria-pressed={vote}
-      onClick={onBascule}
-      className={`flex w-full items-center justify-between gap-4 rounded border px-3 py-2 text-left text-sm ${
-        vote ? 'border-stone-900 bg-stone-900 text-stone-50' : 'border-stone-300 hover:border-stone-500'
-      }`}
+    <div className="flex items-center justify-between gap-4 py-1">
+      <span className="text-sm text-stone-700">{libelle}</span>
+
+      <button
+        type="button"
+        aria-pressed={vote}
+        aria-label={vote ? `Annuler mon vote : ${nomDuVote}` : nomDuVote}
+        onClick={onBascule}
+        className={`inline-flex shrink-0 items-center gap-2 rounded-full border px-3 py-1 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 ${
+          vote
+            ? 'border-stone-900 text-stone-900'
+            : 'border-stone-300 text-stone-500 hover:border-stone-500 hover:text-stone-700'
+        }`}
+      >
+        <Chevron plein={vote} />
+        <span className="tabular-nums">{compte}</span>
+      </button>
+    </div>
+  )
+}
+
+/** Plein une fois voté, en contour sinon : la forme seule distingue les deux états,
+ *  sans dépendre de la couleur. */
+function Chevron({ plein }: { plein: boolean }) {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 12 10"
+      className="h-3 w-3"
+      fill={plein ? 'currentColor' : 'none'}
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinejoin="round"
     >
-      <span>{vote ? `${question} — annuler mon vote` : question}</span>
-      <span className="tabular-nums">{compte}</span>
-    </button>
+      <path d="M6 1 L11 9 L1 9 Z" />
+    </svg>
   )
 }
