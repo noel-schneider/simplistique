@@ -12,6 +12,13 @@
  * problème : la migration « marcherait » dans les tests et jamais en vrai.
  * Ce découpage permet d’appliquer les instructions une par une, par le même
  * chemin en test et en production.
+ *
+ * Le découpage est naïf : il coupe sur chaque `;`, sans tenir compte des
+ * chaînes littérales ni des corps de fonction. Il suffit à ce fichier de
+ * migration, dont aucune instruction ne contient de `;` ailleurs qu’à sa fin.
+ * Une migration future qui en contiendrait un à l’intérieur d’une chaîne ou
+ * d’un `$$ ... $$` serait coupée en fragments invalides : il faudra alors un
+ * vrai analyseur, ou un fichier par instruction.
  */
 export const CHEMIN_MIGRATION = 'migrations/001-votes.sql'
 

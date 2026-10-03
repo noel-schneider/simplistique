@@ -13,12 +13,14 @@ describe('instructionsSql', () => {
     }
   })
 
-  it('aucune instruction rendue ne contient de point-virgule', () => {
-    const texte = readFileSync(join(process.cwd(), CHEMIN_MIGRATION), 'utf8')
-    const instructions = instructionsSql(texte)
-    for (const instruction of instructions) {
-      expect(instruction).not.toContain(';')
-    }
+  it('rend chaque instruction entière, sans en perdre un morceau', () => {
+    // L’assertion porte sur le contenu, pas sur l’absence de `;` : tout découpage
+    // par `split(';')` la satisferait par construction, quelle que soit la suite.
+    const texte = 'CREATE TABLE a (x int);\n-- un commentaire\nCREATE INDEX i ON a (x);\n'
+    expect(instructionsSql(texte)).toEqual([
+      'CREATE TABLE a (x int)',
+      '-- un commentaire\nCREATE INDEX i ON a (x)',
+    ])
   })
 
   it('un commentaire après la dernière instruction ne produit pas d’instruction fantôme', () => {
