@@ -16,9 +16,22 @@ async function principal(): Promise<void> {
   }
 
   const sql = neon(url)
-  const lignes = (await sql.query(
-    'SELECT fiche, alternative, count(*)::int AS n FROM votes GROUP BY fiche, alternative',
-  )) as { fiche: string; alternative: string | null; n: number }[]
+  // La requête est la seule chose ici qui dépende du réseau. Sans ce filet, une base
+  // injoignable ou une table pas encore migrée donnerait une trace Node brute, qui
+  // peut porter le nom d’hôte de la base — alors que le cas « DATABASE_URL absente »
+  // est, lui, soigneusement expliqué. On ne répète jamais le message du pilote.
+  let lignes: { fiche: string; alternative: string | null; n: number }[]
+  try {
+    lignes = (await sql.query(
+      'SELECT fiche, alternative, count(*)::int AS n FROM votes GROUP BY fiche, alternative',
+    )) as { fiche: string; alternative: string | null; n: number }[]
+  } catch {
+    console.error(
+      'La base n’a pas répondu, ou la table votes n’existe pas encore. Lancez `npm run migrer`.',
+    )
+    process.exitCode = 1
+    return
+  }
 
   const orphelines = lignes.filter(({ fiche, alternative }) => {
     const empreintes = connues.get(fiche)
@@ -39,4 +52,8 @@ async function principal(): Promise<void> {
   console.log('\nCes lignes ne sont jamais affichées : les compteurs se calculent à partir du corpus.')
 }
 
-principal()
+principal().catch(() => {
+  // Le message du pilote n’est jamais répété : il peut porter un nom d’hôte.
+  console.error('La vérification des votes orphelins a échoué.')
+  process.exitCode = 1
+})

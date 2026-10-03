@@ -195,6 +195,11 @@ describe('Votes', () => {
     vi.stubGlobal('fetch', vi.fn(() => reponse({ bonjour: 'je ne suis pas un état' })))
     const { container } = render(<Votes fiche="f" alternatives={ALTERNATIVES} />)
     await waitFor(() => expect(container.querySelector('[data-charge]')).not.toBeNull())
+    // L’assertion qui compte est celle sur `hidden`. Sans la validation de forme, le
+    // rendu lève une TypeError que vitest classe en « Unhandled Error » : la suite
+    // reste verte et le conteneur finit vide, donc un `textContent` à '' ne prouve
+    // rien. Exiger le repli masqué distingue le silence voulu du plantage.
+    expect(container.querySelector('[data-charge]')).toHaveAttribute('hidden')
     expect(container.textContent).toBe('')
     expect(screen.queryByRole('button')).not.toBeInTheDocument()
   })
