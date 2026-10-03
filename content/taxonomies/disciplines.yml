@@ -1,0 +1,24 @@
+- slug: mathematiques
+  nom: Mathématiques
+  couleur: '#e8703a'
+  description: >
+    Discipline ancienne et très stable, donc terrain privilégié de la
+    simplistique : ses concepts ne bougent plus guère.
+- slug: comptabilite
+  nom: Comptabilité
+  couleur: '#3b82c4'
+  description: >
+    Vocabulaire quotidien de millions de personnes, bâti sur des mots courants
+    détournés de leur sens.
+- slug: theorie-musicale
+  nom: Théorie musicale
+  couleur: '#9a6fd4'
+  description: >
+    Terminologie sédimentée sur des siècles, avec des couches de vocabulaire
+    qui se contredisent.
+- slug: escalade
+  nom: Escalade
+  couleur: '#3fa08a'
+  description: >
+    Discipline jeune au jargon encore mouvant, où les termes se fixent en ce
+    moment même.

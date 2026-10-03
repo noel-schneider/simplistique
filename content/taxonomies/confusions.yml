@@ -1,0 +1,23 @@
+- slug: faux-ami-courant
+  nom: Faux ami courant
+  description: >
+    Un mot du langage ordinaire dont le sens technique n'a aucun rapport avec
+    le sens commun. Le lecteur croit comprendre, et c'est pire que de ne pas
+    comprendre.
+- slug: polysemie-externe
+  nom: Polysémie externe
+  description: >
+    Le même mot désigne des concepts sans rapport, parfois dans la même phrase.
+- slug: paire-bancale
+  nom: Paire bancale
+  description: >
+    Deux termes présentés comme opposés alors qu'ils n'opposent rien de clair.
+- slug: nom-historique
+  nom: Nom historique
+  description: >
+    Un nom hérité d'une personne, d'un lieu ou d'une époque, qui n'évoque pas
+    la chose qu'il désigne.
+- slug: jargon-opaque
+  nom: Jargon opaque
+  description: >
+    La forme du mot n'offre aucune prise pour deviner le sens, même de loin.

@@ -1,0 +1,15 @@
+- slug: pointe
+  nom: Pointé
+  description: >
+    Problème de clarté identifié, sans alternative proposée. Il n'existe pas
+    toujours de meilleur mot disponible.
+- slug: propose
+  nom: Proposé
+  description: >
+    Une ou plusieurs formulations alternatives sont suggérées, avec leurs
+    risques.
+- slug: rejete
+  nom: Rejeté
+  description: >
+    Analyse menée jusqu'au bout, conclusion : ne rien changer. Le coût du
+    changement dépasse le gain de clarté.
