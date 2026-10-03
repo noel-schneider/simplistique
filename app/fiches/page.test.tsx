@@ -1,6 +1,8 @@
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it, vi } from 'vitest'
+import { CatalogueStatique } from '@/components/catalogue-statique'
 import { getIndex } from '@/lib/content/fiches'
+import { chargerTaxonomies } from '@/lib/content/taxonomies'
 import PageFiches from './page'
 
 // Les mêmes mocks que components/corpus.test.tsx : la page rend <Corpus>, qui
@@ -19,21 +21,44 @@ vi.mock('next/link', () => ({
   ),
 }))
 
-describe('PageFiches — repli <noscript>', () => {
-  it('contient un lien par fiche du corpus', () => {
-    // React ne rend pas le contenu de <noscript> côté client (voir
-    // components/corpus.test.tsx pour le rendu habituel) : ce repli n'existe
-    // que dans le HTML statique généré au build, d'où `renderToStaticMarkup`
-    // plutôt que `render`.
-    const html = renderToStaticMarkup(<PageFiches />)
-    const noscript = /<noscript>([\s\S]*?)<\/noscript>/.exec(html)
-    expect(noscript).not.toBeNull()
+describe('CatalogueStatique — repli <Suspense>', () => {
+  // C'est ce composant, et non <noscript>, qui porte désormais le corpus
+  // dans le HTML statique livré au build (voir app/fiches/page.tsx) : un
+  // <Suspense> rend son contenu de secours au build, sans être concerné par
+  // la sortie vers le rendu client que provoque `useSearchParams()` dans
+  // <Corpus>.
+  it('rend un lien par fiche du corpus, et un seul tableau', () => {
+    const { disciplines, statuts } = chargerTaxonomies()
+    const index = getIndex()
 
-    const liens = noscript![1].match(/<a /g) ?? []
-    expect(liens).toHaveLength(getIndex().length)
+    const html = renderToStaticMarkup(
+      <CatalogueStatique index={index} disciplines={disciplines} statuts={statuts} />,
+    )
 
-    for (const fiche of getIndex()) {
-      expect(noscript![1]).toContain(`href="/fiches/${fiche.slug}"`)
+    const tables = html.match(/<table/g) ?? []
+    expect(tables).toHaveLength(1)
+
+    // Compte exact, pas « au moins » : un compte minimal ne détecterait pas
+    // un corpus listé deux fois.
+    const liens = html.match(/<a /g) ?? []
+    expect(liens).toHaveLength(index.length)
+
+    for (const fiche of index) {
+      expect(html).toContain(`href="/fiches/${fiche.slug}"`)
     }
+  })
+})
+
+describe('PageFiches', () => {
+  it('ne rend plus de <noscript>, et un seul listing du corpus', () => {
+    const html = renderToStaticMarkup(<PageFiches />)
+
+    expect(html).not.toContain('<noscript>')
+
+    const tables = html.match(/<table/g) ?? []
+    expect(tables).toHaveLength(1)
+
+    const liens = html.match(/<a href="\/fiches\//g) ?? []
+    expect(liens).toHaveLength(getIndex().length)
   })
 })
