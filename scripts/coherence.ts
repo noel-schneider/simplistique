@@ -3,15 +3,20 @@ import { LONGUEUR_MAX_RESUME, type Fiche } from '../lib/content/schema'
 
 export type Avertissement = { slug: string; message: string }
 
+// 95 % de la limite dure : assez près pour prévenir avant le refus, assez loin
+// pour ne pas crier sur un resume simplement bien rempli.
 const SEUIL_RESUME = Math.floor(LONGUEUR_MAX_RESUME * 0.95)
 
 export function verifierCoherence(fiche: Fiche): Avertissement[] {
   const avertissements: string[] = []
   const titres = listerTitres(fiche.corps).map((t) => t.toLowerCase())
 
-  if (!titres.includes('risques')) {
+  // Sous-chaîne et non égalité : « ## Risques et limites » ou « ## Les risques du
+  // changement » traitent bien le sujet et ne doivent pas être signalés. Un
+  // avertissement qui se trompe se fait ignorer, et ne garde plus rien.
+  if (!titres.some((titre) => titre.includes('risques'))) {
     avertissements.push(
-      'aucune section « ## Risques » : le manifeste demande d\'identifier les risques de la modification',
+      'aucune section de niveau 2 dont le titre contient « risques » : le manifeste demande d\'identifier les risques de la modification',
     )
   }
 
@@ -37,9 +42,12 @@ export function verifierCoherence(fiche: Fiche): Avertissement[] {
     avertissements.push('modifie est antérieur à cree')
   }
 
-  if (retirerCrochets(fiche.corps).includes('[[')) {
+  const aplati = retirerCrochets(fiche.corps)
+  const positionCrochets = aplati.indexOf('[[')
+  if (positionCrochets !== -1) {
+    const extrait = aplati.slice(positionCrochets, positionCrochets + 40).split('\n')[0]
     avertissements.push(
-      'des crochets doubles survivent à l\'aplatissement : probablement un `[[` non fermé ou imbriqué, qui s\'affichera tel quel',
+      `des crochets doubles survivent à l'aplatissement, probablement un « [[ » non fermé ou imbriqué, qui s'affichera tel quel : « ${extrait} »`,
     )
   }
 

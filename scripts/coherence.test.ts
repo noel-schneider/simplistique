@@ -28,7 +28,16 @@ describe('verifierCoherence', () => {
   it('signale l\'absence de section Risques', () => {
     const a = verifierCoherence(fiche({ corps: '## Pourquoi c\'est confus\n\ntexte\n' }))
     expect(a).toHaveLength(1)
-    expect(a[0]).toEqual({ slug: 'groupe-mathematiques', message: expect.stringMatching(/Risques/) })
+    expect(a[0]).toEqual({ slug: 'groupe-mathematiques', message: expect.stringMatching(/risques/) })
+  })
+
+  it('accepte un titre de section plus long que « Risques »', () => {
+    expect(verifierCoherence(fiche({ corps: '## Risques et limites\n\ntexte\n' }))).toEqual([])
+    expect(verifierCoherence(fiche({ corps: '## Les risques du changement\n\ntexte\n' }))).toEqual([])
+  })
+
+  it('accepte le titre quelle que soit la casse', () => {
+    expect(verifierCoherence(fiche({ corps: '## RISQUES\n\ntexte\n' }))).toEqual([])
   })
 
   it('signale un statut pointe accompagné de suggestions', () => {
@@ -51,9 +60,11 @@ describe('verifierCoherence', () => {
     expect(a.map((x) => x.message).join()).toMatch(/resume/)
   })
 
-  it('signale des crochets doubles qui survivent à l\'aplatissement', () => {
+  it('signale des crochets doubles qui survivent à l\'aplatissement, en situant le passage', () => {
     const a = verifierCoherence(fiche({ corps: '## Risques\n\nun [[crochet non ferme\n' }))
-    expect(a.map((x) => x.message).join()).toMatch(/crochets doubles/)
+    expect(a).toHaveLength(1)
+    expect(a[0].message).toMatch(/crochets doubles/)
+    expect(a[0].message).toContain('[[crochet non ferme')
   })
 
   it('ne signale rien pour des crochets bien formés', () => {
