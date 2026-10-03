@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { FicheIndex } from '../lib/content/schema'
@@ -173,6 +173,59 @@ describe('Corpus — filtres et URL', () => {
     afficher()
     await userEvent.click(screen.getByRole('button', { name: /carte/i }))
     expect(remplacer).toHaveBeenCalledWith('/fiches?vue=carte&discipline=escalade', { scroll: false })
+  })
+})
+
+describe('Corpus — temporisation de la recherche', () => {
+  beforeEach(() => {
+    vi.useFakeTimers()
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
+  // `userEvent` combiné aux faux minuteurs de Vitest bloque indéfiniment dans
+  // cet environnement (React 19 + jsdom 30 + user-event 14.6.7) — reproduit
+  // même sur un composant minimal sans rapport avec le corpus, qu'il s'agisse
+  // de `.type()` ou de `.click()`. On utilise donc `fireEvent`, qui ne
+  // dépend d'aucun minuteur, pour simuler la frappe et le clic ci-dessous.
+  it('filtre l’affichage à chaque frappe, avant toute écriture dans l’URL', () => {
+    afficher()
+    const champ = screen.getByRole('searchbox')
+
+    fireEvent.change(champ, { target: { value: 't' } })
+    fireEvent.change(champ, { target: { value: 'te' } })
+    fireEvent.change(champ, { target: { value: 'tempe' } })
+
+    expect(screen.getByRole('link', { name: /tempérament/ })).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: /groupe/ })).not.toBeInTheDocument()
+    expect(remplacer).not.toHaveBeenCalled()
+  })
+
+  it('n’écrit dans l’URL que 200 ms après la dernière frappe, en un seul appel', () => {
+    afficher()
+    const champ = screen.getByRole('searchbox')
+
+    // Chaque frappe est espacée de 100 ms (moins que la temporisation) : si
+    // elle ne l'annulait pas, la précédente écrirait quand même dans l'URL.
+    fireEvent.change(champ, { target: { value: 't' } })
+    vi.advanceTimersByTime(100)
+    fireEvent.change(champ, { target: { value: 'te' } })
+    vi.advanceTimersByTime(100)
+    fireEvent.change(champ, { target: { value: 'tempe' } })
+    expect(remplacer).not.toHaveBeenCalled()
+
+    vi.advanceTimersByTime(200)
+
+    expect(remplacer).toHaveBeenCalledTimes(1)
+    expect(remplacer).toHaveBeenCalledWith('/fiches?q=tempe', { scroll: false })
+  })
+
+  it('les clics sur les filtres restent immédiats, sans attendre la temporisation', () => {
+    afficher()
+    fireEvent.click(screen.getByRole('button', { name: 'Escalade' }))
+    expect(remplacer).toHaveBeenCalledWith('/fiches?discipline=escalade', { scroll: false })
   })
 })
 

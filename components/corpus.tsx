@@ -97,7 +97,23 @@ export function Corpus({
     statuts: libellesParSlug.statuts,
   }
 
+  // L'écriture dans l'URL de la recherche texte est temporisée (voir
+  // `changerRecherche`) : chaque frappe annule le minuteur en cours. On
+  // l'annule aussi au démontage, pour ne pas écrire dans l'URL d'une page
+  // qui n'est plus affichée.
+  const minuteurRecherche = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  function annulerMinuteurRecherche() {
+    if (minuteurRecherche.current === null) return
+    clearTimeout(minuteurRecherche.current)
+    minuteurRecherche.current = null
+  }
+
+  useEffect(() => annulerMinuteurRecherche, [])
+
   function naviguer(prochainsCriteres: Criteres, prochaineVue: Vue) {
+    annulerMinuteurRecherche()
+
     const explicite = vueExplicite || prochaineVue !== vue
 
     setCriteres(prochainsCriteres)
@@ -109,10 +125,33 @@ export function Corpus({
     router.replace(requete ? `${chemin}?${requete}` : chemin, { scroll: false })
   }
 
+  // La recherche texte met à jour l'affichage à chaque frappe, mais
+  // n'écrit dans l'URL que 200 ms après la dernière frappe : sinon chaque
+  // caractère tapé produit une navigation douce, ce qui multiplie les
+  // annonces du compteur pour un lecteur d'écran et peut épuiser la limite
+  // de `history.replaceState` de Safari sur une requête tapée vite.
+  function changerRecherche(q: string) {
+    annulerMinuteurRecherche()
+
+    const prochainsCriteres = { ...criteres, q }
+    setCriteres(prochainsCriteres)
+
+    minuteurRecherche.current = setTimeout(() => {
+      minuteurRecherche.current = null
+      const requete = ecrireCriteres(prochainsCriteres, vueExplicite ? vue : undefined)
+      derniereRequeteEcrite.current = requete
+      router.replace(requete ? `${chemin}?${requete}` : chemin, { scroll: false })
+    }, 200)
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center gap-3">
-        <div className="inline-flex overflow-hidden rounded border border-stone-300 text-xs">
+        <div
+          role="group"
+          aria-label="Affichage"
+          className="inline-flex overflow-hidden rounded border border-stone-300 text-xs"
+        >
           {(['carte', 'liste'] as const).map((v) => (
             <button
               key={v}
@@ -136,6 +175,7 @@ export function Corpus({
         criteres={criteres}
         filtreActif={aUnFiltre(criteres)}
         onChange={(c) => naviguer(c, vue)}
+        onChangeRecherche={changerRecherche}
         onEffacer={() => naviguer(CRITERES_VIDES, vue)}
         groupes={[
           { cle: 'disciplines', libelle: 'Discipline', entrees: disciplines },

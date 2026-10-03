@@ -8,12 +8,14 @@ export function Filtres({
   criteres,
   groupes,
   onChange,
+  onChangeRecherche,
   onEffacer,
   filtreActif,
 }: {
   criteres: Criteres
   groupes: Groupe[]
   onChange: (criteres: Criteres) => void
+  onChangeRecherche: (q: string) => void
   onEffacer: () => void
   filtreActif: boolean
 }) {
@@ -33,7 +35,7 @@ export function Filtres({
         aria-label="Chercher un terme"
         placeholder="Chercher un terme…"
         value={criteres.q}
-        onChange={(e) => onChange({ ...criteres, q: e.target.value })}
+        onChange={(e) => onChangeRecherche(e.target.value)}
         className="w-full rounded border border-stone-300 px-3 py-2 text-sm"
       />
 
