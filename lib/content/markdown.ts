@@ -1,3 +1,4 @@
+import rehypeSanitize from 'rehype-sanitize'
 import rehypeSlug from 'rehype-slug'
 import rehypeStringify from 'rehype-stringify'
 import remarkParse from 'remark-parse'
@@ -13,6 +14,7 @@ export function retirerCrochets(texte: string): string {
 const processeur = unified()
   .use(remarkParse)
   .use(remarkRehype)
+  .use(rehypeSanitize)
   .use(rehypeSlug)
   .use(rehypeStringify)
 

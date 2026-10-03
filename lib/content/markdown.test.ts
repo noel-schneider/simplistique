@@ -33,6 +33,22 @@ describe('rendreMarkdown', () => {
     expect(html).not.toContain('<script>')
   })
 
+  it('retire un lien dont le protocole est exécutable', async () => {
+    const html = await rendreMarkdown('[clic](javascript:alert(1))')
+    expect(html).not.toContain('javascript:')
+    expect(html).toContain('clic')
+  })
+
+  it('retire une image dont le protocole est exécutable', async () => {
+    const html = await rendreMarkdown('![x](javascript:alert(1))')
+    expect(html).not.toContain('javascript:')
+  })
+
+  it('conserve un lien http légitime', async () => {
+    const html = await rendreMarkdown('[le dépôt](https://example.org/a)')
+    expect(html).toContain('href="https://example.org/a"')
+  })
+
   it('rend les listes et l\'emphase', async () => {
     const html = await rendreMarkdown('- un *mot*\n- deux')
     expect(html).toContain('<li>')
