@@ -1,0 +1,153 @@
+import { render, screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { Votes } from './votes'
+
+const ALTERNATIVES = [
+  { texte: 'avoir', empreinte: 'aaaa1111bbbb2222' },
+  { texte: 'ressources', empreinte: 'cccc3333dddd4444' },
+]
+
+function reponse(corps: unknown, status = 200) {
+  return Promise.resolve(new Response(JSON.stringify(corps), { status }))
+}
+
+const VIDE = { fiche: 0, alternatives: {}, miens: { fiche: false, alternatives: [] } }
+
+beforeEach(() => {
+  vi.stubGlobal('fetch', vi.fn(() => reponse(VIDE)))
+})
+
+afterEach(() => {
+  vi.unstubAllGlobals()
+  vi.restoreAllMocks()
+})
+
+describe('Votes', () => {
+  it('pose la question de la fiche', async () => {
+    render(<Votes fiche="f" alternatives={ALTERNATIVES} />)
+    expect(await screen.findByRole('button', { name: /vous a-t-il gêné/i })).toBeInTheDocument()
+  })
+
+  it('affiche les compteurs reçus', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(() =>
+        reponse({
+          fiche: 12,
+          alternatives: { aaaa1111bbbb2222: 7 },
+          miens: { fiche: false, alternatives: [] },
+        }),
+      ),
+    )
+    render(<Votes fiche="f" alternatives={ALTERNATIVES} />)
+    expect(await screen.findByText('12')).toBeInTheDocument()
+    expect(await screen.findByText('7')).toBeInTheDocument()
+  })
+
+  it('incrémente immédiatement au clic, avant la réponse du serveur', async () => {
+    let resoudre: (r: Response) => void = () => {}
+    vi.stubGlobal(
+      'fetch',
+      vi
+        .fn()
+        .mockImplementationOnce(() => reponse(VIDE))
+        .mockImplementationOnce(() => new Promise<Response>((r) => (resoudre = r))),
+    )
+    render(<Votes fiche="f" alternatives={ALTERNATIVES} />)
+    await userEvent.click(await screen.findByRole('button', { name: /vous a-t-il gêné/i }))
+    expect(await screen.findByText('1')).toBeInTheDocument()
+
+    resoudre(
+      new Response(
+        JSON.stringify({ fiche: 1, alternatives: {}, miens: { fiche: true, alternatives: [] } }),
+      ),
+    )
+  })
+
+  it('revient en arrière si l’envoi échoue', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi
+        .fn()
+        .mockImplementationOnce(() => reponse(VIDE))
+        .mockImplementationOnce(() => Promise.reject(new Error('réseau'))),
+    )
+    render(<Votes fiche="f" alternatives={ALTERNATIVES} />)
+    const bouton = await screen.findByRole('button', { name: /vous a-t-il gêné/i })
+    await userEvent.click(bouton)
+
+    // On vise le compteur de ce bouton-là : les deux alternatives affichent aussi
+    // `0`, et un `getByText('0')` global trouverait trois éléments.
+    await waitFor(() => expect(bouton).toHaveTextContent('0'))
+    // Et on vérifie que `miens` est revenu lui aussi : sans cette assertion, un
+    // retour en arrière qui remettrait le compteur sans déposer le vote passerait.
+    expect(bouton).toHaveAttribute('aria-pressed', 'false')
+  })
+
+  it('se réaligne silencieusement sur un 409 au lieu d’afficher une erreur', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi
+        .fn()
+        .mockImplementationOnce(() => reponse(VIDE))
+        .mockImplementationOnce(() => reponse({ erreur: 'deja' }, 409))
+        .mockImplementationOnce(() =>
+          reponse({ fiche: 1, alternatives: {}, miens: { fiche: true, alternatives: [] } }),
+        ),
+    )
+    render(<Votes fiche="f" alternatives={ALTERNATIVES} />)
+    await userEvent.click(await screen.findByRole('button', { name: /vous a-t-il gêné/i }))
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: /annuler/i })).toBeInTheDocument(),
+    )
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+  })
+
+  it('propose d’annuler ce qu’on a déjà voté', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(() =>
+        reponse({
+          fiche: 3,
+          alternatives: {},
+          miens: { fiche: true, alternatives: [] },
+        }),
+      ),
+    )
+    render(<Votes fiche="f" alternatives={ALTERNATIVES} />)
+    expect(await screen.findByRole('button', { name: /annuler/i })).toBeInTheDocument()
+  })
+
+  it('reste entièrement silencieux quand la base est indisponible', async () => {
+    vi.stubGlobal('fetch', vi.fn(() => reponse({ erreur: 'indisponible' }, 503)))
+    const { container } = render(<Votes fiche="f" alternatives={ALTERNATIVES} />)
+    await waitFor(() => expect(container.querySelector('[data-charge]')).not.toBeNull())
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button')).not.toBeInTheDocument()
+  })
+
+  it('n’affiche aucune question d’alternative quand la fiche n’en a pas', async () => {
+    render(<Votes fiche="f" alternatives={[]} />)
+    expect(await screen.findByRole('button', { name: /vous a-t-il gêné/i })).toBeInTheDocument()
+    expect(screen.queryByText('avoir')).not.toBeInTheDocument()
+  })
+
+  it('annonce poliment un compteur à zéro', async () => {
+    render(<Votes fiche="f" alternatives={ALTERNATIVES} />)
+    await screen.findByRole('button', { name: /vous a-t-il gêné/i })
+    expect(screen.getByRole('status')).toHaveTextContent('Personne n’a encore été gêné')
+  })
+
+  it('accorde la phrase au singulier pour un seul vote', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(() =>
+        reponse({ fiche: 1, alternatives: {}, miens: { fiche: false, alternatives: [] } }),
+      ),
+    )
+    render(<Votes fiche="f" alternatives={ALTERNATIVES} />)
+    await screen.findByRole('button', { name: /vous a-t-il gêné/i })
+    expect(screen.getByRole('status')).toHaveTextContent('Une personne a été gênée')
+  })
+})
