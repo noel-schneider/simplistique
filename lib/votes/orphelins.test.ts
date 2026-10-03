@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { orphelines, type LigneDeVote } from './votes-orphelins'
+import { orphelines, type LigneDeVote } from './orphelins'
 
 describe('orphelines', () => {
   it('rend vide pour un corpus de lignes vide', () => {

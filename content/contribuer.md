@@ -77,4 +77,6 @@ d’audience.
 
 Un vote peut être annulé depuis la fiche où il a été émis, tant que vous y revenez
 avec le même navigateur et la même connexion : l’empreinte change avec eux, et le site
-n’a aucun autre moyen de reconnaître que ce vote est le vôtre.
+n’a aucun autre moyen de reconnaître que ce vote est le vôtre. Une mise à jour de votre
+navigateur suffit à la changer aussi — c’est son numéro de version exact qui entre dans
+le calcul, pas son nom.

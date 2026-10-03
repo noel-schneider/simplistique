@@ -32,25 +32,48 @@ describe('generateMetadata d\'une fiche', () => {
 })
 
 describe('PageFiche', () => {
-  it('branche <Votes> sur l’empreinte de chaque alternative, pas sur son texte', async () => {
+  // Parcours récursif, et non lecture des enfants directs de `<article>` : envelopper
+  // `<Votes>` dans une `<div>` ou l’extraire dans un sous-composant ne change rien pour
+  // un visiteur, et ne doit donc pas faire tomber ce test. Ce qui doit le faire tomber,
+  // c’est la disparition du composant ou la perte de l’identité des alternatives.
+  function trouverVotes(noeud: ReactNode): ReactElement<ComponentProps<typeof Votes>> | null {
+    if (Array.isArray(noeud)) {
+      for (const enfant of noeud) {
+        const trouve = trouverVotes(enfant)
+        if (trouve) return trouve
+      }
+      return null
+    }
+    if (!isValidElement(noeud)) return null
+    if (noeud.type === Votes) return noeud as ReactElement<ComponentProps<typeof Votes>>
+    return trouverVotes((noeud.props as { children?: ReactNode }).children)
+  }
+
+  it('branche <Votes> sur le slug et sur l’empreinte de chaque alternative', async () => {
     const page = await PageFiche({ params: Promise.resolve({ slug: 'actif-comptabilite' }) })
+    const votes = trouverVotes(page)
 
-    // Un dessin amputé du bloc <Votes> afficherait la fiche sans qu’aucune
+    // Un dessin amputé du bloc <Votes> afficherait la fiche sans qu’aucune autre
     // assertion ne bronche : on exige explicitement sa présence.
-    const enfants = (page as ReactElement<{ children: ReactNode[] }>).props.children
-    const votes = enfants.find(
-      (enfant): enfant is ReactElement<ComponentProps<typeof Votes>> =>
-        isValidElement(enfant) && enfant.type === Votes,
-    )
-    expect(votes).toBeDefined()
+    expect(votes).not.toBeNull()
 
-    // `a2d8a39243d55e10` est l’empreinte de « avoirs », une suggestion de
-    // content/fiches/actif-comptabilite.md. Un littéral, pas une valeur
-    // recalculée : si la suggestion est renommée, ce test doit tomber
-    // bruyamment plutôt que de s’adapter en silence.
-    expect(votes?.props.alternatives).toContainEqual({
-      texte: 'avoirs',
-      empreinte: 'a2d8a39243d55e10',
-    })
+    // Le slug, et non le terme : c’est lui que la route valide contre le corpus.
+    // Passer `fiche.terme` ferait répondre 404 à chaque vote, pour toujours.
+    expect(votes?.props.fiche).toBe('actif-comptabilite')
+
+    // Les deux empreintes, en entier et dans l’ordre du fichier : une liste tronquée
+    // ferait disparaître un bouton sans bruit. Ce sont des littéraux et non des
+    // valeurs recalculées — si une suggestion est renommée, ce test doit tomber
+    // bruyamment plutôt que de s’adapter en silence. Ils correspondent à
+    // « avoirs » et « ressources » de content/fiches/actif-comptabilite.md.
+    expect(votes?.props.alternatives).toEqual([
+      { texte: 'avoirs', empreinte: 'a2d8a39243d55e10' },
+      { texte: 'ressources', empreinte: '8e3830470c8d4f95' },
+    ])
+  })
+
+  it('passe une liste vide pour une fiche sans alternative', async () => {
+    const page = await PageFiche({ params: Promise.resolve({ slug: 'groupe-mathematiques' }) })
+    expect(trouverVotes(page)?.props.alternatives).toEqual([])
   })
 })

@@ -136,7 +136,7 @@ describe('Votes', () => {
     ).toBeInTheDocument()
   })
 
-  it('n’affiche aucun message sur un 404 : il n’est pas couvert par le silence du 409', async () => {
+  it('invite à recharger la page sur un 404, qu’aucune règle de silence ne couvre', async () => {
     vi.stubGlobal(
       'fetch',
       vi

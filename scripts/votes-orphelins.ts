@@ -1,24 +1,7 @@
 import { neon } from '@neondatabase/serverless'
 import { getFiches } from '../lib/content/fiches'
 import { empreinteAlternative } from '../lib/votes/empreintes'
-
-export type LigneDeVote = { fiche: string; alternative: string | null; n: number }
-
-/**
- * Une ligne est orpheline si sa fiche n’existe plus, ou si son alternative ne figure
- * plus parmi celles de la fiche. Un vote de fiche (`alternative` nulle) sur une fiche
- * existante n’est jamais orphelin.
- */
-export function orphelines(
-  lignes: LigneDeVote[],
-  connues: Map<string, Set<string>>,
-): LigneDeVote[] {
-  return lignes.filter(({ fiche, alternative }) => {
-    const empreintes = connues.get(fiche)
-    if (!empreintes) return true
-    return alternative !== null && !empreintes.has(alternative)
-  })
-}
+import { orphelines, type LigneDeVote } from '../lib/votes/orphelins'
 
 async function principal(): Promise<void> {
   const url = process.env.DATABASE_URL

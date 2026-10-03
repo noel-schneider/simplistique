@@ -45,7 +45,18 @@ function contexte(request: Request) {
     // `x-real-ip` est posé par l’hébergeur et ne porte qu’une valeur, que l’appelant
     // ne contrôle pas. `x-forwarded-for` est une liste à laquelle un appelant peut
     // ajouter ce qu’il veut en tête : on ne s’y rabat que faute de mieux, en local.
-    request.headers.get('x-real-ip') ??
+    //
+    // **Ce repli suppose que l’hébergeur pose toujours `x-real-ip` et écrase celui
+    // du client.** C’est le cas de Vercel. Chez un hébergeur qui ne le poserait pas,
+    // la déduplication et la limite de débit redeviendraient contournables : un
+    // appelant forgerait un `x-forwarded-for` différent à chaque vote. C’est la seule
+    // dépendance à l’hébergement de tout le projet, et elle est à vérifier le jour
+    // d’une migration.
+    //
+    // `||` et non `??` : un `x-real-ip` présent mais vide est une chaîne vide, que
+    // `??` prendrait pour une adresse valable — et tous les visiteurs partageraient
+    // alors une seule empreinte.
+    request.headers.get('x-real-ip') ||
       adresseDeLEnTete(request.headers.get('x-forwarded-for')),
     request.headers.get('user-agent') ?? 'inconnu',
   )

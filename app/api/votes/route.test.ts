@@ -114,8 +114,11 @@ describe('POST /api/votes', () => {
   })
 
   it('refuse un corps sans clé alternative plutôt que de deviner', async () => {
-    // Un `undefined` qui passerait serait traité par la persistance comme une
-    // alternative nommée « undefined », au lieu d’un vote de fiche.
+    // Le `?? null` qui suit la garde transformerait un `undefined` en vote de fiche :
+    // un corps incomplet deviendrait silencieusement un vote sur autre chose que ce
+    // que l’appelant croyait demander. Et si la garde de type sautait aussi, la
+    // persistance en mémoire créerait une alternative nommée « undefined » là où
+    // PostgreSQL écrirait `NULL` — la seule divergence possible entre les deux dépôts.
     const r = await POST(
       requete('http://x/api/votes', {
         method: 'POST',
@@ -151,6 +154,40 @@ describe('POST /api/votes', () => {
       }),
     )
     expect(r.status).toBe(409)
+  })
+
+  it('ignore un x-real-ip vide au lieu d’en faire une adresse', async () => {
+    // Un en-tête présent mais vide rend une chaîne vide, pas `null` : avec `??`, elle
+    // serait prise pour une adresse valable et **tous** les visiteurs partageraient une
+    // seule empreinte — donc une seule voix pour tout le monde.
+    const corps = JSON.stringify({ fiche: 'groupe-mathematiques', alternative: null })
+    await POST(
+      new Request('http://x/api/votes', {
+        method: 'POST',
+        body: corps,
+        headers: {
+          'x-real-ip': '',
+          'x-forwarded-for': '203.0.113.7',
+          'user-agent': 'Vitest',
+          'sec-fetch-site': 'same-origin',
+        },
+      }),
+    )
+    const r = await POST(
+      new Request('http://x/api/votes', {
+        method: 'POST',
+        body: corps,
+        headers: {
+          'x-real-ip': '',
+          'x-forwarded-for': '198.51.100.2',
+          'user-agent': 'Vitest',
+          'sec-fetch-site': 'same-origin',
+        },
+      }),
+    )
+    // Deux adresses distinctes, donc deux votants : 200 et non 409.
+    expect(r.status).toBe(200)
+    expect((await r.json()).fiche).toBe(2)
   })
 
   it('refuse un POST d’origine extérieure, et n’écrit rien', async () => {
