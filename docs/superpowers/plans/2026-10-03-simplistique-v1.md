@@ -3379,7 +3379,39 @@ git commit -m "feat: vue carte constellations, encodage couleur et statut"
 - Consumes: tout le reste.
 - Produces: un dépôt dont chaque PR est vérifiée, et un README qui dit comment ajouter une fiche.
 
-- [ ] **Step 1: Écrire le workflow d'intégration continue**
+- [ ] **Step 1: Compléter le `.gitignore`**
+
+Le `.gitignore` du dépôt a été écrit à la main avant l'échafaudage, et l'étape de recopie de la Tâche 1 l'a volontairement exclue du `rsync` pour ne pas écraser ses entrées propres au projet (`.superpowers/`, `.worktrees/`). Conséquence : les entrées que `create-next-app` aurait apportées manquent, dont **`.env*`** — un fichier d'environnement contenant des secrets serait donc commité sans avertissement, sur un dépôt destiné à GitHub.
+
+Ajouter à la fin de `.gitignore` :
+
+```gitignore
+
+# TypeScript
+*.tsbuildinfo
+
+# Sorties de build
+/out/
+/build
+/coverage
+
+# Fichiers d'environnement — jamais versionnés
+.env*
+
+# Divers
+*.pem
+npm-debug.log*
+```
+
+Puis vérifier que rien d'indésirable n'est déjà suivi :
+
+```bash
+git ls-files | grep -E '\.env|tsbuildinfo|\.pem$' && echo "ATTENTION : des fichiers à ignorer sont déjà suivis" || echo "rien d'indésirable n'est suivi"
+```
+
+`next-env.d.ts` reste **suivi** volontairement, bien que l'échafaudage l'ignore par défaut : il est déjà commité, Next le régénère à l'identique, et le retirer créerait du bruit sans bénéfice.
+
+- [ ] **Step 2: Écrire le workflow d'intégration continue**
 
 Créer `.github/workflows/ci.yml` :
 
@@ -3407,12 +3439,12 @@ jobs:
       - run: npm run build
 ```
 
-- [ ] **Step 2: Vérifier localement la séquence exacte de la CI**
+- [ ] **Step 3: Vérifier localement la séquence exacte de la CI**
 
 Run: `npm run lint:content && npm run test:once && npm run lint && npm run build`
 Expected: les quatre commandes réussissent d'affilée.
 
-- [ ] **Step 3: Déclarer le moteur Node, puis écrire le README**
+- [ ] **Step 4: Déclarer le moteur Node, puis écrire le README**
 
 La contrainte globale exige Node 22 ou plus, mais rien dans le dépôt ne le dit à un contributeur : il découvrirait le problème par un échec de build obscur. Ajouter dans `package.json`, après le champ `private` :
 
@@ -3466,7 +3498,7 @@ Les valeurs de `discipline` et `confusion` doivent exister dans
 | `npm run lint:content` | Avertissements de cohérence des fiches |
 ```
 
-- [ ] **Step 4: Donner un chemin vers la carte sans JavaScript**
+- [ ] **Step 5: Donner un chemin vers la carte sans JavaScript**
 
 La vue carte vit dans un composant client. Sans JavaScript, `/fiches` n'affiche
 que le secours de `<Suspense>`, donc les fiches doivent rester atteignables
@@ -3488,19 +3520,19 @@ après le `</Suspense>` :
       </noscript>
 ```
 
-- [ ] **Step 5: Vérifier le build complet**
+- [ ] **Step 6: Vérifier le build complet**
 
 Run: `npm run build`
 Expected: le build réussit ; toutes les routes sont statiques ; les cinq fiches sont pré-rendues.
 
-- [ ] **Step 6: Commit**
+- [ ] **Step 7: Commit**
 
 ```bash
-git add .github README.md app
+git add .github README.md app .gitignore
 git commit -m "ci: vérification du contenu, des tests et du build sur chaque PR"
 ```
 
-- [ ] **Step 7: Déployer**
+- [ ] **Step 8: Déployer**
 
 À faire par Noël, puisque cela demande ses comptes :
 
