@@ -3212,6 +3212,18 @@ describe('VueCarte', () => {
     }
   })
 
+  it('marque chaque point d’une classe qui porte le style de focus', () => {
+    render(<VueCarte fiches={fiches} disciplines={disciplines} libellesStatuts={libellesStatuts} />)
+    for (const lien of screen.getAllByRole('link')) {
+      expect(lien).toHaveClass('point-fiche')
+    }
+  })
+
+  it('dit en clair ce que la couleur et le remplissage encodent', () => {
+    render(<VueCarte fiches={fiches} disciplines={disciplines} libellesStatuts={libellesStatuts} />)
+    expect(screen.getByText(/Chaque couleur désigne une discipline/)).toBeInTheDocument()
+  })
+
   it('décrit chaque point par son terme et son statut', () => {
     render(<VueCarte fiches={fiches} disciplines={disciplines} libellesStatuts={libellesStatuts} />)
     expect(screen.getByRole('link', { name: 'groupe — Pointé' })).toBeInTheDocument()
@@ -3275,6 +3287,7 @@ function Zone({
           return (
             <a
               key={fiche.slug}
+              className="point-fiche"
               href={`/fiches/${fiche.slug}`}
               aria-label={`${fiche.terme} — ${nomStatut}`}
             >
@@ -3316,7 +3329,12 @@ export function VueCarte({
         ))}
       </div>
 
-      <dl className="flex flex-wrap gap-x-6 gap-y-2 border-t border-stone-200 pt-4 text-xs text-stone-500">
+      <p className="border-t border-stone-200 pt-4 text-xs text-stone-500">
+        Chaque couleur désigne une discipline ; le remplissage du point dit le statut de
+        l’analyse.
+      </p>
+
+      <dl className="flex flex-wrap gap-x-6 gap-y-2 text-xs text-stone-500">
         {STATUTS.map((statut) => {
           const style = styleStatut(statut, '#78716c')
           return (
@@ -3338,6 +3356,30 @@ export function VueCarte({
 
 Run: `npm run test:once components/vue-carte.test.tsx`
 Expected: PASS — tous les tests du fichier réussissent
+
+- [ ] **Step 5a: Rendre le focus clavier visible sur les points**
+
+Les points de la carte sont de petites cibles rapprochées (rayon 7, pas de 26). L'anneau de focus natif du navigateur subsiste — Tailwind ne le supprime pas — mais il se dessine sur la boîte englobante et sa couleur par défaut dans Chrome est proche du bleu de la comptabilité (`#3b82c4`). Une navigation au clavier qui fonctionne sans qu'on voie où l'on est n'est pas utilisable.
+
+Ajouter à la fin de `app/globals.css` :
+
+```css
+/* Les points de la carte sont des liens SVG. L'anneau de focus natif se dessine
+   sur la boîte englobante et peut se confondre avec la couleur de la discipline :
+   on double donc le repère par un contour sombre sur le cercle lui-même, qui
+   contraste avec le fond clair comme avec les quatre couleurs de disciplines. */
+.point-fiche:focus-visible {
+  outline: 2px solid #1c1917;
+  outline-offset: 2px;
+}
+
+.point-fiche:focus-visible circle {
+  stroke: #1c1917;
+  stroke-width: 3;
+}
+```
+
+Le contour sur le `<circle>` est la ceinture, l'`outline` les bretelles : si le navigateur gère mal l'un sur du SVG, l'autre reste visible.
 
 - [ ] **Step 5: Brancher la carte dans `components/corpus.tsx`**
 
