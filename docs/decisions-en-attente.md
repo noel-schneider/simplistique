@@ -1,6 +1,6 @@
-# Trois décisions en attente
+# Cinq décisions en attente
 
-Trois questions se sont posées pendant la construction de la v1. Elles ne sont pas
+Cinq questions se sont posées pendant la construction de la v1. Elles ne sont pas
 des défauts : ce sont des choix de conception qui t'appartiennent, et je les ai
 laissées ouvertes plutôt que de les trancher à ta place.
 
@@ -155,14 +155,117 @@ entièrement, et elle peut attendre.
 
 ---
 
-## Résumé
+---
+
+## 4. Une de mes contraintes est trop absolue pour le code qu'elle régit
+
+### Ce qui se passe aujourd'hui
+
+Le plan porte cette contrainte :
+
+> Aucun slug de discipline ni de type de confusion n'est codé en dur hors de
+> `content/taxonomies/*.yml`. Les trois statuts font exception : ils vivent dans le
+> type `Statut`, la constante `STATUTS` et les tables exhaustives de la forme
+> `Record<Statut, …>`, **et nulle part ailleurs**.
+
+Les trois derniers mots sont faux, et ils l'étaient dès l'écriture. `scripts/coherence.ts`
+nomme `pointe` et `propose` dans des conditions ordinaires, parce que ses règles
+*portent sur le sens de ces statuts* :
+
+- un statut `pointe` accompagné de suggestions est une fiche qui se contredit ;
+- un statut `propose` sans aucune suggestion aussi.
+
+Ce code a toutes les raisons d'exister — c'est le garde-fou éditorial du projet, celui
+qui vérifie que tes fiches ne se contredisent pas elles-mêmes. Mais il viole la lettre
+de ma contrainte.
+
+### Les options
+
+**A. Reformuler la contrainte.** Autoriser explicitement de nommer un statut là où
+le statut *est le sujet* de la logique, et interdire ailleurs (affichage, filtrage,
+routage).
+*Coût : deux lignes de plan.*
+
+**B. Refondre `coherence.ts`** pour exprimer ses règles dans une table indexée par
+statut plutôt que par des conditions.
+*Coût : une réécriture pour deux règles. Je ne le recommande pas — ce serait
+contorsionner du code lisible pour satisfaire une formule.*
+
+**C. Ne rien faire**, et garder une contrainte que le code enfreint légitimement.
+
+### Ce que je recommande : A
+
+L'intention de la contrainte était d'empêcher la *connaissance de la taxonomie* de
+fuir dans du code qui n'a pas à la connaître : un composant d'affichage, un filtre,
+une route. Les règles de cohérence, elles, n'ont pas d'autre objet que le sens des
+statuts. La contrainte visait juste, elle a simplement été écrite trop large.
+
+---
+
+## 5. Un champ obligatoire que personne ne voit jamais
+
+### Ce qui se passe aujourd'hui
+
+La spec §3.4 exige un champ `description` sur **chaque** entrée de taxonomie —
+chaque discipline, chaque type de confusion, chaque statut. Ces descriptions
+existent, elles sont écrites, elles sont validées au build… et **aucune page ne les
+affiche**. Elles ne servent à rien aujourd'hui.
+
+Et ce sont de bons textes. Par exemple, pour le faux ami courant : « un mot du
+langage ordinaire dont le sens technique n'a aucun rapport avec le sens commun. Le
+lecteur croit comprendre, et c'est pire que de ne pas comprendre. » C'est exactement
+ce qu'un visiteur a besoin de lire pour comprendre la taxonomie — et il ne le lira
+jamais.
+
+Il y a là une petite ironie : un projet dont la thèse est que les obligations inertes
+coûtent à ceux qui les héritent impose un champ obligatoire sans consommateur.
+
+### Les options
+
+**A. Les afficher.** Les descriptions des cinq types de confusion et des trois
+statuts forment un glossaire naturel. Trois emplacements possibles :
+- sur `/fiches`, dans un bloc dépliable « que veulent dire ces catégories ? » au-dessus
+  des filtres — là où la question se pose vraiment ;
+- sur `/contribuer`, où un contributeur doit justement choisir un type de confusion ;
+- dans la légende de la carte, qui explique déjà l'encodage des statuts.
+*Coût : une quinzaine de lignes pour le premier, moins pour les autres.*
+
+Un avertissement : ne les mets **pas** uniquement dans un attribut de survol. Sur un
+téléphone, le survol n'existe pas, et ces textes deviendraient invisibles pour la
+moitié de tes visiteurs.
+
+**B. Rendre le champ optionnel** dans le schéma, et accepter que ces descriptions
+soient des notes internes.
+*Coût : un caractère dans le schéma.*
+
+**C. Ne rien faire**, et garder l'obligation sans emploi.
+
+### Ce que je recommande : A, sur `/fiches`
+
+C'est l'endroit où un visiteur rencontre les catégories pour la première fois, et où
+il se demande ce que « paire bancale » veut dire. Le bloc dépliable évite d'alourdir
+la page pour qui connaît déjà.
+
+Si tu ne veux pas de ce travail maintenant, prends B plutôt que C : une obligation
+sans raison finit toujours par être remplie à la va-vite, et la première description
+bâclée vaudra moins que pas de description du tout.
+
+---
+
+## Résumé, mis à jour
 
 | Question | Recommandation | Coût | Touche ton texte ? |
 |---|---|---|---|
 | 1. Noms anglais | Renommer les quatre (option A) | une demi-heure, mécanique | non |
 | 2. Titres du manifeste | Décaler au rendu (option B) | une vingtaine de lignes | non |
 | 3. Types de confusion en double | Laisser + détecter le décalage (A+B) | une quinzaine de lignes | non |
+| 4. Contrainte trop absolue | Reformuler le plan (option A) | deux lignes | non |
+| 5. `description` sans emploi | Afficher sur `/fiches` (option A) | une quinzaine de lignes | non |
 
-Aucune des trois n'est urgente, et aucune ne bloque la mise en ligne. La seule qui
-ait un effet sur un visiteur dès aujourd'hui est la deuxième, et seulement pour
-ceux qui naviguent avec un lecteur d'écran.
+Les questions 4 et 5 sont des défauts de **ma** spec, pas du code : elle se contredit
+dans un cas, et impose une obligation sans emploi dans l'autre. Les trois premières
+sont de vrais choix de conception qui t'appartiennent.
+
+Aucune des cinq n'est urgente, et aucune ne bloque la mise en ligne. La seule qui ait
+un effet sur un visiteur dès aujourd'hui reste la deuxième, et seulement pour ceux qui
+naviguent avec un lecteur d'écran.
