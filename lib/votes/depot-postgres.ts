@@ -34,7 +34,7 @@ export function depotPostgres(executer: Executeur): DepotDeVotes {
 
     async votesDe(fiche, votant) {
       const lignes = await executer(
-        'SELECT alternative FROM votes WHERE fiche = $1 AND votant = $2',
+        'SELECT alternative FROM votes WHERE fiche = $1 AND votant = $2 ORDER BY id',
         [fiche, votant],
       )
       const miens: Miens = { fiche: false, alternatives: [] }

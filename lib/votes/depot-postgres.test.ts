@@ -4,6 +4,7 @@ import { join } from 'node:path'
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import { depotPostgres, type Executeur } from './depot-postgres'
 import type { DepotDeVotes } from './depot'
+import { CHEMIN_MIGRATION, instructionsSql } from './migration'
 
 const URL_TEST = process.env.DATABASE_URL_TEST
 
@@ -19,7 +20,13 @@ describe.skipIf(!URL_TEST)('depotPostgres contre un vrai PostgreSQL', () => {
   beforeAll(async () => {
     client = new Client({ connectionString: URL_TEST })
     await client.connect()
-    await client.query(readFileSync(join(process.cwd(), 'migrations/001-votes.sql'), 'utf8'))
+    // On applique la migration par le même chemin que la production (une
+    // instruction à la fois), pour prouver que le découpage produit des
+    // instructions valides contre un vrai PostgreSQL.
+    const instructions = instructionsSql(readFileSync(join(process.cwd(), CHEMIN_MIGRATION), 'utf8'))
+    for (const instruction of instructions) {
+      await client.query(instruction)
+    }
 
     const executer: Executeur = async (sql, parametres) =>
       (await client.query(sql, parametres)).rows as Record<string, unknown>[]
@@ -57,12 +64,30 @@ describe.skipIf(!URL_TEST)('depotPostgres contre un vrai PostgreSQL', () => {
   })
 
   it('deux votes concurrents du même votant n’en laissent qu’un', async () => {
+    // Deux clients distincts, pour que les deux INSERT arrivent réellement en
+    // concurrence côté serveur : un seul pg.Client sérialise ses requêtes sur
+    // une connexion unique, et ne prouverait rien de plus qu’un doublon simple.
     const cible = { fiche: 'f', alternative: null }
-    const issues = await Promise.all([depot.ajouter(cible, ALICE), depot.ajouter(cible, ALICE)])
-    expect(issues.filter((i) => i === 'ajoute')).toHaveLength(1)
-    expect(issues.filter((i) => i === 'deja')).toHaveLength(1)
-    const { rows } = await client.query('SELECT count(*)::int AS n FROM votes')
-    expect(rows[0].n).toBe(1)
+    const clientA = new Client({ connectionString: URL_TEST })
+    const clientB = new Client({ connectionString: URL_TEST })
+    await clientA.connect()
+    await clientB.connect()
+    try {
+      const executerA: Executeur = async (sql, parametres) =>
+        (await clientA.query(sql, parametres)).rows as Record<string, unknown>[]
+      const executerB: Executeur = async (sql, parametres) =>
+        (await clientB.query(sql, parametres)).rows as Record<string, unknown>[]
+      const depotA = depotPostgres(executerA)
+      const depotB = depotPostgres(executerB)
+      const issues = await Promise.all([depotA.ajouter(cible, ALICE), depotB.ajouter(cible, ALICE)])
+      expect(issues.filter((i) => i === 'ajoute')).toHaveLength(1)
+      expect(issues.filter((i) => i === 'deja')).toHaveLength(1)
+      const { rows } = await client.query('SELECT count(*)::int AS n FROM votes')
+      expect(rows[0].n).toBe(1)
+    } finally {
+      await clientA.end()
+      await clientB.end()
+    }
   })
 
   it('dit ce qu’un votant a voté sans révéler les autres', async () => {
@@ -89,5 +114,7 @@ describe.skipIf(!URL_TEST)('depotPostgres contre un vrai PostgreSQL', () => {
     await depot.ajouter({ fiche: 'f1', alternative: null }, BOB)
     const depuis = new Date(Date.now() - 60_000)
     expect(await depot.nombreDepuis(ALICE, depuis)).toBe(2)
+    const apres = new Date(Date.now() + 60_000)
+    expect(await depot.nombreDepuis(ALICE, apres)).toBe(0)
   })
 })
