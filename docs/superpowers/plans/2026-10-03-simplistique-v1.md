@@ -61,41 +61,30 @@ cd /Users/noel/Documents/simplistique && rm -rf node_modules package-lock.json
 
 - [ ] **Step 2: Figer les versions et ajouter les dépendances**
 
-Remplacer les champs `dependencies` et `devDependencies` de `package.json` par exactement ceci (aucun `^`, aucun `~`) :
+Deux gestes distincts, dans cet ordre.
 
-```json
-  "dependencies": {
-    "next": "16.3.8",
-    "react": "19.3.0",
-    "react-dom": "19.3.0",
-    "zod": "4.6.5",
-    "gray-matter": "4.0.3",
-    "js-yaml": "5.4.2",
-    "unified": "11.0.5",
-    "remark-parse": "11.0.0",
-    "remark-rehype": "11.1.2",
-    "rehype-slug": "6.0.0",
-    "rehype-stringify": "10.0.1"
-  },
-  "devDependencies": {
-    "typescript": "7.0.2",
-    "@types/node": "22.14.0",
-    "@types/react": "19.3.0",
-    "@types/react-dom": "19.3.0",
-    "tailwindcss": "4.3.3",
-    "@tailwindcss/postcss": "4.3.3",
-    "@tailwindcss/typography": "0.5.19",
-    "eslint": "9.39.1",
-    "eslint-config-next": "16.3.8",
-    "vitest": "5.0.3",
-    "@vitejs/plugin-react": "6.1.1",
-    "@testing-library/react": "16.3.3",
-    "@testing-library/user-event": "14.6.7",
-    "@testing-library/jest-dom": "6.9.1",
-    "jsdom": "30.1.1",
-    "tsx": "4.20.6"
-  }
+**a. Figer ce que `create-next-app` a déjà installé.** Ne pas remplacer ces versions : retirer seulement les `^` et les `~` devant chacune, pour satisfaire la contrainte globale. Cela concerne `next`, `react`, `react-dom`, `typescript`, `@types/node`, `@types/react`, `@types/react-dom`, `tailwindcss`, `@tailwindcss/postcss`, `eslint` et `eslint-config-next`. Fixer soi-même `eslint` risquerait un conflit de pairs avec `eslint-config-next` ; l'échafaudage a choisi un couple cohérent, on le garde.
+
+Vérifier ensuite que les versions obtenues correspondent bien à la pile annoncée (Next 16.3.x, React 19.3.x, Tailwind 4.3.x, TypeScript 7.0.x) et signaler tout écart dans le rapport.
+
+**b. Ajouter exactement ces dépendances,** aux versions indiquées, sans intervalle :
+
+```bash
+npm install --save-exact \
+  zod@4.6.5 gray-matter@4.0.3 js-yaml@5.4.2 \
+  unified@11.0.5 remark-parse@11.0.0 remark-rehype@11.1.2 \
+  rehype-slug@6.0.0 rehype-stringify@10.0.1
+
+npm install --save-exact --save-dev \
+  @tailwindcss/typography@0.5.20 \
+  vitest@5.0.3 @vitejs/plugin-react@6.1.1 \
+  @testing-library/react@16.3.3 @testing-library/user-event@14.6.7 \
+  @testing-library/jest-dom@7.0.1 jsdom@30.1.1 tsx@4.23.15
 ```
+
+`js-yaml` embarque ses propres types (`dist/js-yaml.d.ts`) : ne pas installer `@types/js-yaml`, qui ne décrit que la version 4 et entrerait en conflit.
+
+Si l'une de ces versions exactes n'existe plus au moment de l'exécution, prendre la plus proche version publiée de la même majeure, la figer sans intervalle, et noter l'écart dans le rapport et le message de commit.
 
 Remplacer le champ `scripts` par :
 
@@ -111,13 +100,12 @@ Remplacer le champ `scripts` par :
   }
 ```
 
-Puis installer :
+Puis vérifier que l'arbre de dépendances est cohérent :
 
 ```bash
 npm install
+npm ls --depth=0
 ```
-
-Si une version exacte n'existe plus au moment de l'exécution, prendre la plus proche version publiée de la même majeure, la figer sans intervalle, et noter l'écart dans le message de commit.
 
 - [ ] **Step 3: Configurer Vitest**
 
