@@ -10,6 +10,10 @@ describe('empreinteAlternative', () => {
     expect(empreinteAlternative('avoir')).toBe(empreinteAlternative('avoir'))
   })
 
+  // Ce regroupement est un comportement documenté, pas souhaité : deux alternatives
+  // d’une même fiche dont le texte ne diffère que par la casse ou les accents
+  // partagent une empreinte, donc leurs votes fusionnent. C’est `lint:content` qui
+  // le signale à l’auteur, pas ce test.
   it('ignore la casse, les accents et les espaces superflus', () => {
     expect(empreinteAlternative('Avoir')).toBe(empreinteAlternative('avoir'))
     expect(empreinteAlternative('  avoir ')).toBe(empreinteAlternative('avoir'))
