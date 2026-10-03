@@ -44,6 +44,12 @@ describe('rendreMarkdown', () => {
     expect(html).not.toContain('javascript:')
   })
 
+  it('retire une image distante', async () => {
+    const html = await rendreMarkdown('![x](https://evil.example/pixel.png)')
+    expect(html).not.toContain('<img')
+    expect(html).not.toContain('evil.example')
+  })
+
   it('conserve un lien http légitime', async () => {
     const html = await rendreMarkdown('[le dépôt](https://example.org/a)')
     expect(html).toContain('href="https://example.org/a"')
@@ -53,6 +59,18 @@ describe('rendreMarkdown', () => {
     const html = await rendreMarkdown('- un *mot*\n- deux')
     expect(html).toContain('<li>')
     expect(html).toContain('<em>mot</em>')
+  })
+
+  it('rend un tableau markdown avec ses cellules', async () => {
+    const html = await rendreMarkdown('| a | b |\n| --- | --- |\n| un | deux |\n')
+    expect(html).toContain('<table>')
+    expect(html).toContain('<th>a</th>')
+    expect(html).toContain('<td>un</td>')
+  })
+
+  it('rend le texte barré', async () => {
+    const html = await rendreMarkdown('~~barré~~')
+    expect(html).toContain('<del>barré</del>')
   })
 })
 
