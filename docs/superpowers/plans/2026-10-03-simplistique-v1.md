@@ -2375,10 +2375,14 @@ const index: FicheIndex[] = [
   fiche({ slug: 'statique-escalade', terme: 'statique', discipline: 'escalade', statut: 'propose', suggestions: ['contrôlé'] }),
 ]
 
+// Un élément neuf à chaque appel : React peut court-circuiter un re-rendu si on
+// lui repasse exactement la même référence d'élément.
+function elementCorpus() {
+  return <Corpus index={index} disciplines={disciplines} confusions={confusions} statuts={statuts} />
+}
+
 function afficher() {
-  return render(
-    <Corpus index={index} disciplines={disciplines} confusions={confusions} statuts={statuts} />,
-  )
+  return render(elementCorpus())
 }
 
 beforeEach(() => {
@@ -2439,6 +2443,30 @@ describe('Corpus — filtres et URL', () => {
     await userEvent.type(screen.getByRole('searchbox'), 'tempe')
     expect(screen.getByRole('link', { name: /tempérament/ })).toBeInTheDocument()
     expect(screen.queryByRole('link', { name: /groupe/ })).not.toBeInTheDocument()
+  })
+
+  it('resynchronise ses filtres quand l’URL change sans passer par lui', () => {
+    recherche = 'discipline=escalade'
+    const { rerender } = afficher()
+    expect(screen.queryByRole('link', { name: /groupe/ })).not.toBeInTheDocument()
+
+    // Lien interne vers /fiches sans paramètre : le segment de route ne change
+    // pas, donc le composant reste monté avec son état.
+    recherche = ''
+    rerender(elementCorpus())
+
+    expect(screen.getByRole('link', { name: /groupe/ })).toBeInTheDocument()
+    expect(screen.getByText(/3 fiches/)).toBeInTheDocument()
+  })
+
+  it('ne réécrit pas un filtre périmé après une resynchronisation', async () => {
+    recherche = 'discipline=escalade'
+    const { rerender } = afficher()
+    recherche = ''
+    rerender(elementCorpus())
+
+    await userEvent.click(screen.getByRole('button', { name: 'Pointé' }))
+    expect(remplacer).toHaveBeenLastCalledWith('/fiches?statut=pointe', { scroll: false })
   })
 
   it('trouve une fiche en tapant le nom de sa discipline', async () => {
@@ -2520,7 +2548,12 @@ export function Filtres({
       />
 
       {groupes.map(({ cle, libelle, entrees }) => (
-        <div key={cle} className="flex flex-wrap items-baseline gap-2">
+        <div
+          key={cle}
+          role="group"
+          aria-label={libelle}
+          className="flex flex-wrap items-baseline gap-2"
+        >
           <span className="text-xs uppercase tracking-wide text-stone-500">{libelle}</span>
           {entrees.map(({ slug, nom }) => {
             const actif = criteres[cle].includes(slug)
@@ -2584,6 +2617,23 @@ const libelles: Libelles = {
   ]),
 }
 
+// Libellés dont l'ordre alphabétique DIFFÈRE de celui des slugs. C'est la seule
+// façon de prouver que le tri porte sur le libellé affiché et non sur le slug :
+// avec les libellés réels ci-dessus, « Escalade » et « escalade » se classent de
+// la même façon, et un tri qui ignorerait complètement les libellés passerait
+// quand même.
+const LIBELLES_DIVERGENTS: Libelles = {
+  disciplines: new Map([
+    ['mathematiques', 'Algèbre'], // slug second, libellé premier
+    ['escalade', 'Varappe'], // slug premier, libellé second
+  ]),
+  statuts: new Map([
+    ['pointe', 'Signalé'], // slug premier, libellé troisième
+    ['propose', 'Avancé'], // slug second, libellé premier
+    ['rejete', 'Écarté'], // slug troisième, libellé second
+  ]),
+}
+
 function fiche(p: Partial<FicheIndex>): FicheIndex {
   return {
     slug: 'x',
@@ -2628,18 +2678,18 @@ describe('trierFiches', () => {
   })
 
   it('trie par libellé de discipline, pas par slug', () => {
-    expect(trierFiches(fiches, 'discipline', true, libelles).map((f) => f.discipline)).toEqual([
+    expect(trierFiches(fiches, 'discipline', true, LIBELLES_DIVERGENTS).map((f) => f.discipline)).toEqual([
+      'mathematiques',
+      'mathematiques',
       'escalade',
-      'mathematiques',
-      'mathematiques',
     ])
   })
 
-  it('trie par libellé de statut', () => {
-    expect(trierFiches(fiches, 'statut', true, libelles).map((f) => f.statut)).toEqual([
-      'pointe',
+  it('trie par libellé de statut, pas par slug', () => {
+    expect(trierFiches(fiches, 'statut', true, LIBELLES_DIVERGENTS).map((f) => f.statut)).toEqual([
       'propose',
       'rejete',
+      'pointe',
     ])
   })
 
@@ -2818,7 +2868,7 @@ Trois points de conception, chacun imposé par la spec ou par le test :
 'use client'
 
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import type { Discipline, EntreeTaxonomie, FicheIndex } from '@/lib/content/schema'
 import {
   analyserCriteres,
@@ -2864,32 +2914,53 @@ export function Corpus({
     [disciplines, confusions, statuts],
   )
 
+  const requeteActuelle = params.toString()
   const vueDemandee = params.get('vue')
   const vueValide = vueDemandee === 'carte' || vueDemandee === 'liste' ? vueDemandee : null
 
   const [criteres, setCriteres] = useState<Criteres>(() =>
-    analyserCriteres(new URLSearchParams(params.toString()), valides),
+    analyserCriteres(new URLSearchParams(requeteActuelle), valides),
   )
   const [vue, setVue] = useState<Vue>(() => vueValide ?? vueParDefaut())
   const [vueExplicite, setVueExplicite] = useState(vueValide !== null)
 
-  const libellesRecherche = useMemo(
+  // La requête que NOUS avons écrite en dernier. Tout écart signifie que l'URL a
+  // changé sans passer par `naviguer` — un lien interne vers /fiches depuis la
+  // navigation du site, par exemple, qui laisse ce composant monté. Il faut alors
+  // repartir de l'URL : sinon l'affichage garde des filtres que l'URL ne porte
+  // plus, et la prochaine interaction les réécrirait dedans.
+  const derniereRequeteEcrite = useRef(requeteActuelle)
+
+  useEffect(() => {
+    if (derniereRequeteEcrite.current === requeteActuelle) return
+    derniereRequeteEcrite.current = requeteActuelle
+
+    const prochains = new URLSearchParams(requeteActuelle)
+    const demandee = prochains.get('vue')
+    const valide = demandee === 'carte' || demandee === 'liste' ? demandee : null
+
+    setCriteres(analyserCriteres(prochains, valides))
+    setVue(valide ?? vueParDefaut())
+    setVueExplicite(valide !== null)
+  }, [requeteActuelle, valides])
+
+  // Une seule construction des tables slug -> libellé, consommée à la fois par la
+  // recherche et par l'affichage.
+  const libellesParSlug = useMemo(
     () => ({
       disciplines: new Map(disciplines.map((d) => [d.slug, d.nom])),
       confusions: new Map(confusions.map((c) => [c.slug, c.nom])),
-    }),
-    [disciplines, confusions],
-  )
-
-  const fiches = filtrerFiches(index, criteres, libellesRecherche)
-
-  const libelles: Libelles = useMemo(
-    () => ({
-      disciplines: new Map(disciplines.map((d) => [d.slug, d.nom])),
       statuts: new Map(statuts.map((s) => [s.slug, s.nom])),
     }),
-    [disciplines, statuts],
+    [disciplines, confusions, statuts],
   )
+
+  const fiches = filtrerFiches(index, criteres, libellesParSlug)
+
+  const libelles: Libelles = {
+    disciplines: libellesParSlug.disciplines,
+    statuts: libellesParSlug.statuts,
+  }
 
   function naviguer(prochainsCriteres: Criteres, prochaineVue: Vue) {
     const explicite = vueExplicite || prochaineVue !== vue
@@ -2899,6 +2970,7 @@ export function Corpus({
     setVueExplicite(explicite)
 
     const requete = ecrireCriteres(prochainsCriteres, explicite ? prochaineVue : undefined)
+    derniereRequeteEcrite.current = requete
     router.replace(requete ? `${chemin}?${requete}` : chemin, { scroll: false })
   }
 
@@ -2918,7 +2990,7 @@ export function Corpus({
             </button>
           ))}
         </div>
-        <p className="text-sm text-stone-500">
+        <p role="status" className="text-sm text-stone-500">
           {`${fiches.length} fiche${fiches.length > 1 ? 's' : ''}${
             fiches.length === index.length ? '' : ` sur ${index.length}`
           }`}
