@@ -73,6 +73,15 @@ describe('chargerTaxonomies', () => {
     expect(() => chargerTaxonomies(racine)).toThrow(/couleur/)
   })
 
+  it('cite le slug fautif dans le message, même quand un autre champ est invalide', () => {
+    const racine = dossierFactice({
+      'statuts.yml': STATUTS_VALIDES,
+      'confusions.yml': CONFUSIONS_VALIDES,
+      'disciplines.yml': `- { slug: escalade, nom: Escalade, couleur: turquoise, description: a }`,
+    })
+    expect(() => chargerTaxonomies(racine)).toThrow(/entrée 1 \(« escalade »\)/)
+  })
+
   it('refuse une taxonomie de statuts qui ne contient pas les trois attendus', () => {
     const racine = dossierFactice({
       'statuts.yml': `- { slug: pointe, nom: Pointé, description: a }`,

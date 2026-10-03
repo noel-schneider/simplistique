@@ -53,7 +53,10 @@ export function getFiche(
   dossier: string = DOSSIER_CONTENU,
   taxonomies: Taxonomies = chargerTaxonomies(dossier),
 ): Fiche | null {
-  return getFiches(dossier, taxonomies).find((f) => f.slug === slug) ?? null
+  const fichier = `${slug}.md`
+  const chemin = join(dossier, 'fiches', fichier)
+  if (!existsSync(chemin)) return null
+  return lireFiche(dossier, fichier, taxonomies)
 }
 
 export function getIndex(

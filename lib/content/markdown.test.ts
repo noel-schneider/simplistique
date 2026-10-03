@@ -13,6 +13,23 @@ describe('retirerCrochets', () => {
   it('laisse intact un texte sans crochets', () => {
     expect(retirerCrochets('rien à signaler')).toBe('rien à signaler')
   })
+
+  // Comportement figé, pas documenté ni voulu : les crochets imbriqués ne
+  // sont pas pris en charge. La regex s'arrête à la première occurrence de
+  // « ] » ou « | », donc le « [[ » intérieur survit tel quel dans le
+  // résultat — c'est l'avertissement de `lint:content` sur un « [[ »
+  // résiduel (voir scripts/coherence.ts) qui sert de filet pour ce cas.
+  it('ne prend pas en charge les crochets imbriqués : le « [[ » intérieur survit', () => {
+    expect(retirerCrochets('[[a [[b]] c]]')).toBe('a [[b c]]')
+  })
+
+  // Comportement figé : plusieurs barres verticales dans un même crochet
+  // gardent tout ce qui suit la première barre, y compris les barres
+  // suivantes — c'est le comportement d'Obsidian pour un lien à affichage
+  // personnalisé, donc intentionnel.
+  it('garde tout ce qui suit la première barre quand il y en a plusieurs', () => {
+    expect(retirerCrochets('[[a|b|c]]')).toBe('b|c')
+  })
 })
 
 describe('rendreMarkdown', () => {

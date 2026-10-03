@@ -92,10 +92,13 @@ export function Corpus({
 
   const fiches = filtrerFiches(index, criteres, libellesParSlug)
 
-  const libelles: Libelles = {
-    disciplines: libellesParSlug.disciplines,
-    statuts: libellesParSlug.statuts,
-  }
+  const libelles: Libelles = useMemo(
+    () => ({
+      disciplines: libellesParSlug.disciplines,
+      statuts: libellesParSlug.statuts,
+    }),
+    [libellesParSlug],
+  )
 
   // L'écriture dans l'URL de la recherche texte est temporisée (voir
   // `changerRecherche`) : chaque frappe annule le minuteur en cours. On

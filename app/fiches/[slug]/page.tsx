@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
+import { cache } from 'react'
 import { EnteteFiche } from '@/components/entete-fiche'
 import { Prose } from '@/components/prose'
 import { getFiche, getFiches } from '@/lib/content/fiches'
@@ -7,6 +8,13 @@ import { rendreMarkdown } from '@/lib/content/markdown'
 import { chargerTaxonomies } from '@/lib/content/taxonomies'
 
 type Params = { params: Promise<{ slug: string }> }
+
+// `generateMetadata` et le composant de page sont deux invocations distinctes
+// de Next pour la même fiche, et chacune a besoin des taxonomies pour
+// résoudre `getFiche`. `cache` de React mémoïse l'appel pour la durée du
+// rendu de cette route : chargerTaxonomies() ne s'exécute plus qu'une fois
+// par fiche au build plutôt que deux.
+const taxonomiesDeLaRequete = cache(() => chargerTaxonomies())
 
 // Sans cela, `dynamicParams` vaut `true` : un slug absent de la liste ci-dessous
 // déclencherait un rendu de page à la demande côté serveur, qui lirait le disque
@@ -20,7 +28,7 @@ export function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
-  const fiche = getFiche((await params).slug)
+  const fiche = getFiche((await params).slug, undefined, taxonomiesDeLaRequete())
   if (!fiche) return {}
   return { title: fiche.terme, description: fiche.resume }
 }
@@ -30,7 +38,7 @@ function nomDe(entrees: { slug: string; nom: string }[], slug: string): string {
 }
 
 export default async function PageFiche({ params }: Params) {
-  const taxonomies = chargerTaxonomies()
+  const taxonomies = taxonomiesDeLaRequete()
   const fiche = getFiche((await params).slug, undefined, taxonomies)
   if (!fiche) notFound()
 

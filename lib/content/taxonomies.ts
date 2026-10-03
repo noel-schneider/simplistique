@@ -31,7 +31,13 @@ function chargerListe<T extends { slug: string }>(
       const details = resultat.error.issues
         .map((p) => `${p.path.join('.') || '(racine)'} : ${p.message}`)
         .join(' ; ')
-      throw new Error(`${fichier}, entrée ${i + 1} : ${details}`)
+      const slugBrut =
+        entree !== null && typeof entree === 'object' && 'slug' in entree
+          ? (entree as Record<string, unknown>).slug
+          : undefined
+      const identifiant =
+        typeof slugBrut === 'string' && slugBrut.length > 0 ? ` (« ${slugBrut} »)` : ''
+      throw new Error(`${fichier}, entrée ${i + 1}${identifiant} : ${details}`)
     }
     return resultat.data
   })

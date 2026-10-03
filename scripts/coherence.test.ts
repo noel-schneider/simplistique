@@ -67,6 +67,19 @@ describe('verifierCoherence', () => {
     expect(a[0].message).toContain('[[crochet non ferme')
   })
 
+  it('ne coupe pas un caractère accentué décomposé tombant à la frontière des 40 caractères', () => {
+    // « e » + accent aigu combinant (U+0301) : deux points de code pour un
+    // seul graphème. Construit pour que l'ancien découpage par index de
+    // code unité tranche juste entre les deux — avant le graphème complet,
+    // donc avant que l'accent ne soit inclus.
+    const accentDecompose = 'é'
+    const remplissage = 'x'.repeat(37)
+    const corps = `## Risques\n\nun [[${remplissage}${accentDecompose} fin\n`
+    const a = verifierCoherence(fiche({ corps }))
+    expect(a).toHaveLength(1)
+    expect(a[0].message).toContain(accentDecompose)
+  })
+
   it('ne signale rien pour des crochets bien formés', () => {
     expect(verifierCoherence(fiche({ corps: '## Risques\n\nla [[clarté]] et [[Intuitivité|intuitif]]\n' }))).toEqual([])
   })

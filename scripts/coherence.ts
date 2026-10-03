@@ -7,6 +7,21 @@ export type Avertissement = { slug: string; message: string }
 // pour ne pas crier sur un resume simplement bien rempli.
 const SEUIL_RESUME = Math.floor(LONGUEUR_MAX_RESUME * 0.95)
 
+// Découpe par graphème (Intl.Segmenter) plutôt que par index de code unité :
+// un index brut peut tomber entre les deux moitiés d'une paire supplétive
+// (émoji, etc.) ou entre une lettre de base et sa marque combinante (un
+// accent décomposé), et rendrait un extrait tronqué au milieu d'un caractère.
+const segmenteurGraphemes = new Intl.Segmenter('fr', { granularity: 'grapheme' })
+
+function tronquerParGraphemes(texte: string, longueur: number): string {
+  const graphemes: string[] = []
+  for (const { segment } of segmenteurGraphemes.segment(texte)) {
+    if (graphemes.length >= longueur) break
+    graphemes.push(segment)
+  }
+  return graphemes.join('')
+}
+
 export function verifierCoherence(fiche: Fiche): Avertissement[] {
   const avertissements: string[] = []
   const titres = listerTitres(fiche.corps).map((t) => t.toLowerCase())
@@ -45,7 +60,7 @@ export function verifierCoherence(fiche: Fiche): Avertissement[] {
   const aplati = retirerCrochets(fiche.corps)
   const positionCrochets = aplati.indexOf('[[')
   if (positionCrochets !== -1) {
-    const extrait = aplati.slice(positionCrochets, positionCrochets + 40).split('\n')[0]
+    const extrait = tronquerParGraphemes(aplati.slice(positionCrochets), 40).split('\n')[0]
     avertissements.push(
       `des crochets doubles survivent à l'aplatissement, probablement un « [[ » non fermé ou imbriqué, qui s'affichera tel quel : « ${extrait} »`,
     )

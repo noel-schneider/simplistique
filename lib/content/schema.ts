@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { z, type ZodType } from 'zod'
 
 export type Statut = 'pointe' | 'propose' | 'rejete'
 export const STATUTS = ['pointe', 'propose', 'rejete'] as const satisfies readonly Statut[]
@@ -45,7 +45,7 @@ export type Fiche = FicheMeta & { corps: string }
 
 export const LONGUEUR_MAX_RESUME = 240
 
-export function creerSchemaFiche(taxonomies: Taxonomies) {
+export function creerSchemaFiche(taxonomies: Taxonomies): ZodType<Omit<FicheMeta, 'slug'>> {
   const disciplines = taxonomies.disciplines.map((d) => d.slug) as [string, ...string[]]
   const confusions = taxonomies.confusions.map((c) => c.slug) as [string, ...string[]]
 
