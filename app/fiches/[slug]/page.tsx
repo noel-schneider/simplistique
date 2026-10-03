@@ -30,7 +30,11 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const fiche = getFiche((await params).slug, undefined, taxonomiesDeLaRequete())
   if (!fiche) return {}
-  return { title: fiche.terme, description: fiche.resume }
+  return {
+    title: fiche.terme,
+    description: fiche.resume,
+    openGraph: { title: fiche.terme, description: fiche.resume, type: 'article' },
+  }
 }
 
 function nomDe(entrees: { slug: string; nom: string }[], slug: string): string {

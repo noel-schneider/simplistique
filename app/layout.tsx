@@ -1,12 +1,23 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { Navigation } from '@/components/navigation'
+import { urlSite } from '@/lib/site'
 import './globals.css'
 
+const DESCRIPTION =
+  'Simplifier le langage des disciplines scientifiques et artistiques, pour abaisser la barrière à l’entrée et bâtir des ponts entre elles.'
+
 export const metadata: Metadata = {
+  metadataBase: new URL(urlSite()),
   title: { default: 'Simplistique', template: '%s — Simplistique' },
-  description:
-    'Simplifier le langage des disciplines scientifiques et artistiques, pour abaisser la barrière à l’entrée et bâtir des ponts entre elles.',
+  description: DESCRIPTION,
+  openGraph: {
+    title: 'Simplistique',
+    description: DESCRIPTION,
+    type: 'website',
+    locale: 'fr_FR',
+    siteName: 'Simplistique',
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
