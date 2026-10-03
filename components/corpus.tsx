@@ -18,7 +18,7 @@ import { VueListe, type Libelles } from './vue-liste'
 export type Vue = 'carte' | 'liste'
 
 // Ce nombre doit rester aligné sur le point de rupture `sm` (640px) de Tailwind,
-// utilisé pour la grille à deux colonnes dans components/vue-carte.tsx:89 (sm:grid-cols-2).
+// utilisé par la grille des zones de components/vue-carte.tsx (classe `sm:grid-cols-2`).
 const GRAND_ECRAN = '(min-width: 640px)'
 
 export function vueParDefaut(): Vue {
