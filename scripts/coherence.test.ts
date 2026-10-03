@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { Fiche } from '../lib/content/schema'
-import { verifierCoherence, verifierCorpus } from './coherence'
+import { verifierCoherence, verifierCorpus, verifierDocuments } from './coherence'
 import { getFiches } from '../lib/content/fiches'
 import { DOSSIER_CONTENU } from '../lib/content/taxonomies'
 
@@ -88,5 +88,17 @@ describe('verifierCorpus', () => {
 
   it('rend une liste vide pour un corpus vide', () => {
     expect(verifierCorpus([])).toEqual([])
+  })
+})
+
+describe('verifierDocuments', () => {
+  it('signale un marqueur URL-DU-DEPOT résiduel', () => {
+    const a = verifierDocuments([{ nom: 'contribuer', texte: 'Voir `URL-DU-DEPOT`.' }])
+    expect(a).toHaveLength(1)
+    expect(a[0]).toEqual({ slug: 'contribuer', message: expect.stringMatching(/URL-DU-DEPOT/) })
+  })
+
+  it('ne signale rien pour un document sans marqueur', () => {
+    expect(verifierDocuments([{ nom: 'manifeste', texte: 'Rien à signaler ici.' }])).toEqual([])
   })
 })

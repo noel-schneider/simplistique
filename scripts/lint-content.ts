@@ -1,11 +1,15 @@
-import { getFiches } from '../lib/content/fiches'
+import { getDocument, getFiches } from '../lib/content/fiches'
 import { chargerTaxonomies, DOSSIER_CONTENU } from '../lib/content/taxonomies'
-import { verifierCorpus } from './coherence'
+import { verifierCorpus, verifierDocuments } from './coherence'
 
 function principal(): void {
   const taxonomies = chargerTaxonomies(DOSSIER_CONTENU)
   const fiches = getFiches(DOSSIER_CONTENU, taxonomies)
-  const avertissements = verifierCorpus(fiches)
+  const documents = (['manifeste', 'contribuer'] as const).map((nom) => ({
+    nom,
+    texte: getDocument(nom, DOSSIER_CONTENU),
+  }))
+  const avertissements = [...verifierCorpus(fiches), ...verifierDocuments(documents)]
 
   console.log(
     `${fiches.length} fiche(s), ${taxonomies.disciplines.length} discipline(s) — validation du schéma réussie.`,

@@ -5,7 +5,7 @@ tout passe par le dépôt, où la discussion reste publique et tracée.
 
 ## Proposer une analyse
 
-Ouvrir une *issue* ou une *pull request* sur <URL-DU-DEPOT>. Une pull request
+Ouvrir une *issue* ou une *pull request* sur `URL-DU-DEPOT`. Une pull request
 obtient automatiquement une adresse de prévisualisation : la fiche se voit
 rendue avant d'être intégrée.
 
@@ -24,6 +24,21 @@ Les règles de suggestion du manifeste, appliquées :
    qu'on casse. Une proposition sans risques identifiés est incomplète.
 5. **D'où vient la réflexion** — une autre langue, une autre discipline, un
    témoignage d'enseignement.
+
+## Ce que la vérification automatique attend
+
+Une pull request qui ajoute ou modifie une fiche passe par une intégration
+continue qui vérifie, sans discussion possible :
+
+- Le nom de fichier : `content/fiches/<terme>-<discipline>.md`, en minuscules,
+  sans accent.
+- Les huit champs du front-matter : `terme`, `discipline`, `confusion`,
+  `statut`, `resume`, `suggestions`, `cree`, `modifie`.
+- `resume` : 240 caractères maximum.
+- `discipline` et `confusion` : doivent exister dans `content/taxonomies/`.
+
+La commande `npm run lint:content` reproduit cette vérification en local,
+avant d'ouvrir la pull request.
 
 ## Ce qui sera probablement refusé
 

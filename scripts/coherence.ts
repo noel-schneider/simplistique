@@ -57,3 +57,20 @@ export function verifierCoherence(fiche: Fiche): Avertissement[] {
 export function verifierCorpus(fiches: Fiche[]): Avertissement[] {
   return fiches.flatMap(verifierCoherence)
 }
+
+// Le marqueur sert de point d'ancrage dans content/manifeste.md et
+// content/contribuer.md, à remplacer par l'adresse réelle du dépôt une fois
+// publié. Laissé entre chevrons, il est lu comme une balise HTML inconnue et
+// disparaît silencieusement au rendu — entre accents graves, il survit comme
+// du code littéral. Ce contrôle signale l'oubli sans jamais bloquer : la
+// publication initiale, avant que l'adresse ne soit connue, en dépend.
+const MARQUEUR_URL_DEPOT = 'URL-DU-DEPOT'
+
+export function verifierDocuments(documents: { nom: string; texte: string }[]): Avertissement[] {
+  return documents
+    .filter((document) => document.texte.includes(MARQUEUR_URL_DEPOT))
+    .map((document) => ({
+      slug: document.nom,
+      message: `le marqueur « ${MARQUEUR_URL_DEPOT} » est encore présent : à remplacer par l'adresse réelle du dépôt`,
+    }))
+}
