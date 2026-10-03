@@ -20,14 +20,26 @@ function estEtat(valeur: unknown): valeur is Etat {
   if (typeof valeur !== 'object' || valeur === null) return false
   const objet = valeur as Record<string, unknown>
   const miens = objet.miens as Record<string, unknown> | null | undefined
+  // Les deux exclusions de tableau comptent autant que le reste : en JavaScript un
+  // tableau est un objet non nul, donc un `alternatives` reçu comme tableau passerait
+  // le contrôle, puis chaque compteur vaudrait zéro en silence. De même, un
+  // `miens.alternatives` rempli d’autre chose que des chaînes ferait répondre `false` à
+  // chaque `includes`, et le lecteur verrait « non voté » sur un vote qu’il a émis.
+  // Un affichage faux sans erreur est pire qu’un affichage absent.
   return (
     typeof objet.fiche === 'number' &&
+    Number.isFinite(objet.fiche) &&
     typeof objet.alternatives === 'object' &&
     objet.alternatives !== null &&
+    !Array.isArray(objet.alternatives) &&
+    Object.values(objet.alternatives as Record<string, unknown>).every(
+      (compte) => typeof compte === 'number' && Number.isFinite(compte),
+    ) &&
     typeof miens === 'object' &&
     miens !== null &&
     typeof miens.fiche === 'boolean' &&
-    Array.isArray(miens.alternatives)
+    Array.isArray(miens.alternatives) &&
+    miens.alternatives.every((empreinte) => typeof empreinte === 'string')
   )
 }
 

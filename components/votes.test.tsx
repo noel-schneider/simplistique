@@ -191,6 +191,37 @@ describe('Votes', () => {
     expect(bouton).toHaveTextContent('0')
   })
 
+  it('refuse un `alternatives` reçu comme tableau au lieu d’un objet', async () => {
+    // Seule faute de ce corps, pour que le test tombe si et seulement si cette
+    // vérification-là disparaît : en JavaScript un tableau est un objet non nul, donc
+    // sans elle chaque compteur d’alternative vaudrait zéro en silence.
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(() =>
+        reponse({ fiche: 1, alternatives: [], miens: { fiche: false, alternatives: [] } }),
+      ),
+    )
+    const { container } = render(<Votes fiche="f" alternatives={ALTERNATIVES} />)
+    await waitFor(() => expect(container.querySelector('[data-charge]')).not.toBeNull())
+    expect(container.querySelector('[data-charge]')).toHaveAttribute('hidden')
+    expect(container.textContent).toBe('')
+  })
+
+  it('refuse un `miens.alternatives` qui ne contient pas des chaînes', async () => {
+    // Seule faute de ce corps. Sans cette vérification, chaque `includes` répondrait
+    // `false` et le lecteur verrait « non voté » sur un vote qu’il vient d’émettre.
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(() =>
+        reponse({ fiche: 1, alternatives: {}, miens: { fiche: false, alternatives: [42] } }),
+      ),
+    )
+    const { container } = render(<Votes fiche="f" alternatives={ALTERNATIVES} />)
+    await waitFor(() => expect(container.querySelector('[data-charge]')).not.toBeNull())
+    expect(container.querySelector('[data-charge]')).toHaveAttribute('hidden')
+    expect(container.textContent).toBe('')
+  })
+
   it('reste silencieux si le serveur répond 200 avec un corps inattendu', async () => {
     vi.stubGlobal('fetch', vi.fn(() => reponse({ bonjour: 'je ne suis pas un état' })))
     const { container } = render(<Votes fiche="f" alternatives={ALTERNATIVES} />)
