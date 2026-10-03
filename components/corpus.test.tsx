@@ -1,8 +1,8 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { FicheIndex } from '../lib/content/schema'
-import { Corpus } from './corpus'
+import { Corpus, vueParDefaut } from './corpus'
 
 const remplacer = vi.fn()
 let recherche = ''
@@ -173,5 +173,68 @@ describe('Corpus — filtres et URL', () => {
     afficher()
     await userEvent.click(screen.getByRole('button', { name: /carte/i }))
     expect(remplacer).toHaveBeenCalledWith('/fiches?vue=carte&discipline=escalade', { scroll: false })
+  })
+})
+
+// jsdom ne fournit pas matchMedia : on l’injecte pour les deux tests qui ont
+// besoin d’une largeur d’écran, et on le retire ensuite.
+function simulerGrandEcran(grandEcran: boolean) {
+  Object.defineProperty(window, 'matchMedia', {
+    configurable: true,
+    writable: true,
+    value: (requete: string) => ({ matches: grandEcran, media: requete }) as MediaQueryList,
+  })
+}
+
+afterEach(() => {
+  vi.restoreAllMocks()
+  delete (window as { matchMedia?: unknown }).matchMedia
+})
+
+describe('vueParDefaut', () => {
+  it('se replie sur la liste quand matchMedia n’est pas disponible', () => {
+    // C’est l’état par défaut de jsdom, donc celui de tous les autres tests.
+    expect(vueParDefaut()).toBe('liste')
+  })
+})
+
+describe('Corpus — bascule entre les deux vues', () => {
+  it('affiche la carte quand l’URL le demande', () => {
+    recherche = 'vue=carte'
+    const { container } = afficher()
+    expect(container.querySelectorAll('circle').length).toBeGreaterThan(0)
+    expect(container.querySelector('table')).toBeNull()
+  })
+
+  it('affiche la liste quand l’URL le demande', () => {
+    recherche = 'vue=liste'
+    const { container } = afficher()
+    expect(container.querySelector('table')).not.toBeNull()
+  })
+
+  it('choisit la liste par défaut sur petit écran', () => {
+    simulerGrandEcran(false)
+    const { container } = afficher()
+    expect(container.querySelector('table')).not.toBeNull()
+  })
+
+  it('choisit la carte par défaut sur grand écran', () => {
+    simulerGrandEcran(true)
+    const { container } = afficher()
+    expect(container.querySelectorAll('circle').length).toBeGreaterThan(0)
+    expect(container.querySelector('table')).toBeNull()
+  })
+
+  it('garde la recherche texte en passant à la carte', async () => {
+    recherche = 'q=tempe'
+    afficher()
+    await userEvent.click(screen.getByRole('button', { name: /carte/i }))
+    expect(remplacer).toHaveBeenCalledWith('/fiches?vue=carte&q=tempe', { scroll: false })
+  })
+
+  it('n’écrit pas la vue dans l’URL tant qu’on n’a pas basculé', async () => {
+    afficher()
+    await userEvent.click(screen.getByRole('button', { name: 'Escalade' }))
+    expect(remplacer).toHaveBeenCalledWith('/fiches?discipline=escalade', { scroll: false })
   })
 })

@@ -12,6 +12,7 @@ import {
   type Criteres,
 } from '@/lib/filtrage'
 import { Filtres } from './filtres'
+import { VueCarte } from './vue-carte'
 import { VueListe, type Libelles } from './vue-liste'
 
 export type Vue = 'carte' | 'liste'
@@ -147,6 +148,8 @@ export function Corpus({
         <p className="py-10 text-center text-stone-500">
           Aucune fiche ne correspond à ces critères.
         </p>
+      ) : vue === 'carte' ? (
+        <VueCarte fiches={fiches} disciplines={disciplines} libellesStatuts={libelles.statuts} />
       ) : (
         <VueListe fiches={fiches} libelles={libelles} />
       )}
