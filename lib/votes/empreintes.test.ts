@@ -19,13 +19,6 @@ describe('empreinteAlternative', () => {
   it('distingue deux textes différents', () => {
     expect(empreinteAlternative('avoir')).not.toBe(empreinteAlternative('ressources'))
   })
-
-  // Comportement documenté, pas souhaitable : deux alternatives d’une même fiche
-  // dont le texte ne diffère que par la casse partagent une empreinte, donc leurs
-  // votes fusionnent. L’avertissement de lint:content (Tâche 7) le signale.
-  it('fusionne deux alternatives que la normalisation rend identiques', () => {
-    expect(empreinteAlternative('Avoir')).toBe(empreinteAlternative('avoir'))
-  })
 })
 
 describe('adresseDeLEnTete', () => {

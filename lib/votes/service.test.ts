@@ -189,6 +189,17 @@ describe('annuler', () => {
     }
     expect((await annuler(depot, cible, fiche(), ALICE)).type).toBe('ok')
   })
+
+  it('refuse une cible invalide, et ne retire rien', async () => {
+    const cible = { fiche: 'actif-comptabilite', alternative: null }
+    await voter(depot, cible, fiche(), ALICE)
+    // `annuler` n’est pas soumis à la limite de débit : cette garde est le seul filet
+    // qui empêche un DELETE d’aller interroger la base sur des chaînes arbitraires.
+    expect(
+      await annuler(depot, { fiche: 'actif-comptabilite', alternative: INCONNUE }, fiche(), ALICE),
+    ).toEqual({ type: 'inconnu' })
+    expect((await depot.compter('actif-comptabilite')).fiche).toBe(1)
+  })
 })
 
 describe('lire', () => {

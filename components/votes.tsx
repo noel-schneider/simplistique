@@ -46,6 +46,7 @@ function estEtat(valeur: unknown): valeur is Etat {
 export function Votes({ fiche, alternatives }: { fiche: string; alternatives: Alternative[] }) {
   const [etat, setEtat] = useState<Etat | null>(null)
   const [charge, setCharge] = useState(false)
+  const [message, setMessage] = useState<string | null>(null)
   const dernierEnvoi = useRef(0)
 
   const relire = useCallback(async () => {
@@ -103,6 +104,12 @@ export function Votes({ fiche, alternatives }: { fiche: string; alternatives: Al
           ))}
         </div>
       )}
+
+      {message && (
+        <p role="status" className="text-sm text-stone-600">
+          {message}
+        </p>
+      )}
     </section>
   )
 
@@ -110,6 +117,7 @@ export function Votes({ fiche, alternatives }: { fiche: string; alternatives: Al
     const avant = etat!
     const vote =
       alternative === null ? avant.miens.fiche : avant.miens.alternatives.includes(alternative)
+    setMessage(null)
 
     // Chaque bascule prend un numéro. Une réponse qui revient alors qu'une bascule
     // plus récente est partie ne doit plus rien écrire : sinon deux clics rapprochés
@@ -135,6 +143,16 @@ export function Votes({ fiche, alternatives }: { fiche: string; alternatives: Al
           setEtat(recu)
           return
         }
+      }
+
+      // 429 et 404 ne sont pas couverts par le silence que la spec impose au 409 et
+      // à la base absente : sans ce message, un lecteur qui atteint la limite horaire
+      // ou qui avait la page ouverte avant un redéploiement voit le compteur revenir
+      // en arrière et conclut que le site est cassé.
+      if (r.status === 429) {
+        setMessage('Vous avez voté beaucoup de fois cette heure-ci. Réessayez plus tard.')
+      } else if (r.status === 404) {
+        setMessage('Cette fiche a changé depuis l’ouverture de la page. Rechargez-la.')
       }
 
       // 409 : le serveur sait que ce visiteur a déjà voté, le navigateur

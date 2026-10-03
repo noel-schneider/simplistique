@@ -107,6 +107,49 @@ describe('Votes', () => {
       expect(screen.getByRole('button', { name: /annuler/i })).toHaveTextContent('7'),
     )
     expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+    // La spec exige le silence pour le 409 : aucune phrase supplémentaire, et donc
+    // aucun second `role="status"` à côté de celui, toujours présent, du compteur.
+    expect(screen.getAllByRole('status')).toHaveLength(1)
+  })
+
+  it('affiche un message calme sur un 429, et le compteur revient à zéro', async () => {
+    // La spec demande le silence pour le 409 et la base absente, pas pour le 429 : un
+    // lecteur qui atteint la limite horaire verrait sinon le compteur bouger puis
+    // revenir, sans explication.
+    vi.stubGlobal(
+      'fetch',
+      vi
+        .fn()
+        .mockImplementationOnce(() => reponse(VIDE))
+        .mockImplementationOnce(() => reponse({ erreur: 'trop' }, 429))
+        .mockImplementationOnce(() => reponse(VIDE)),
+    )
+    render(<Votes fiche="f" alternatives={ALTERNATIVES} />)
+    const bouton = await screen.findByRole('button', { name: /vous a-t-il gêné/i })
+    await userEvent.click(bouton)
+
+    await waitFor(() => expect(bouton).toHaveTextContent('0'))
+    expect(
+      await screen.findByText(
+        'Vous avez voté beaucoup de fois cette heure-ci. Réessayez plus tard.',
+      ),
+    ).toBeInTheDocument()
+  })
+
+  it('n’affiche aucun message sur un 404 : il n’est pas couvert par le silence du 409', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi
+        .fn()
+        .mockImplementationOnce(() => reponse(VIDE))
+        .mockImplementationOnce(() => reponse({ erreur: 'inconnu' }, 404))
+        .mockImplementationOnce(() => reponse(VIDE)),
+    )
+    render(<Votes fiche="f" alternatives={ALTERNATIVES} />)
+    await userEvent.click(await screen.findByRole('button', { name: /vous a-t-il gêné/i }))
+    expect(
+      await screen.findByText('Cette fiche a changé depuis l’ouverture de la page. Rechargez-la.'),
+    ).toBeInTheDocument()
   })
 
   it('propose d’annuler ce qu’on a déjà voté', async () => {

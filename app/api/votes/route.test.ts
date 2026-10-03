@@ -44,10 +44,20 @@ describe('GET /api/votes', () => {
     expect(r.status).toBe(400)
   })
 
-  it('répond 503 et n’écrit rien quand le sel est absent', async () => {
+  it('répond 503 quand le sel est absent', async () => {
     vi.stubEnv('SEL_VOTES', '')
     const r = await GET(requete('http://x/api/votes?fiche=groupe-mathematiques'))
     expect(r.status).toBe(503)
+  })
+
+  it('interdit la mise en cache de toute réponse, succès comme refus', async () => {
+    // Le corps porte `miens`, propre au visiteur, et la clé de cache est l’URL seule :
+    // un cache partagé servirait le vote d’un visiteur à un autre.
+    const ok = await GET(requete('http://x/api/votes?fiche=groupe-mathematiques'))
+    expect(ok.headers.get('cache-control')).toBe('private, no-store')
+    const refus = await GET(requete('http://x/api/votes'))
+    expect(refus.status).toBe(400)
+    expect(refus.headers.get('cache-control')).toBe('private, no-store')
   })
 })
 
@@ -101,6 +111,72 @@ describe('POST /api/votes', () => {
   it('répond 400 pour un corps mal formé', async () => {
     const r = await POST(requete('http://x/api/votes', { method: 'POST', body: 'pas du json' }))
     expect(r.status).toBe(400)
+  })
+
+  it('refuse un corps sans clé alternative plutôt que de deviner', async () => {
+    // Un `undefined` qui passerait serait traité par la persistance comme une
+    // alternative nommée « undefined », au lieu d’un vote de fiche.
+    const r = await POST(
+      requete('http://x/api/votes', {
+        method: 'POST',
+        body: JSON.stringify({ fiche: 'groupe-mathematiques' }),
+      }),
+    )
+    expect(r.status).toBe(400)
+    expect(await depotCourant.compter('groupe-mathematiques')).toEqual({
+      fiche: 0,
+      alternatives: {},
+    })
+  })
+
+  it('préfère x-real-ip à x-forwarded-for, que l’appelant peut forger', async () => {
+    const corps = JSON.stringify({ fiche: 'groupe-mathematiques', alternative: null })
+    await POST(
+      new Request('http://x/api/votes', {
+        method: 'POST',
+        body: corps,
+        headers: { 'x-real-ip': '203.0.113.7', 'user-agent': 'Vitest' },
+      }),
+    )
+    // Même `x-real-ip`, donc même votant : le `x-forwarded-for` forgé ne doit rien changer.
+    const r = await POST(
+      new Request('http://x/api/votes', {
+        method: 'POST',
+        body: corps,
+        headers: {
+          'x-real-ip': '203.0.113.7',
+          'x-forwarded-for': '198.51.100.99',
+          'user-agent': 'Vitest',
+        },
+      }),
+    )
+    expect(r.status).toBe(409)
+  })
+
+  it('refuse un POST d’origine extérieure, et n’écrit rien', async () => {
+    const r = await POST(
+      requete('http://x/api/votes', {
+        method: 'POST',
+        body: JSON.stringify({ fiche: 'groupe-mathematiques', alternative: null }),
+        headers: { 'sec-fetch-site': 'cross-site' },
+      }),
+    )
+    expect(r.status).toBe(403)
+    expect(await depotCourant.compter('groupe-mathematiques')).toEqual({
+      fiche: 0,
+      alternatives: {},
+    })
+  })
+
+  it('accepte un POST de même origine', async () => {
+    const r = await POST(
+      requete('http://x/api/votes', {
+        method: 'POST',
+        body: JSON.stringify({ fiche: 'groupe-mathematiques', alternative: null }),
+        headers: { 'sec-fetch-site': 'same-origin' },
+      }),
+    )
+    expect(r.status).toBe(200)
   })
 
   it('répond 503 sans jamais écrire quand le sel est absent', async () => {
