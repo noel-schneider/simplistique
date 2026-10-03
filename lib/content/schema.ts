@@ -3,9 +3,12 @@ import { z } from 'zod'
 export type Statut = 'pointe' | 'propose' | 'rejete'
 export const STATUTS = ['pointe', 'propose', 'rejete'] as const satisfies readonly Statut[]
 
-const slug = z
-  .string()
-  .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'slug invalide : minuscules, chiffres et tirets uniquement')
+// Réutilisée telle quelle pour valider le nom de fichier d'une fiche (voir
+// `lireFiche` dans lib/content/fiches.ts), dont le slug n'est pas un champ de
+// schéma mais le nom de fichier brut.
+export const schemaSlug = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
+
+const slug = z.string().regex(schemaSlug, 'slug invalide : minuscules, chiffres et tirets uniquement')
 
 export const schemaEntreeTaxonomie = z.object({
   slug,

@@ -15,7 +15,8 @@ npm run dev
 
 1. Créer `content/fiches/<terme>-<discipline>.md`. Le nom du fichier devient
    l’URL ; il n’est jamais dérivé du terme, pour que deux disciplines puissent
-   analyser le même mot.
+   analyser le même mot. Minuscules, chiffres et tirets uniquement, sans
+   accent : le build échoue sinon, avec le nom du fichier fautif.
 2. Remplir le front-matter : `terme`, `discipline`, `confusion`, `statut`,
    `resume` (240 caractères max), `suggestions` (une liste, éventuellement
    vide), `cree`, `modifie`.

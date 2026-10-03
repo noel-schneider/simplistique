@@ -118,6 +118,11 @@ describe('getFiches refuse le contenu invalide', () => {
     const racine = corpusFactice({ 'x-mathematiques.md': VALIDE.replace('suggestions: []', 'suggestions: avoir') })
     expect(() => getFiches(racine, taxonomies)).toThrow(/suggestions/)
   })
+
+  it('refuse un slug de fichier avec accents, majuscules et espaces, en le citant', () => {
+    const racine = corpusFactice({ 'Théorie Groupe .md': VALIDE })
+    expect(() => getFiches(racine, taxonomies)).toThrow(/Théorie Groupe \.md/)
+  })
 })
 
 describe('getFiche', () => {

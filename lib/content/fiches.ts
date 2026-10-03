@@ -2,11 +2,18 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import matter from 'gray-matter'
 import { chargerTaxonomies, DOSSIER_CONTENU } from './taxonomies'
-import { creerSchemaFiche, type Fiche, type FicheIndex, type Taxonomies } from './schema'
+import { creerSchemaFiche, schemaSlug, type Fiche, type FicheIndex, type Taxonomies } from './schema'
 
 export { DOSSIER_CONTENU }
 
 function lireFiche(dossier: string, fichier: string, taxonomies: Taxonomies): Fiche {
+  const slug = fichier.replace(/\.md$/, '')
+  if (!schemaSlug.test(slug)) {
+    throw new Error(
+      `${fichier} : slug de fiche invalide (« ${slug} ») — le nom de fichier doit être en minuscules, sans accent, sans espace, avec uniquement des chiffres et des tirets (forme attendue : <terme>-<discipline>.md)`,
+    )
+  }
+
   const chemin = join(dossier, 'fiches', fichier)
   const { data, content } = matter(readFileSync(chemin, 'utf8'))
   const resultat = creerSchemaFiche(taxonomies).safeParse(data)
@@ -25,7 +32,7 @@ function lireFiche(dossier: string, fichier: string, taxonomies: Taxonomies): Fi
     throw new Error(`${fichier} : ${details}`)
   }
 
-  return { slug: fichier.replace(/\.md$/, ''), ...resultat.data, corps: content }
+  return { slug, ...resultat.data, corps: content }
 }
 
 export function getFiches(
