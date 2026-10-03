@@ -39,9 +39,9 @@ function Zone({
           className="inline-block size-2.5 rounded-sm"
           style={{ backgroundColor: discipline.couleur }}
         />
-        <h3 className="text-xs uppercase tracking-wide text-stone-500">
+        <h2 className="text-xs uppercase tracking-wide text-stone-500">
           {`${discipline.nom} · ${fiches.length} fiche${fiches.length > 1 ? 's' : ''}`}
-        </h3>
+        </h2>
       </div>
       <svg
         role="presentation"

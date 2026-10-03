@@ -122,4 +122,11 @@ describe('VueCarte', () => {
     render(<VueCarte fiches={fiches} disciplines={disciplines} libellesStatuts={libellesStatuts} />)
     expect(screen.getByText(/Chaque couleur désigne une discipline/)).toBeInTheDocument()
   })
+
+  it('utilise des titres de niveau 2 pour chaque zone de discipline', () => {
+    render(<VueCarte fiches={fiches} disciplines={disciplines} libellesStatuts={libellesStatuts} />)
+    const titresNiveau2 = screen.getAllByRole('heading', { level: 2 })
+    // Une zone par discipline, même celles sans fiche (Mathématiques, Escalade, Comptabilité)
+    expect(titresNiveau2).toHaveLength(3)
+  })
 })
