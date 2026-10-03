@@ -46,6 +46,7 @@ function Zone({
           return (
             <a
               key={fiche.slug}
+              className="point-fiche"
               href={`/fiches/${fiche.slug}`}
               aria-label={`${fiche.terme} — ${nomStatut}`}
             >
@@ -87,7 +88,12 @@ export function VueCarte({
         ))}
       </div>
 
-      <dl className="flex flex-wrap gap-x-6 gap-y-2 border-t border-stone-200 pt-4 text-xs text-stone-500">
+      <p className="border-t border-stone-200 pt-4 text-xs text-stone-500">
+        Chaque couleur désigne une discipline ; le remplissage du point dit le statut de
+        l’analyse.
+      </p>
+
+      <dl className="flex flex-wrap gap-x-6 gap-y-2 text-xs text-stone-500">
         {STATUTS.map((statut) => {
           const style = styleStatut(statut, '#78716c')
           return (

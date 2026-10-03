@@ -110,4 +110,16 @@ describe('VueCarte', () => {
     render(<VueCarte fiches={fiches} disciplines={disciplines} libellesStatuts={libellesStatuts} />)
     expect(screen.getByRole('link', { name: 'groupe — Pointé' })).toBeInTheDocument()
   })
+
+  it('marque chaque point d’une classe qui porte le style de focus', () => {
+    render(<VueCarte fiches={fiches} disciplines={disciplines} libellesStatuts={libellesStatuts} />)
+    for (const lien of screen.getAllByRole('link')) {
+      expect(lien).toHaveClass('point-fiche')
+    }
+  })
+
+  it('dit en clair ce que la couleur et le remplissage encodent', () => {
+    render(<VueCarte fiches={fiches} disciplines={disciplines} libellesStatuts={libellesStatuts} />)
+    expect(screen.getByText(/Chaque couleur désigne une discipline/)).toBeInTheDocument()
+  })
 })
