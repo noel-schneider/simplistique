@@ -1491,7 +1491,16 @@ describe('verifierCoherence', () => {
   it('signale l\'absence de section Risques', () => {
     const a = verifierCoherence(fiche({ corps: '## Pourquoi c\'est confus\n\ntexte\n' }))
     expect(a).toHaveLength(1)
-    expect(a[0]).toEqual({ slug: 'groupe-mathematiques', message: expect.stringMatching(/Risques/) })
+    expect(a[0]).toEqual({ slug: 'groupe-mathematiques', message: expect.stringMatching(/risques/) })
+  })
+
+  it('accepte un titre de section plus long que « Risques »', () => {
+    expect(verifierCoherence(fiche({ corps: '## Risques et limites\n\ntexte\n' }))).toEqual([])
+    expect(verifierCoherence(fiche({ corps: '## Les risques du changement\n\ntexte\n' }))).toEqual([])
+  })
+
+  it('accepte le titre quelle que soit la casse', () => {
+    expect(verifierCoherence(fiche({ corps: '## RISQUES\n\ntexte\n' }))).toEqual([])
   })
 
   it('signale un statut pointe accompagné de suggestions', () => {
@@ -1514,9 +1523,11 @@ describe('verifierCoherence', () => {
     expect(a.map((x) => x.message).join()).toMatch(/resume/)
   })
 
-  it('signale des crochets doubles qui survivent à l\'aplatissement', () => {
+  it('signale des crochets doubles qui survivent à l\'aplatissement, en situant le passage', () => {
     const a = verifierCoherence(fiche({ corps: '## Risques\n\nun [[crochet non ferme\n' }))
-    expect(a.map((x) => x.message).join()).toMatch(/crochets doubles/)
+    expect(a).toHaveLength(1)
+    expect(a[0].message).toMatch(/crochets doubles/)
+    expect(a[0].message).toContain('[[crochet non ferme')
   })
 
   it('ne signale rien pour des crochets bien formés', () => {
@@ -1557,15 +1568,20 @@ import { LONGUEUR_MAX_RESUME, type Fiche } from '../lib/content/schema'
 
 export type Avertissement = { slug: string; message: string }
 
+// 95 % de la limite dure : assez près pour prévenir avant le refus, assez loin
+// pour ne pas crier sur un resume simplement bien rempli.
 const SEUIL_RESUME = Math.floor(LONGUEUR_MAX_RESUME * 0.95)
 
 export function verifierCoherence(fiche: Fiche): Avertissement[] {
   const avertissements: string[] = []
   const titres = listerTitres(fiche.corps).map((t) => t.toLowerCase())
 
-  if (!titres.includes('risques')) {
+  // Sous-chaîne et non égalité : « ## Risques et limites » ou « ## Les risques du
+  // changement » traitent bien le sujet et ne doivent pas être signalés. Un
+  // avertissement qui se trompe se fait ignorer, et ne garde plus rien.
+  if (!titres.some((titre) => titre.includes('risques'))) {
     avertissements.push(
-      'aucune section « ## Risques » : le manifeste demande d\'identifier les risques de la modification',
+      'aucune section de niveau 2 dont le titre contient « risques » : le manifeste demande d\'identifier les risques de la modification',
     )
   }
 
@@ -1591,9 +1607,12 @@ export function verifierCoherence(fiche: Fiche): Avertissement[] {
     avertissements.push('modifie est antérieur à cree')
   }
 
-  if (retirerCrochets(fiche.corps).includes('[[')) {
+  const aplati = retirerCrochets(fiche.corps)
+  const positionCrochets = aplati.indexOf('[[')
+  if (positionCrochets !== -1) {
+    const extrait = aplati.slice(positionCrochets, positionCrochets + 40).split('\n')[0]
     avertissements.push(
-      'des crochets doubles survivent à l\'aplatissement : probablement un `[[` non fermé ou imbriqué, qui s\'affichera tel quel',
+      `des crochets doubles survivent à l'aplatissement, probablement un « [[ » non fermé ou imbriqué, qui s'affichera tel quel : « ${extrait} »`,
     )
   }
 
