@@ -3,7 +3,7 @@ import type { Statut } from '@/lib/content/schema'
 const CLASSES: Record<Statut, string> = {
   pointe: 'border-amber-500 text-amber-700',
   propose: 'border-emerald-600 text-emerald-700',
-  rejete: 'border-stone-400 text-stone-500',
+  rejete: 'border-stone-400 text-stone-600',
 }
 
 export function BadgeStatut({ statut, nom }: { statut: Statut; nom: string }) {

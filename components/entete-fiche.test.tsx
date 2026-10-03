@@ -50,6 +50,18 @@ describe('EnteteFiche', () => {
     expect(screen.getByText(/aucune alternative/i)).toBeInTheDocument()
   })
 
+  it('met « Suggestion » au singulier quand il n’y en a qu’une', () => {
+    render(
+      <EnteteFiche
+        fiche={meta({ statut: 'propose', suggestions: ['avoir'] })}
+        {...libelles}
+        nomStatut="Proposé"
+      />,
+    )
+    expect(screen.getByText(/^Suggestion :$/)).toBeInTheDocument()
+    expect(screen.getByText('avoir')).toBeInTheDocument()
+  })
+
   it('liste les suggestions quand il y en a plusieurs', () => {
     render(
       <EnteteFiche

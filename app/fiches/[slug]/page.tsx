@@ -8,6 +8,13 @@ import { chargerTaxonomies } from '@/lib/content/taxonomies'
 
 type Params = { params: Promise<{ slug: string }> }
 
+// Sans cela, `dynamicParams` vaut `true` : un slug absent de la liste ci-dessous
+// déclencherait un rendu de page à la demande côté serveur, qui lirait le disque
+// avant de conclure au 404. À `false`, Next répond 404 sans jamais invoquer la
+// page. C'est ce qu'exigent la contrainte globale « chaque page est générée au
+// build » et la spec §4 « un slug inconnu ne peut pas exister ».
+export const dynamicParams = false
+
 export function generateStaticParams() {
   return getFiches().map((fiche) => ({ slug: fiche.slug }))
 }
