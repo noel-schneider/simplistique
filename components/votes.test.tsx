@@ -63,6 +63,9 @@ describe('Votes', () => {
         JSON.stringify({ fiche: 1, alternatives: {}, miens: { fiche: true, alternatives: [] } }),
       ),
     )
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: /annuler/i })).toBeInTheDocument(),
+    )
   })
 
   it('revient en arrière si l’envoi échoue', async () => {
@@ -92,14 +95,16 @@ describe('Votes', () => {
         .fn()
         .mockImplementationOnce(() => reponse(VIDE))
         .mockImplementationOnce(() => reponse({ erreur: 'deja' }, 409))
+        // `7` est inatteignable par l'optimisme, qui n'incrémente que de 1 : voir ce
+        // chiffre prouve qu'une vraie relecture a eu lieu et a été utilisée.
         .mockImplementationOnce(() =>
-          reponse({ fiche: 1, alternatives: {}, miens: { fiche: true, alternatives: [] } }),
+          reponse({ fiche: 7, alternatives: {}, miens: { fiche: true, alternatives: [] } }),
         ),
     )
     render(<Votes fiche="f" alternatives={ALTERNATIVES} />)
     await userEvent.click(await screen.findByRole('button', { name: /vous a-t-il gêné/i }))
     await waitFor(() =>
-      expect(screen.getByRole('button', { name: /annuler/i })).toBeInTheDocument(),
+      expect(screen.getByRole('button', { name: /annuler/i })).toHaveTextContent('7'),
     )
     expect(screen.queryByRole('alert')).not.toBeInTheDocument()
   })
@@ -123,6 +128,10 @@ describe('Votes', () => {
     vi.stubGlobal('fetch', vi.fn(() => reponse({ erreur: 'indisponible' }, 503)))
     const { container } = render(<Votes fiche="f" alternatives={ALTERNATIVES} />)
     await waitFor(() => expect(container.querySelector('[data-charge]')).not.toBeNull())
+    // Un texte visible sans rôle ARIA échapperait à `queryByRole` : on vérifie donc
+    // qu'il n'y a rien à lire du tout, et que le conteneur est bien masqué.
+    expect(container.textContent).toBe('')
+    expect(container.querySelector('[data-charge]')).toHaveAttribute('hidden')
     expect(screen.queryByRole('alert')).not.toBeInTheDocument()
     expect(screen.queryByRole('button')).not.toBeInTheDocument()
   })
@@ -149,5 +158,44 @@ describe('Votes', () => {
     render(<Votes fiche="f" alternatives={ALTERNATIVES} />)
     await screen.findByRole('button', { name: /vous a-t-il gêné/i })
     expect(screen.getByRole('status')).toHaveTextContent('Une personne a été gênée')
+  })
+
+  it('ignore une réponse dépassée quand deux bascules se croisent', async () => {
+    // Le cas qui laissait l'affichage durablement faux : on vote, on annule, et la
+    // réponse de l'annulation arrive AVANT celle du vote. L'état final doit refléter
+    // la dernière action de l'utilisateur, pas la dernière réponse reçue.
+    let resoudrePost: (r: Response) => void = () => {}
+    vi.stubGlobal(
+      'fetch',
+      vi
+        .fn()
+        .mockImplementationOnce(() => reponse(VIDE))
+        .mockImplementationOnce(() => new Promise<Response>((r) => (resoudrePost = r)))
+        .mockImplementationOnce(() =>
+          reponse({ fiche: 0, alternatives: {}, miens: { fiche: false, alternatives: [] } }),
+        ),
+    )
+    render(<Votes fiche="f" alternatives={ALTERNATIVES} />)
+    const bouton = await screen.findByRole('button', { name: /vous a-t-il gêné/i })
+
+    await userEvent.click(bouton)
+    await userEvent.click(bouton)
+
+    resoudrePost(
+      new Response(
+        JSON.stringify({ fiche: 1, alternatives: {}, miens: { fiche: true, alternatives: [] } }),
+      ),
+    )
+
+    await waitFor(() => expect(bouton).toHaveAttribute('aria-pressed', 'false'))
+    expect(bouton).toHaveTextContent('0')
+  })
+
+  it('reste silencieux si le serveur répond 200 avec un corps inattendu', async () => {
+    vi.stubGlobal('fetch', vi.fn(() => reponse({ bonjour: 'je ne suis pas un état' })))
+    const { container } = render(<Votes fiche="f" alternatives={ALTERNATIVES} />)
+    await waitFor(() => expect(container.querySelector('[data-charge]')).not.toBeNull())
+    expect(container.textContent).toBe('')
+    expect(screen.queryByRole('button')).not.toBeInTheDocument()
   })
 })

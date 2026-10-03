@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 type Etat = {
   fiche: number
@@ -16,15 +16,32 @@ function phraseDuCompte(compte: number): string {
   return `${compte} personnes ont été gênées par ce terme.`
 }
 
+function estEtat(valeur: unknown): valeur is Etat {
+  if (typeof valeur !== 'object' || valeur === null) return false
+  const objet = valeur as Record<string, unknown>
+  const miens = objet.miens as Record<string, unknown> | null | undefined
+  return (
+    typeof objet.fiche === 'number' &&
+    typeof objet.alternatives === 'object' &&
+    objet.alternatives !== null &&
+    typeof miens === 'object' &&
+    miens !== null &&
+    typeof miens.fiche === 'boolean' &&
+    Array.isArray(miens.alternatives)
+  )
+}
+
 export function Votes({ fiche, alternatives }: { fiche: string; alternatives: Alternative[] }) {
   const [etat, setEtat] = useState<Etat | null>(null)
   const [charge, setCharge] = useState(false)
+  const dernierEnvoi = useRef(0)
 
   const relire = useCallback(async () => {
     try {
       const r = await fetch(`/api/votes?fiche=${encodeURIComponent(fiche)}`)
       if (!r.ok) return null
-      return (await r.json()) as Etat
+      const recu = await r.json()
+      return estEtat(recu) ? recu : null
     } catch {
       return null
     }
@@ -79,7 +96,15 @@ export function Votes({ fiche, alternatives }: { fiche: string; alternatives: Al
 
   async function basculer(alternative: string | null) {
     const avant = etat!
-    const vote = alternative === null ? avant.miens.fiche : avant.miens.alternatives.includes(alternative)
+    const vote =
+      alternative === null ? avant.miens.fiche : avant.miens.alternatives.includes(alternative)
+
+    // Chaque bascule prend un numéro. Une réponse qui revient alors qu'une bascule
+    // plus récente est partie ne doit plus rien écrire : sinon deux clics rapprochés
+    // dont les réponses arrivent dans le désordre laissent l'affichage sur l'état le
+    // plus ancien, et rien ne le rattrape jamais.
+    const envoi = dernierEnvoi.current + 1
+    dernierEnvoi.current = envoi
 
     setEtat(optimiste(avant, alternative, !vote))
 
@@ -89,18 +114,25 @@ export function Votes({ fiche, alternatives }: { fiche: string; alternatives: Al
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ fiche, alternative }),
       })
+      if (envoi !== dernierEnvoi.current) return
 
       if (r.ok) {
-        setEtat((await r.json()) as Etat)
-        return
+        const recu = await r.json()
+        if (envoi !== dernierEnvoi.current) return
+        if (estEtat(recu)) {
+          setEtat(recu)
+          return
+        }
       }
 
       // 409 : le serveur sait que ce visiteur a déjà voté, le navigateur
       // l'ignorait. Ce n'est pas une erreur à montrer, c'est un désaccord
       // d'état — on se réaligne sur le serveur, en silence.
       const frais = await relire()
+      if (envoi !== dernierEnvoi.current) return
       setEtat(frais ?? avant)
     } catch {
+      if (envoi !== dernierEnvoi.current) return
       setEtat(avant)
     }
   }
