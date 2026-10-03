@@ -5,7 +5,7 @@ import type { Cible, Comptes, DepotDeVotes, Miens } from './depot'
  * Le pilote de Neon parle en HTTP et ne sait pas joindre un PostgreSQL
  * ordinaire ; `pg` ne convient pas en production serverless, où chaque
  * invocation ouvrirait une connexion qui ne se referme pas assez vite. Cette
- * indirection permet d'exercer les requêtes SQL elles-mêmes contre un vrai
+ * indirection permet d’exercer les requêtes SQL elles-mêmes contre un vrai
  * PostgreSQL en intégration, en ne changeant que le transport.
  */
 export type Executeur = (sql: string, parametres: unknown[]) => Promise<Record<string, unknown>[]>

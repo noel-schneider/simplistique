@@ -8,7 +8,7 @@ import type { DepotDeVotes } from './depot'
 const URL_TEST = process.env.DATABASE_URL_TEST
 
 // Ces tests exigent un vrai PostgreSQL 15 ou plus : ils vérifient la contrainte
-// d'unicité, c'est-à-dire exactement ce qu'un dépôt en mémoire reproduirait de
+// d’unicité, c’est-à-dire exactement ce qu’un dépôt en mémoire reproduirait de
 // travers. Tester la déduplication contre un faux qui déduplique ne teste rien.
 describe.skipIf(!URL_TEST)('depotPostgres contre un vrai PostgreSQL', () => {
   let client: Client
@@ -43,7 +43,7 @@ describe.skipIf(!URL_TEST)('depotPostgres contre un vrai PostgreSQL', () => {
     })
   })
 
-  // Le test qui justifie à lui seul l'existence de ce fichier.
+  // Le test qui justifie à lui seul l’existence de ce fichier.
   it('la contrainte bloque un second vote de FICHE du même votant', async () => {
     expect(await depot.ajouter({ fiche: 'f', alternative: null }, ALICE)).toBe('ajoute')
     expect(await depot.ajouter({ fiche: 'f', alternative: null }, ALICE)).toBe('deja')

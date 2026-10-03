@@ -31,12 +31,12 @@ Les valeurs de `discipline` et `confusion` doivent exister dans
 ## Adresse du site
 
 `lib/site.ts` expose `urlSite()`, la seule source de l'adresse de base du
-site (métadonnées, plan de site, fichier robots). Elle vaut, dans l'ordre :
+site (métadonnées, plan de site, fichier robots). Elle vaut, dans l’ordre :
 `NEXT_PUBLIC_URL_SITE` si elle est définie, sinon
 `VERCEL_PROJECT_PRODUCTION_URL` (fournie automatiquement par Vercel,
 préfixée de `https://`), sinon `http://localhost:3000`. En développement,
-c'est donc `http://localhost:3000` par défaut ; elle se règle à
-l'hébergement, pas dans le code.
+c’est donc `http://localhost:3000` par défaut ; elle se règle à
+l’hébergement, pas dans le code.
 
 ## Commandes
 
