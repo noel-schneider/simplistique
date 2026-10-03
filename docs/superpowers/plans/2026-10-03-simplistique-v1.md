@@ -3260,7 +3260,17 @@ jobs:
 Run: `npm run lint:content && npm run test:once && npm run lint && npm run build`
 Expected: les quatre commandes réussissent d'affilée.
 
-- [ ] **Step 3: Écrire le README**
+- [ ] **Step 3: Déclarer le moteur Node, puis écrire le README**
+
+La contrainte globale exige Node 22 ou plus, mais rien dans le dépôt ne le dit à un contributeur : il découvrirait le problème par un échec de build obscur. Ajouter dans `package.json`, après le champ `private` :
+
+```json
+  "engines": {
+    "node": ">=22"
+  },
+```
+
+C'est le seul endroit du projet où un intervalle de version est voulu : il décrit le moteur attendu, pas une dépendance figée.
 
 Créer `README.md` :
 
