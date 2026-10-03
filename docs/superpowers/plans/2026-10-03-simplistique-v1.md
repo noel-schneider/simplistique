@@ -1023,15 +1023,20 @@ export function getIndex(dossier?: string, taxonomies?: Taxonomies): FicheIndex[
 // lib/filtrage.ts
 export type Criteres = { disciplines: string[]; confusions: string[]; statuts: string[]; q: string }
 export type SlugsValides = { disciplines: string[]; confusions: string[]; statuts: string[] }
+export type LibellesRecherche = { disciplines: Map<string, string>; confusions: Map<string, string> }
 export const CRITERES_VIDES: Criteres
 export function normaliser(texte: string): string
 export function analyserCriteres(params: URLSearchParams, valides: SlugsValides): Criteres
 export function ecrireCriteres(criteres: Criteres, vue?: 'carte' | 'liste'): string  // querystring sans « ? »
-export function filtrerFiches(index: FicheIndex[], criteres: Criteres): FicheIndex[]
+export function filtrerFiches(index: FicheIndex[], criteres: Criteres, libelles?: LibellesRecherche): FicheIndex[]
 export function aUnFiltre(criteres: Criteres): boolean
 ```
 
 `FicheIndex` ne porte pas les dates : c'est le seul objet traversé jusqu'au navigateur, autant qu'il reste minimal. `analyserCriteres` reçoit la liste des slugs valides en argument pour que `lib/filtrage.ts` ne lise jamais le disque et reste utilisable dans un composant client.
+
+`analyserCriteres` **élague les espaces de `q`**, parce que c'est le seul point d'entrée des critères dans le système : tout consommateur peut donc comparer `criteres.q` à la chaîne vide sans se demander s'il lui manque un `trim()`. Sans cela, une URL portant `?q=%20%20%20` produit un `q` qui paraît actif, ne filtre rien, et disparaît à la prochaine écriture — trois fonctions en désaccord sur le même état.
+
+`filtrerFiches` accepte en troisième argument, facultatif, les **libellés de taxonomie** : la recherche compare alors aussi le nom affiché de la discipline et du type de confusion. Sans cela, un visiteur qui tape « escalade » dans le champ de recherche n'obtient rien, alors qu'un bouton « Escalade » se trouve juste à côté. Comparer au slug ne suffirait pas, puisque le nom affiché est accentué (« Comptabilité », « Théorie musicale ») — c'est `normaliser` qui réconcilie les deux. L'argument reste facultatif pour que le module fonctionne sans taxonomie.
 
 - [ ] **Step 1: Écrire les tests qui échouent**
 
@@ -1103,6 +1108,19 @@ function fiche(p: Partial<FicheIndex>): FicheIndex {
   }
 }
 
+const LIBELLES = {
+  disciplines: new Map([
+    ['mathematiques', 'Mathématiques'],
+    ['comptabilite', 'Comptabilité'],
+    ['theorie-musicale', 'Théorie musicale'],
+    ['escalade', 'Escalade'],
+  ]),
+  confusions: new Map([
+    ['faux-ami-courant', 'Faux ami courant'],
+    ['polysemie-externe', 'Polysémie externe'],
+  ]),
+}
+
 const CORPUS: FicheIndex[] = [
   fiche({ slug: 'groupe-mathematiques', terme: 'groupe', resume: 'structure algébrique' }),
   fiche({ slug: 'actif-comptabilite', terme: 'actif', discipline: 'comptabilite', statut: 'propose', suggestions: ['avoir'] }),
@@ -1151,6 +1169,14 @@ describe('analyserCriteres', () => {
 
   it('conserve la recherche telle que saisie', () => {
     expect(analyserCriteres(new URLSearchParams('q=Tempé'), valides).q).toBe('Tempé')
+  })
+
+  it('élague les espaces autour de la recherche', () => {
+    expect(analyserCriteres(new URLSearchParams('q=%20%20mesure%20'), valides).q).toBe('mesure')
+  })
+
+  it('traite une recherche faite uniquement d\'espaces comme absente', () => {
+    expect(analyserCriteres(new URLSearchParams('q=%20%20%20'), valides)).toEqual(CRITERES_VIDES)
   })
 })
 
@@ -1203,9 +1229,28 @@ describe('filtrerFiches', () => {
     expect(filtrerFiches(CORPUS, { ...CRITERES_VIDES, q: 'licorne' })).toEqual([])
   })
 
-  it('ne modifie pas le tableau reçu', () => {
-    const copie = [...CORPUS]
-    filtrerFiches(CORPUS, { ...CRITERES_VIDES, q: 'mesure' })
+  it('ignore le nom de la discipline quand aucun libellé n\'est fourni', () => {
+    expect(filtrerFiches(CORPUS, { ...CRITERES_VIDES, q: 'escalade' })).toEqual([])
+  })
+
+  it('trouve par nom de discipline quand les libellés sont fournis', () => {
+    const r = filtrerFiches(CORPUS, { ...CRITERES_VIDES, q: 'escalade' }, LIBELLES)
+    expect(r.map((f) => f.slug)).toEqual(['mesure-escalade'])
+  })
+
+  it('trouve par nom de discipline accentué, tapé sans accent', () => {
+    const r = filtrerFiches(CORPUS, { ...CRITERES_VIDES, q: 'comptabilite' }, LIBELLES)
+    expect(r.map((f) => f.slug)).toEqual(['actif-comptabilite'])
+  })
+
+  it('trouve par nom de type de confusion', () => {
+    const r = filtrerFiches(CORPUS, { ...CRITERES_VIDES, q: 'polysémie' }, LIBELLES)
+    expect(r).toHaveLength(2)
+  })
+
+  it('ne modifie ni le tableau reçu ni les fiches qu\'il contient', () => {
+    const copie = structuredClone(CORPUS)
+    filtrerFiches(CORPUS, { ...CRITERES_VIDES, q: 'mesure' }, LIBELLES)
     expect(CORPUS).toEqual(copie)
   })
 })
@@ -1295,12 +1340,17 @@ export type SlugsValides = {
   statuts: string[]
 }
 
+export type LibellesRecherche = {
+  disciplines: Map<string, string>
+  confusions: Map<string, string>
+}
+
 export const CRITERES_VIDES: Criteres = { disciplines: [], confusions: [], statuts: [], q: '' }
 
 export function normaliser(texte: string): string {
   return texte
     .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
+    .replace(/[\u0300-\u036f]/g, '') // diacritiques, en échappements : ces caractères combinants sont invisibles
     .replace(/œ/gi, 'oe')
     .replace(/æ/gi, 'ae')
     .toLowerCase()
@@ -1322,7 +1372,7 @@ export function analyserCriteres(params: URLSearchParams, valides: SlugsValides)
     disciplines: lireListe(params, 'discipline', valides.disciplines),
     confusions: lireListe(params, 'confusion', valides.confusions),
     statuts: lireListe(params, 'statut', valides.statuts),
-    q: params.get('q') ?? '',
+    q: (params.get('q') ?? '').trim(),
   }
 }
 
@@ -1345,7 +1395,11 @@ export function aUnFiltre(criteres: Criteres): boolean {
   )
 }
 
-export function filtrerFiches(index: FicheIndex[], criteres: Criteres): FicheIndex[] {
+export function filtrerFiches(
+  index: FicheIndex[],
+  criteres: Criteres,
+  libelles?: LibellesRecherche,
+): FicheIndex[] {
   const recherche = normaliser(criteres.q)
 
   return index.filter((fiche) => {
@@ -1354,8 +1408,14 @@ export function filtrerFiches(index: FicheIndex[], criteres: Criteres): FicheInd
     if (criteres.statuts.length && !criteres.statuts.includes(fiche.statut)) return false
     if (!recherche) return true
 
-    const champs = [fiche.terme, fiche.resume, ...fiche.suggestions]
-    return champs.some((champ) => normaliser(champ).includes(recherche))
+    const champs = [
+      fiche.terme,
+      fiche.resume,
+      ...fiche.suggestions,
+      libelles?.disciplines.get(fiche.discipline) ?? '',
+      libelles?.confusions.get(fiche.confusion) ?? '',
+    ]
+    return champs.some((champ) => champ !== '' && normaliser(champ).includes(recherche))
   })
 }
 ```
@@ -2343,6 +2403,14 @@ describe('Corpus — filtres et URL', () => {
     expect(screen.queryByRole('link', { name: /groupe/ })).not.toBeInTheDocument()
   })
 
+  it('trouve une fiche en tapant le nom de sa discipline', async () => {
+    afficher()
+    await userEvent.type(screen.getByRole('searchbox'), 'escalade')
+    expect(screen.getByRole('link', { name: /tempérament/ })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /statique/ })).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: /groupe/ })).not.toBeInTheDocument()
+  })
+
   it('cumule deux filtres', () => {
     recherche = 'discipline=escalade&statut=rejete'
     afficher()
@@ -2767,7 +2835,15 @@ export function Corpus({
   const [vue, setVue] = useState<Vue>(() => vueValide ?? vueParDefaut())
   const [vueExplicite, setVueExplicite] = useState(vueValide !== null)
 
-  const fiches = filtrerFiches(index, criteres)
+  const libellesRecherche = useMemo(
+    () => ({
+      disciplines: new Map(disciplines.map((d) => [d.slug, d.nom])),
+      confusions: new Map(confusions.map((c) => [c.slug, c.nom])),
+    }),
+    [disciplines, confusions],
+  )
+
+  const fiches = filtrerFiches(index, criteres, libellesRecherche)
 
   const libelles: Libelles = useMemo(
     () => ({
