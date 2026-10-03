@@ -3,7 +3,16 @@ import type { FicheMeta } from '@/lib/content/schema'
 import { BadgeStatut } from './badge-statut'
 
 function enFrancais(date: Date): string {
-  return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
+  // Les dates du front-matter sont parsées à minuit UTC (`cree: 2026-10-03`).
+  // Sans timeZone explicite, l'affichage suit le fuseau du serveur de build :
+  // à l'ouest de UTC, la date affichée recule d'un jour par rapport à
+  // l'attribut `datetime` sur la même ligne.
+  return date.toLocaleDateString('fr-FR', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'UTC',
+  })
 }
 
 export function EnteteFiche({
