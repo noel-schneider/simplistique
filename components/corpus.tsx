@@ -1,7 +1,7 @@
 'use client'
 
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import type { Discipline, EntreeTaxonomie, FicheIndex } from '@/lib/content/schema'
 import {
   analyserCriteres,
@@ -50,29 +50,51 @@ export function Corpus({
   const vueDemandee = params.get('vue')
   const vueValide = vueDemandee === 'carte' || vueDemandee === 'liste' ? vueDemandee : null
 
+  const requeteActuelle = params.toString()
+
   const [criteres, setCriteres] = useState<Criteres>(() =>
-    analyserCriteres(new URLSearchParams(params.toString()), valides),
+    analyserCriteres(new URLSearchParams(requeteActuelle), valides),
   )
   const [vue, setVue] = useState<Vue>(() => vueValide ?? vueParDefaut())
   const [vueExplicite, setVueExplicite] = useState(vueValide !== null)
 
-  const libellesRecherche = useMemo(
+  // La requête que NOUS avons écrite en dernier. Tout écart signifie que l’URL a
+  // changé sans passer par `naviguer` — un lien interne vers /fiches depuis la
+  // navigation du site, par exemple, qui laisse ce composant monté. Il faut alors
+  // repartir de l’URL : sinon l’affichage garde des filtres que l’URL ne porte
+  // plus, et la prochaine interaction les réécrirait dedans.
+  const derniereRequeteEcrite = useRef(requeteActuelle)
+
+  useEffect(() => {
+    if (derniereRequeteEcrite.current === requeteActuelle) return
+    derniereRequeteEcrite.current = requeteActuelle
+
+    const prochains = new URLSearchParams(requeteActuelle)
+    const demandee = prochains.get('vue')
+    const valide = demandee === 'carte' || demandee === 'liste' ? demandee : null
+
+    setCriteres(analyserCriteres(prochains, valides))
+    setVue(valide ?? vueParDefaut())
+    setVueExplicite(valide !== null)
+  }, [requeteActuelle, valides])
+
+  // Une seule construction des tables slug -> libellé, consommée à la fois par la
+  // recherche et par l’affichage.
+  const libellesParSlug = useMemo(
     () => ({
       disciplines: new Map(disciplines.map((d) => [d.slug, d.nom])),
       confusions: new Map(confusions.map((c) => [c.slug, c.nom])),
-    }),
-    [disciplines, confusions],
-  )
-
-  const fiches = filtrerFiches(index, criteres, libellesRecherche)
-
-  const libelles: Libelles = useMemo(
-    () => ({
-      disciplines: new Map(disciplines.map((d) => [d.slug, d.nom])),
       statuts: new Map(statuts.map((s) => [s.slug, s.nom])),
     }),
-    [disciplines, statuts],
+    [disciplines, confusions, statuts],
   )
+
+  const fiches = filtrerFiches(index, criteres, libellesParSlug)
+
+  const libelles: Libelles = {
+    disciplines: libellesParSlug.disciplines,
+    statuts: libellesParSlug.statuts,
+  }
 
   function naviguer(prochainsCriteres: Criteres, prochaineVue: Vue) {
     const explicite = vueExplicite || prochaineVue !== vue
@@ -82,6 +104,7 @@ export function Corpus({
     setVueExplicite(explicite)
 
     const requete = ecrireCriteres(prochainsCriteres, explicite ? prochaineVue : undefined)
+    derniereRequeteEcrite.current = requete
     router.replace(requete ? `${chemin}?${requete}` : chemin, { scroll: false })
   }
 
@@ -101,7 +124,7 @@ export function Corpus({
             </button>
           ))}
         </div>
-        <p className="text-sm text-stone-500">
+        <p role="status" className="text-sm text-stone-500">
           {`${fiches.length} fiche${fiches.length > 1 ? 's' : ''}${
             fiches.length === index.length ? '' : ` sur ${index.length}`
           }`}

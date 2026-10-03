@@ -38,7 +38,12 @@ export function Filtres({
       />
 
       {groupes.map(({ cle, libelle, entrees }) => (
-        <div key={cle} className="flex flex-wrap items-baseline gap-2">
+        <div
+          key={cle}
+          role="group"
+          aria-label={libelle}
+          className="flex flex-wrap items-baseline gap-2"
+        >
           <span className="text-xs uppercase tracking-wide text-stone-500">{libelle}</span>
           {entrees.map(({ slug, nom }) => {
             const actif = criteres[cle].includes(slug)

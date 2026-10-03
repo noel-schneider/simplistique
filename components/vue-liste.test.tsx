@@ -24,6 +24,23 @@ const libelles: Libelles = {
   ]),
 }
 
+// Libellés dont l’ordre alphabétique DIFFÈRE de celui des slugs. C’est la seule
+// façon de prouver que le tri porte sur le libellé affiché et non sur le slug :
+// avec les libellés réels ci-dessus, « Escalade » et « escalade » se classent de
+// la même façon, et un tri qui ignorerait complètement les libellés passerait
+// quand même.
+const LIBELLES_DIVERGENTS: Libelles = {
+  disciplines: new Map([
+    ['mathematiques', 'Algèbre'], // slug second, libellé premier
+    ['escalade', 'Varappe'], // slug premier, libellé second
+  ]),
+  statuts: new Map([
+    ['pointe', 'Signalé'], // slug premier, libellé troisième
+    ['propose', 'Avancé'], // slug second, libellé premier
+    ['rejete', 'Écarté'], // slug troisième, libellé second
+  ]),
+}
+
 function fiche(p: Partial<FicheIndex>): FicheIndex {
   return {
     slug: 'x',
@@ -68,18 +85,18 @@ describe('trierFiches', () => {
   })
 
   it('trie par libellé de discipline, pas par slug', () => {
-    expect(trierFiches(fiches, 'discipline', true, libelles).map((f) => f.discipline)).toEqual([
+    expect(trierFiches(fiches, 'discipline', true, LIBELLES_DIVERGENTS).map((f) => f.discipline)).toEqual([
+      'mathematiques',
+      'mathematiques',
       'escalade',
-      'mathematiques',
-      'mathematiques',
     ])
   })
 
-  it('trie par libellé de statut', () => {
-    expect(trierFiches(fiches, 'statut', true, libelles).map((f) => f.statut)).toEqual([
-      'pointe',
+  it('trie par libellé de statut, pas par slug', () => {
+    expect(trierFiches(fiches, 'statut', true, LIBELLES_DIVERGENTS).map((f) => f.statut)).toEqual([
       'propose',
       'rejete',
+      'pointe',
     ])
   })
 

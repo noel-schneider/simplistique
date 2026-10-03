@@ -51,10 +51,14 @@ const index: FicheIndex[] = [
   fiche({ slug: 'statique-escalade', terme: 'statique', discipline: 'escalade', statut: 'propose', suggestions: ['contrôlé'] }),
 ]
 
+// Un élément neuf à chaque appel : React peut court-circuiter un re-rendu si on
+// lui repasse exactement la même référence d’élément.
+function elementCorpus() {
+  return <Corpus index={index} disciplines={disciplines} confusions={confusions} statuts={statuts} />
+}
+
 function afficher() {
-  return render(
-    <Corpus index={index} disciplines={disciplines} confusions={confusions} statuts={statuts} />,
-  )
+  return render(elementCorpus())
 }
 
 beforeEach(() => {
@@ -115,6 +119,30 @@ describe('Corpus — filtres et URL', () => {
     await userEvent.type(screen.getByRole('searchbox'), 'tempe')
     expect(screen.getByRole('link', { name: /tempérament/ })).toBeInTheDocument()
     expect(screen.queryByRole('link', { name: /groupe/ })).not.toBeInTheDocument()
+  })
+
+  it('resynchronise ses filtres quand l’URL change sans passer par lui', () => {
+    recherche = 'discipline=escalade'
+    const { rerender } = afficher()
+    expect(screen.queryByRole('link', { name: /groupe/ })).not.toBeInTheDocument()
+
+    // Lien interne vers /fiches sans paramètre : le segment de route ne change
+    // pas, donc le composant reste monté avec son état.
+    recherche = ''
+    rerender(elementCorpus())
+
+    expect(screen.getByRole('link', { name: /groupe/ })).toBeInTheDocument()
+    expect(screen.getByText(/3 fiches/)).toBeInTheDocument()
+  })
+
+  it('ne réécrit pas un filtre périmé après une resynchronisation', async () => {
+    recherche = 'discipline=escalade'
+    const { rerender } = afficher()
+    recherche = ''
+    rerender(elementCorpus())
+
+    await userEvent.click(screen.getByRole('button', { name: 'Pointé' }))
+    expect(remplacer).toHaveBeenLastCalledWith('/fiches?statut=pointe', { scroll: false })
   })
 
   it('trouve une fiche en tapant le nom de sa discipline', async () => {
