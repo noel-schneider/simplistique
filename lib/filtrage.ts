@@ -13,12 +13,17 @@ export type SlugsValides = {
   statuts: string[]
 }
 
+export type LibellesRecherche = {
+  disciplines: Map<string, string>
+  confusions: Map<string, string>
+}
+
 export const CRITERES_VIDES: Criteres = { disciplines: [], confusions: [], statuts: [], q: '' }
 
 export function normaliser(texte: string): string {
   return texte
     .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
+    .replace(/[̀-ͯ]/g, '') // diacritiques, en échappements : ces caractères combinants sont invisibles
     .replace(/œ/gi, 'oe')
     .replace(/æ/gi, 'ae')
     .toLowerCase()
@@ -40,7 +45,7 @@ export function analyserCriteres(params: URLSearchParams, valides: SlugsValides)
     disciplines: lireListe(params, 'discipline', valides.disciplines),
     confusions: lireListe(params, 'confusion', valides.confusions),
     statuts: lireListe(params, 'statut', valides.statuts),
-    q: params.get('q') ?? '',
+    q: (params.get('q') ?? '').trim(),
   }
 }
 
@@ -63,7 +68,11 @@ export function aUnFiltre(criteres: Criteres): boolean {
   )
 }
 
-export function filtrerFiches(index: FicheIndex[], criteres: Criteres): FicheIndex[] {
+export function filtrerFiches(
+  index: FicheIndex[],
+  criteres: Criteres,
+  libelles?: LibellesRecherche,
+): FicheIndex[] {
   const recherche = normaliser(criteres.q)
 
   return index.filter((fiche) => {
@@ -72,7 +81,13 @@ export function filtrerFiches(index: FicheIndex[], criteres: Criteres): FicheInd
     if (criteres.statuts.length && !criteres.statuts.includes(fiche.statut)) return false
     if (!recherche) return true
 
-    const champs = [fiche.terme, fiche.resume, ...fiche.suggestions]
-    return champs.some((champ) => normaliser(champ).includes(recherche))
+    const champs = [
+      fiche.terme,
+      fiche.resume,
+      ...fiche.suggestions,
+      libelles?.disciplines.get(fiche.discipline) ?? '',
+      libelles?.confusions.get(fiche.confusion) ?? '',
+    ]
+    return champs.some((champ) => champ !== '' && normaliser(champ).includes(recherche))
   })
 }

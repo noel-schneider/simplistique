@@ -29,6 +29,19 @@ function fiche(p: Partial<FicheIndex>): FicheIndex {
   }
 }
 
+const LIBELLES = {
+  disciplines: new Map([
+    ['mathematiques', 'Mathématiques'],
+    ['comptabilite', 'Comptabilité'],
+    ['theorie-musicale', 'Théorie musicale'],
+    ['escalade', 'Escalade'],
+  ]),
+  confusions: new Map([
+    ['faux-ami-courant', 'Faux ami courant'],
+    ['polysemie-externe', 'Polysémie externe'],
+  ]),
+}
+
 const CORPUS: FicheIndex[] = [
   fiche({ slug: 'groupe-mathematiques', terme: 'groupe', resume: 'structure algébrique' }),
   fiche({ slug: 'actif-comptabilite', terme: 'actif', discipline: 'comptabilite', statut: 'propose', suggestions: ['avoir'] }),
@@ -77,6 +90,14 @@ describe('analyserCriteres', () => {
 
   it('conserve la recherche telle que saisie', () => {
     expect(analyserCriteres(new URLSearchParams('q=Tempé'), valides).q).toBe('Tempé')
+  })
+
+  it('élague les espaces autour de la recherche', () => {
+    expect(analyserCriteres(new URLSearchParams('q=%20%20mesure%20'), valides).q).toBe('mesure')
+  })
+
+  it('traite une recherche faite uniquement d\'espaces comme absente', () => {
+    expect(analyserCriteres(new URLSearchParams('q=%20%20%20'), valides)).toEqual(CRITERES_VIDES)
   })
 })
 
@@ -129,9 +150,28 @@ describe('filtrerFiches', () => {
     expect(filtrerFiches(CORPUS, { ...CRITERES_VIDES, q: 'licorne' })).toEqual([])
   })
 
-  it('ne modifie pas le tableau reçu', () => {
-    const copie = [...CORPUS]
-    filtrerFiches(CORPUS, { ...CRITERES_VIDES, q: 'mesure' })
+  it('ignore le nom de la discipline quand aucun libellé n\'est fourni', () => {
+    expect(filtrerFiches(CORPUS, { ...CRITERES_VIDES, q: 'escalade' })).toEqual([])
+  })
+
+  it('trouve par nom de discipline quand les libellés sont fournis', () => {
+    const r = filtrerFiches(CORPUS, { ...CRITERES_VIDES, q: 'escalade' }, LIBELLES)
+    expect(r.map((f) => f.slug)).toEqual(['mesure-escalade'])
+  })
+
+  it('trouve par nom de discipline accentué, tapé sans accent', () => {
+    const r = filtrerFiches(CORPUS, { ...CRITERES_VIDES, q: 'comptabilite' }, LIBELLES)
+    expect(r.map((f) => f.slug)).toEqual(['actif-comptabilite'])
+  })
+
+  it('trouve par nom de type de confusion', () => {
+    const r = filtrerFiches(CORPUS, { ...CRITERES_VIDES, q: 'polysémie' }, LIBELLES)
+    expect(r).toHaveLength(2)
+  })
+
+  it('ne modifie ni le tableau reçu ni les fiches qu\'il contient', () => {
+    const copie = structuredClone(CORPUS)
+    filtrerFiches(CORPUS, { ...CRITERES_VIDES, q: 'mesure' }, LIBELLES)
     expect(CORPUS).toEqual(copie)
   })
 })
