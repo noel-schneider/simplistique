@@ -23,7 +23,7 @@ export const CRITERES_VIDES: Criteres = { disciplines: [], confusions: [], statu
 export function normaliser(texte: string): string {
   return texte
     .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '') // diacritiques, en échappements : ces caractères combinants sont invisibles
+    .replace(/[\u0300-\u036f]/g, '') // diacritiques, en échappements : ces caractères combinants sont invisibles
     .replace(/œ/gi, 'oe')
     .replace(/æ/gi, 'ae')
     .toLowerCase()
