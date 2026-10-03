@@ -1,6 +1,7 @@
-# Cinq décisions en attente
+# Sept décisions en attente
 
-Cinq questions se sont posées pendant la construction de la v1. Elles ne sont pas
+Cinq questions se sont posées pendant la construction de la v1, et deux de plus pendant
+celle du système de vote. Elles ne sont pas
 des défauts : ce sont des choix de conception qui t'appartiennent, et je les ai
 laissées ouvertes plutôt que de les trancher à ta place.
 
@@ -252,6 +253,107 @@ bâclée vaudra moins que pas de description du tout.
 
 ---
 
+## 6. Ta note de vie privée dit vrai, mais pas tout
+
+### Ce qui se passe aujourd'hui
+
+La page « contribuer » promet que ton site n'enregistre jamais une adresse, seulement
+son empreinte salée. C'est exact, et la relecture l'a vérifié ligne à ligne : aucune
+colonne d'adresse dans la table, aucune requête qui en lise une, aucun journal,
+aucun cookie.
+
+Deux choses que la note ne dit pas, et que je ne veux pas trancher à ta place parce
+qu'elles touchent ta voix, pas le code :
+
+**Qui a accès à la base peut relier tes votants à eux-mêmes.** L'index
+`votes_par_votant_date` permet de regrouper toutes les lignes d'une même empreinte :
+on obtient la liste horodatée des fiches sur lesquelles cette personne a voté. Ce
+n'est pas un historique de lecture — rien n'est écrit quand on lit une fiche — mais
+c'est une corrélation entre votes que la note ne mentionne pas.
+
+**Et qui détient à la fois la base et `SEL_VOTES` peut confirmer une adresse soupçonnée**
+au prix d'un seul calcul. Ces deux-là vivent côte à côte dans ton panneau Vercel, donc
+cette personne, c'est toi. « Irréversible » est vrai contre une fuite de la base seule,
+pas contre son propriétaire. La note le laisse déjà entendre — « une clé secrète qui
+ne quitte pas le serveur » — mais ne le dit pas franchement.
+
+### Les options
+
+**A. Ajouter deux phrases.** Par exemple, après le paragraphe sur l'empreinte : « Les
+votes d'une même empreinte peuvent être reliés entre eux par qui administre la base.
+L'empreinte ne remonte à une adresse que pour qui détient aussi la clé secrète. »
+*Coût : deux phrases. Elles alourdissent une note aujourd'hui très lisible.*
+
+**B. Ne rien changer.** La note est exacte ; aucune de ces deux nuances ne la rend
+fausse, et elles décrivent une propriété commune à tout système de déduplication sans
+comptes.
+
+**C. Supprimer l'index `votes_par_votant_date`.** Il ne sert que la limite de débit,
+qui filtre déjà par empreinte. Sans index, la corrélation reste possible, juste plus
+lente. *Coût : une requête de limite de débit plus lente, pour un gain réel nul.
+Je ne le recommande pas : ce serait de la sécurité par inconfort.*
+
+### Ce que je recommande : A
+
+Pas parce que la note est trompeuse — elle ne l'est pas —, mais parce que ton projet
+soutient qu'un mot approximatif coûte à celui qui l'hérite. Une note de vie privée qui
+dit exactement l'étendue de ce qu'elle promet est la version de ce site qui se tient.
+
+Si tu choisis B, c'est défendable et je ne le regretterai pas : tu publies alors une
+note vraie, simplement moins complète que ce qu'elle pourrait être.
+
+---
+
+## 7. Trois choses que tu ne pourras pas faire, et aucune n'est un bug
+
+### Ce qui se passe aujourd'hui
+
+Le système de vote est écrit, testé, et prêt. Mais il n'a aucun outil de réparation,
+et c'est un manque de ma spec, pas du code.
+
+**Tu ne pourras pas corriger une ligne orpheline.** Si tu reformules le texte d'une
+alternative, son empreinte change : les anciens votes restent en base et ne sont plus
+affichés nulle part. `npm run votes:orphelins` te les signale — il ne les corrige pas.
+Les rattacher demande une requête SQL écrite à la main.
+
+**Tu ne pourras pas sortir proprement d'une rotation de sel.** Ma spec la présente
+comme « un geste manuel disponible » si tu soupçonnes un abus. En pratique : les
+anciennes lignes gardent leur empreinte, donc comptent toujours dans les compteurs,
+mais leurs auteurs ne les reconnaissent plus comme leurs et peuvent revoter — et
+seront comptés deux fois. Rien ne permet de défaire cela sans `DELETE` manuel.
+
+**Tu ne sauras pas que c'est cassé.** La route reste muette par conception, pour ne
+jamais journaliser quoi que ce soit qui pourrait porter une adresse. Elle consigne
+désormais le nom de la classe d'erreur et le code SQL — assez pour diagnostiquer en
+dix secondes quand tu regardes — mais personne ne t'alertera. Une panne de trois
+semaines ne se remarquerait qu'en ouvrant une fiche.
+
+### Les options
+
+**A. Une commande de purge, avec confirmation.** `npm run votes:purger` qui supprime
+les lignes orphelines, et `--tout` pour vider la table après une rotation de sel.
+*Coût : une petite heure, et un garde-fou sérieux contre la faute de frappe.*
+
+**B. Attendre d'en avoir besoin.** Le corpus compte cinq fiches ; la première
+reformulation d'alternative n'arrivera peut-être jamais, et une requête SQL ponctuelle
+depuis la console Neon fait le travail.
+
+**C. Une alerte minimale.** Un contrôle quotidien qui appelle `/api/votes?fiche=…` et
+te prévient si la réponse n'est pas 200. *Coût : une action planifiée de quelques
+lignes, et un peu de bruit les jours de panne d'hébergeur.*
+
+### Ce que je recommande : B maintenant, A au premier besoin réel
+
+Écrire une commande de purge avant d'avoir une seule ligne à purger, c'est construire
+pour un avenir supposé. La console Neon suffit à cinq fiches. Mais garde cette page
+sous la main : le jour où tu reformules une alternative qui a déjà des votes, tu auras
+exactement ce problème, et tu sauras que ce n'est pas une surprise.
+
+C, en revanche, vaut le coup dès que le vote compte pour toi. Un sondage dont personne
+ne remarque la panne ne mesure rien.
+
+---
+
 ## Résumé, mis à jour
 
 | Question | Recommandation | Coût | Touche ton texte ? |
@@ -261,11 +363,14 @@ bâclée vaudra moins que pas de description du tout.
 | 3. Types de confusion en double | Laisser + détecter le décalage (A+B) | une quinzaine de lignes | non |
 | 4. Contrainte trop absolue | Reformuler le plan (option A) | deux lignes | non |
 | 5. `description` sans emploi | Afficher sur `/fiches` (option A) | une quinzaine de lignes | non |
+| 6. Note de vie privée incomplète | Ajouter deux phrases (option A) | deux phrases | **oui** |
+| 7. Aucun outil de réparation | Attendre, puis purger au besoin (B) | nul aujourd'hui | non |
 
-Les questions 4 et 5 sont des défauts de **ma** spec, pas du code : elle se contredit
+Les questions 4, 5 et 7 sont des défauts de **ma** spec, pas du code : elle se contredit
 dans un cas, et impose une obligation sans emploi dans l'autre. Les trois premières
 sont de vrais choix de conception qui t'appartiennent.
 
-Aucune des cinq n'est urgente, et aucune ne bloque la mise en ligne. La seule qui ait
+Aucune des sept n'est urgente, et aucune ne bloque la mise en ligne. La seule qui ait
 un effet sur un visiteur dès aujourd'hui reste la deuxième, et seulement pour ceux qui
-naviguent avec un lecteur d'écran.
+naviguent avec un lecteur d'écran. La sixième est la seule qui touche un texte publié,
+et la seule qui demande ta voix plutôt que mon avis.

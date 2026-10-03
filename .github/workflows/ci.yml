@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [master]
   pull_request:
 
 jobs:
@@ -34,3 +34,5 @@ jobs:
           DATABASE_URL_TEST: postgres://postgres:ci@localhost:5432/simplistique_test
       - run: npm run lint
       - run: npm run build
+      # Doit suivre le build : il lit les manifestes que celui-ci vient d’écrire.
+      - run: npm run verifier:statique

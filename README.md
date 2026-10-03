@@ -47,6 +47,7 @@ l’hébergement, pas dans le code.
 | `npm run test:once` | Toute la suite de tests |
 | `npm run lint` | ESLint, utilisé par l’intégration continue |
 | `npm run lint:content` | Avertissements de cohérence des fiches |
+| `npm run migrer` | Crée la table des votes et ses index ; sans effet si elle existe déjà |
 | `npm run votes:orphelins` | Signale les votes dont la fiche ou l’alternative a disparu du corpus |
 
 ## Variables d’environnement
@@ -56,6 +57,11 @@ l’hébergement, pas dans le code.
 | `DATABASE_URL` | Posée par l’intégration Neon de Vercel. |
 | `SEL_VOTES` | Une valeur aléatoire de 32 octets, jamais versionnée. |
 | `DATABASE_URL_TEST` | Facultative, pour lancer les tests d’intégration en local. |
+
+Les deux commandes qui touchent la base — `npm run migrer` et
+`npm run votes:orphelins` — lisent `.env.local` s’il existe. Sans lui, passez la
+variable sur la même ligne : `DATABASE_URL='...' npm run migrer`. Ne collez pas la
+chaîne de connexion avec ses guillemets : elle ne serait pas analysable comme URL.
 
 Sans `DATABASE_URL_TEST`, les tests de `depot-postgres` sont ignorés et la
 suite passe quand même.

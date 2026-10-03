@@ -1,7 +1,9 @@
 # Contribuer
 
-Le corpus est ouvert. Il n’y a pas encore de comptes ni de votes sur ce site :
-tout passe par le dépôt, où la discussion reste publique et tracée.
+Le corpus est ouvert, et il n’y a pas de comptes sur ce site. Les propositions
+passent par le dépôt, où la discussion reste publique et tracée ; le vote, lui,
+se fait anonymement depuis chaque fiche (voir « Ce que ce site enregistre »,
+plus bas).
 
 ## Proposer une analyse
 
@@ -65,11 +67,14 @@ Vous pouvez voter sur une fiche et sur ses alternatives sans créer de compte. P
 qu’une même personne ne vote pas deux fois, le serveur calcule une empreinte à partir de
 votre adresse réseau et de votre navigateur.
 
-**Votre adresse n’est jamais enregistrée.** Seule cette empreinte l’est, et elle est
-irréversible : elle est calculée avec une clé secrète qui ne quitte pas le serveur. Elle
-ne permet ni de vous identifier, ni de vous recontacter, ni de savoir ce que vous avez lu.
+**Votre adresse n’est jamais enregistrée par ce site.** Seule cette empreinte l’est. Elle
+est calculée avec une clé secrète qui ne quitte pas le serveur : sans cette clé, elle ne
+remonte pas à votre adresse. Elle ne permet ni de vous recontacter, ni de savoir ce que
+vous avez lu — seulement ce que vous avez voté.
 
 Rien n’est stocké dans votre navigateur. Aucun cookie, aucun traceur, aucune mesure
 d’audience.
 
-Un vote peut être annulé à tout moment, depuis la fiche où il a été émis.
+Un vote peut être annulé depuis la fiche où il a été émis, tant que vous y revenez
+avec le même navigateur et la même connexion : l’empreinte change avec eux, et le site
+n’a aucun autre moyen de reconnaître que ce vote est le vôtre.
