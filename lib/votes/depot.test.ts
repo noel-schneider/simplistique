@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { depotEnMemoire, type DepotDeVotes } from './depot'
 
 const ALICE = 'a'.repeat(64)
@@ -93,5 +93,33 @@ describe('depotEnMemoire', () => {
     await depot.ajouter({ fiche: 'f', alternative: null }, ALICE)
     const apres = new Date(Date.now() + 60_000)
     expect(await depot.nombreDepuis(ALICE, apres)).toBe(0)
+  })
+  it('compte un vote dont la date égale exactement la date demandée', async () => {
+    const instant = new Date('2026-10-03T12:00:00Z')
+    vi.useFakeTimers()
+    vi.setSystemTime(instant)
+    try {
+      await depot.ajouter({ fiche: 'f', alternative: null }, ALICE)
+    } finally {
+      vi.useRealTimers()
+    }
+
+    // La frontière est inclusive : un vote posé à l’instant demandé compte, le suivant non.
+    // Sans ce test, rien ne distinguerait `creeLe >= depuis` de `creeLe > depuis`, et la
+    // limite de débit de la tâche 5 compterait un vote de trop ou de moins à chaque fenêtre.
+    expect(await depot.nombreDepuis(ALICE, instant)).toBe(1)
+    expect(await depot.nombreDepuis(ALICE, new Date(instant.getTime() + 1))).toBe(0)
+  })
+
+  it('ne dit rien d’un votant qui n’a jamais voté', async () => {
+    await depot.ajouter({ fiche: 'f', alternative: 'aaaa1111bbbb2222' }, ALICE)
+    expect(await depot.votesDe('f', BOB)).toEqual({ fiche: false, alternatives: [] })
+  })
+
+  it('retirer deux fois ne retire qu’une fois', async () => {
+    await depot.ajouter({ fiche: 'f', alternative: null }, ALICE)
+    expect(await depot.retirer({ fiche: 'f', alternative: null }, ALICE)).toBe('retire')
+    expect(await depot.retirer({ fiche: 'f', alternative: null }, ALICE)).toBe('absent')
+    expect((await depot.compter('f')).fiche).toBe(0)
   })
 })
