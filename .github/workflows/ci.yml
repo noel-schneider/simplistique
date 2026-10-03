@@ -8,6 +8,19 @@ on:
 jobs:
   verifier:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: ci
+          POSTGRES_DB: simplistique_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
@@ -17,5 +30,7 @@ jobs:
       - run: npm ci
       - run: npm run lint:content
       - run: npm run test:once
+        env:
+          DATABASE_URL_TEST: postgres://postgres:ci@localhost:5432/simplistique_test
       - run: npm run lint
       - run: npm run build

@@ -47,3 +47,14 @@ l'hébergement, pas dans le code.
 | `npm run test:once` | Toute la suite de tests |
 | `npm run lint` | ESLint, utilisé par l’intégration continue |
 | `npm run lint:content` | Avertissements de cohérence des fiches |
+
+## Variables d’environnement
+
+| Variable | Rôle |
+|---|---|
+| `DATABASE_URL` | Posée par l’intégration Neon de Vercel. |
+| `SEL_VOTES` | Une valeur aléatoire de 32 octets, jamais versionnée. |
+| `DATABASE_URL_TEST` | Facultative, pour lancer les tests d’intégration en local. |
+
+Sans `DATABASE_URL_TEST`, les tests de `depot-postgres` sont ignorés et la
+suite passe quand même.
