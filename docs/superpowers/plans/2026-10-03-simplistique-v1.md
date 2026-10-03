@@ -6,7 +6,7 @@
 
 **Architecture:** Le contenu vit dans des fichiers markdown et YAML versionnés sous `content/`. Un seul module (`lib/content`) les lit, les valide avec Zod et expose des objets typés ; aucun composant d'affichage ne sait que la source est du markdown. Le filtrage est une fonction pure (`lib/filtrage.ts`) appelée par un composant client qui lit et écrit l'état dans l'URL. Tout est rendu statiquement au build : aucun code ne tourne à l'exécution.
 
-**Tech Stack:** Next.js 16.3.8 (App Router), React 19.2.8, TypeScript 5.9.3, Tailwind CSS 4.3.3, Zod 4.6.5, gray-matter 4.0.3, js-yaml 5.4.2, unified 11 / remark-parse 11 / remark-rehype 11 / rehype-slug 6 / rehype-stringify 10, Vitest 5.0.3 + @testing-library/react 16.3.3 + jsdom 30, déploiement Vercel, CI GitHub Actions.
+**Tech Stack:** Next.js 16.3.8 (App Router), React 19.2.8, TypeScript 5.9.3, Tailwind CSS 4.3.3, Zod 4.6.5, gray-matter 4.0.3, js-yaml 5.4.2, unified 11 / remark-parse 11 / remark-rehype 11 / rehype-sanitize 6 / rehype-slug 6 / rehype-stringify 10, Vitest 5.0.3 + @testing-library/react 16.3.3 + jsdom 30, déploiement Vercel, CI GitHub Actions.
 
 **Spec:** `docs/superpowers/specs/2026-10-03-simplistique-design.md`
 
@@ -826,6 +826,7 @@ git commit -m "feat: lecture et validation des fiches markdown"
 **Files:**
 - Create: `lib/content/markdown.ts`
 - Test: `lib/content/markdown.test.ts`
+- Installer : `npm install --save-exact rehype-sanitize@6.0.0`
 
 **Interfaces:**
 - Consumes: rien.
@@ -879,6 +880,22 @@ describe('rendreMarkdown', () => {
     expect(html).not.toContain('<script>')
   })
 
+  it('retire un lien dont le protocole est exécutable', async () => {
+    const html = await rendreMarkdown('[clic](javascript:alert(1))')
+    expect(html).not.toContain('javascript:')
+    expect(html).toContain('clic')
+  })
+
+  it('retire une image dont le protocole est exécutable', async () => {
+    const html = await rendreMarkdown('![x](javascript:alert(1))')
+    expect(html).not.toContain('javascript:')
+  })
+
+  it('conserve un lien http légitime', async () => {
+    const html = await rendreMarkdown('[le dépôt](https://example.org/a)')
+    expect(html).toContain('href="https://example.org/a"')
+  })
+
   it('rend les listes et l\'emphase', async () => {
     const html = await rendreMarkdown('- un *mot*\n- deux')
     expect(html).toContain('<li>')
@@ -911,6 +928,7 @@ Expected: FAIL — `Failed to resolve import "./markdown"`
 - [ ] **Step 3: Écrire `lib/content/markdown.ts`**
 
 ```ts
+import rehypeSanitize from 'rehype-sanitize'
 import rehypeSlug from 'rehype-slug'
 import rehypeStringify from 'rehype-stringify'
 import remarkParse from 'remark-parse'
@@ -926,6 +944,7 @@ export function retirerCrochets(texte: string): string {
 const processeur = unified()
   .use(remarkParse)
   .use(remarkRehype)
+  .use(rehypeSanitize)
   .use(rehypeSlug)
   .use(rehypeStringify)
 
@@ -953,7 +972,11 @@ export function listerTitres(markdown: string): string[] {
 }
 ```
 
-`remark-rehype` sans `allowDangerousHtml` écarte le HTML brut de la source, ce qui satisfait le test d'échappement.
+Deux défenses, et chacune couvre ce que l'autre laisse passer.
+
+`remark-rehype` sans `allowDangerousHtml` écarte le HTML brut de la source : une balise `<script>` écrite dans une fiche disparaît. Mais il ne regarde pas les URL, donc un lien markdown parfaitement régulier `[clic](javascript:alert(1))` produirait un `href` exécutable — et la Tâche 7 affiche ce HTML via `dangerouslySetInnerHTML`. Comme les fiches arriveront par *pull request* de contributeurs extérieurs (§9), `rehype-sanitize` ferme cette porte : son schéma par défaut n'autorise que les protocoles sûrs.
+
+**L'ordre des greffons compte.** `rehype-sanitize` est placé **avant** `rehype-slug`, pas après : son schéma par défaut n'autorise pas l'attribut `id`, donc l'assainir en dernier effacerait les ancres de titres que `rehype-slug` vient de poser. En assainissant d'abord, les identifiants sont ajoutés sur un arbre déjà propre et survivent sans qu'on ait à étendre le schéma.
 
 - [ ] **Step 4: Lancer les tests et vérifier qu'ils passent**
 
@@ -1431,6 +1454,15 @@ describe('verifierCoherence', () => {
     expect(a.map((x) => x.message).join()).toMatch(/resume/)
   })
 
+  it('signale des crochets doubles qui survivent à l\'aplatissement', () => {
+    const a = verifierCoherence(fiche({ corps: '## Risques\n\nun [[crochet non ferme\n' }))
+    expect(a.map((x) => x.message).join()).toMatch(/crochets doubles/)
+  })
+
+  it('ne signale rien pour des crochets bien formés', () => {
+    expect(verifierCoherence(fiche({ corps: '## Risques\n\nla [[clarté]] et [[Intuitivité|intuitif]]\n' }))).toEqual([])
+  })
+
   it('signale une date de modification antérieure à la création', () => {
     const a = verifierCoherence(fiche({ cree: new Date('2026-10-03'), modifie: new Date('2026-01-01') }))
     expect(a.map((x) => x.message).join()).toMatch(/modifie/)
@@ -1460,7 +1492,7 @@ Expected: FAIL — `Failed to resolve import "./coherence"`
 - [ ] **Step 3: Écrire `scripts/coherence.ts`**
 
 ```ts
-import { listerTitres } from '../lib/content/markdown'
+import { listerTitres, retirerCrochets } from '../lib/content/markdown'
 import { LONGUEUR_MAX_RESUME, type Fiche } from '../lib/content/schema'
 
 export type Avertissement = { slug: string; message: string }
@@ -1497,6 +1529,12 @@ export function verifierCoherence(fiche: Fiche): Avertissement[] {
 
   if (fiche.modifie.getTime() < fiche.cree.getTime()) {
     avertissements.push('modifie est antérieur à cree')
+  }
+
+  if (retirerCrochets(fiche.corps).includes('[[')) {
+    avertissements.push(
+      'des crochets doubles survivent à l\'aplatissement : probablement un `[[` non fermé ou imbriqué, qui s\'affichera tel quel',
+    )
   }
 
   return avertissements.map((message) => ({ slug: fiche.slug, message }))
