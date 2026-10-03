@@ -10,13 +10,13 @@ describe('Prose', () => {
     expect(screen.getByText('Un paragraphe.')).toBeInTheDocument()
   })
 
-  it('n\'affiche aucun crochet double issu de la source', async () => {
+  it('n’affiche aucun crochet double issu de la source', async () => {
     const { container } = render(<Prose html={await rendreMarkdown('un frein à la [[clarté]]')} />)
     expect(container.textContent).toContain('un frein à la clarté')
     expect(container.textContent).not.toContain('[[')
   })
 
-  it('n\'exécute pas le HTML brut présent dans la source', async () => {
+  it('n’exécute pas le HTML brut présent dans la source', async () => {
     const { container } = render(<Prose html={await rendreMarkdown('<script>alert(1)</script>')} />)
     expect(container.querySelector('script')).toBeNull()
   })

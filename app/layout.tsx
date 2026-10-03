@@ -5,7 +5,7 @@ import './globals.css'
 export const metadata: Metadata = {
   title: { default: 'Simplistique', template: '%s — Simplistique' },
   description:
-    'Simplifier le langage des disciplines scientifiques et artistiques, pour abaisser la barrière à l\'entrée et bâtir des ponts entre elles.',
+    'Simplifier le langage des disciplines scientifiques et artistiques, pour abaisser la barrière à l’entrée et bâtir des ponts entre elles.',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
