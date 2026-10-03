@@ -47,6 +47,7 @@ l’hébergement, pas dans le code.
 | `npm run test:once` | Toute la suite de tests |
 | `npm run lint` | ESLint, utilisé par l’intégration continue |
 | `npm run lint:content` | Avertissements de cohérence des fiches |
+| `npm run votes:orphelins` | Signale les votes dont la fiche ou l’alternative a disparu du corpus |
 
 ## Variables d’environnement
 

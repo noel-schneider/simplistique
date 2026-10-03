@@ -13,7 +13,8 @@
     "test": "vitest",
     "test:once": "vitest run",
     "lint:content": "tsx scripts/lint-content.ts",
-    "migrer": "tsx scripts/migrer.ts"
+    "migrer": "tsx scripts/migrer.ts",
+    "votes:orphelins": "tsx scripts/votes-orphelins.ts"
   },
   "dependencies": {
     "@neondatabase/serverless": "1.2.0",

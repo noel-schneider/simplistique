@@ -1,5 +1,6 @@
 import { listerTitres, retirerCrochets } from '../lib/content/markdown'
 import { LONGUEUR_MAX_RESUME, type Fiche } from '../lib/content/schema'
+import { empreinteAlternative } from '../lib/votes/empreintes'
 
 export type Avertissement = { slug: string; message: string }
 
@@ -63,6 +64,15 @@ export function verifierCoherence(fiche: Fiche): Avertissement[] {
     const extrait = tronquerParGraphemes(aplati.slice(positionCrochets), 40).split('\n')[0]
     avertissements.push(
       `des crochets doubles survivent à l'aplatissement, probablement un « [[ » non fermé ou imbriqué, qui s'affichera tel quel : « ${extrait} »`,
+    )
+  }
+
+  // Deux alternatives dont le texte ne diffère que par la casse ou les accents
+  // partagent une empreinte, donc leurs votes fusionneraient en silence.
+  const empreintes = fiche.suggestions.map(empreinteAlternative)
+  if (new Set(empreintes).size !== empreintes.length) {
+    avertissements.push(
+      'deux alternatives ont la même empreinte une fois normalisées : leurs votes seraient comptés ensemble',
     )
   }
 

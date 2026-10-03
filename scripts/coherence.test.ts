@@ -92,6 +92,17 @@ describe('verifierCoherence', () => {
   it('cumule plusieurs avertissements sur une même fiche', () => {
     expect(verifierCoherence(fiche({ statut: 'propose', suggestions: [], corps: 'rien' }))).toHaveLength(2)
   })
+
+  it('signale deux alternatives que la normalisation rend identiques', () => {
+    const a = verifierCoherence(fiche({ statut: 'propose', suggestions: ['Avoir', 'avoir'] }))
+    expect(a.map((x) => x.message).join()).toMatch(/même empreinte|identiques/i)
+  })
+
+  it('ne signale rien pour deux alternatives réellement distinctes', () => {
+    expect(
+      verifierCoherence(fiche({ statut: 'propose', suggestions: ['avoir', 'ressources'] })),
+    ).toEqual([])
+  })
 })
 
 describe('verifierCorpus', () => {

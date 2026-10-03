@@ -3,9 +3,11 @@ import { notFound } from 'next/navigation'
 import { cache } from 'react'
 import { EnteteFiche } from '@/components/entete-fiche'
 import { Prose } from '@/components/prose'
+import { Votes } from '@/components/votes'
 import { getFiche, getFiches } from '@/lib/content/fiches'
 import { rendreMarkdown } from '@/lib/content/markdown'
 import { chargerTaxonomies } from '@/lib/content/taxonomies'
+import { empreinteAlternative } from '@/lib/votes/empreintes'
 
 type Params = { params: Promise<{ slug: string }> }
 
@@ -55,6 +57,13 @@ export default async function PageFiche({ params }: Params) {
         nomStatut={nomDe(taxonomies.statuts, fiche.statut)}
       />
       <Prose html={await rendreMarkdown(fiche.corps)} />
+      <Votes
+        fiche={fiche.slug}
+        alternatives={fiche.suggestions.map((texte) => ({
+          texte,
+          empreinte: empreinteAlternative(texte),
+        }))}
+      />
     </article>
   )
 }

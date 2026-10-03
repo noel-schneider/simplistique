@@ -58,3 +58,18 @@ avant d’ouvrir la pull request.
 La simplistique suggère des usages, elle n’impose pas de changements. Le but
 est d’abaisser la barrière à l’entrée des disciplines et de bâtir des ponts
 entre elles — pas de corriger la langue de ceux qui les pratiquent.
+
+## Ce que ce site enregistre
+
+Vous pouvez voter sur une fiche et sur ses alternatives sans créer de compte. Pour
+qu’une même personne ne vote pas deux fois, le serveur calcule une empreinte à partir de
+votre adresse réseau et de votre navigateur.
+
+**Votre adresse n’est jamais enregistrée.** Seule cette empreinte l’est, et elle est
+irréversible : elle est calculée avec une clé secrète qui ne quitte pas le serveur. Elle
+ne permet ni de vous identifier, ni de vous recontacter, ni de savoir ce que vous avez lu.
+
+Rien n’est stocké dans votre navigateur. Aucun cookie, aucun traceur, aucune mesure
+d’audience.
+
+Un vote peut être annulé à tout moment, depuis la fiche où il a été émis.
