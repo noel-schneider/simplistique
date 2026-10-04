@@ -34,9 +34,15 @@ Le corps.
 `
 
 describe('getFiches sur le corpus réel', () => {
-  it('lit toutes les fiches du dépôt', () => {
+  it('lit toutes les fiches du dépôt, et chacune une seule fois', () => {
     const fiches = getFiches(DOSSIER_CONTENU, taxonomies)
-    expect(fiches.length).toBeGreaterThanOrEqual(5)
+    // Compte exact et non plancher : un plancher ne verrait jamais une fiche
+    // lue deux fois. C’est le seul endroit du projet qui encode ce nombre
+    // indépendamment du chargeur, donc le seul filet contre un sur-comptage —
+    // `app/sitemap.test.ts` calcule désormais son attendu avec `getFiches()`
+    // lui-même, et ne peut donc pas jouer ce rôle.
+    expect(fiches).toHaveLength(5)
+    expect(new Set(fiches.map((f) => f.slug)).size).toBe(fiches.length)
   })
 
   it('trie par terme selon l\'ordre alphabétique français', () => {

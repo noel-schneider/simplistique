@@ -91,6 +91,14 @@ describe('getChantiers', () => {
   })
 })
 
+describe('getChantiers sur le corpus réel', () => {
+  it('lit tous les chantiers du dépôt, et chacun une seule fois', () => {
+    const chantiers = getChantiers(DOSSIER_CONTENU, TAXONOMIES)
+    expect(chantiers).toHaveLength(1)
+    expect(new Set(chantiers.map((c) => c.slug)).size).toBe(chantiers.length)
+  })
+})
+
 describe('getChantier', () => {
   it("rend null pour un slug inconnu", () => {
     expect(getChantier('absent', dossier, TAXONOMIES)).toBeNull()

@@ -1,6 +1,8 @@
+import { render, screen } from '@testing-library/react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it, vi } from 'vitest'
 import { CatalogueStatique } from '@/components/catalogue-statique'
+import { getChantiers } from '@/lib/content/chantiers'
 import { getIndex } from '@/lib/content/fiches'
 import { chargerTaxonomies } from '@/lib/content/taxonomies'
 import PageFiches from './page'
@@ -30,9 +32,15 @@ describe('CatalogueStatique — repli <Suspense>', () => {
   it('rend un lien par fiche du corpus, et un seul tableau', () => {
     const { disciplines, statuts } = chargerTaxonomies()
     const index = getIndex()
+    const chantiers = getChantiers().map((c) => ({ slug: c.slug, nom: c.nom }))
 
     const html = renderToStaticMarkup(
-      <CatalogueStatique index={index} disciplines={disciplines} statuts={statuts} />,
+      <CatalogueStatique
+        index={index}
+        disciplines={disciplines}
+        statuts={statuts}
+        chantiers={chantiers}
+      />,
     )
 
     const tables = html.match(/<table/g) ?? []
@@ -46,6 +54,37 @@ describe('CatalogueStatique — repli <Suspense>', () => {
     for (const fiche of index) {
       expect(html).toContain(`href="/fiches/${fiche.slug}"`)
     }
+  })
+
+  it('montre le chantier d’une fiche, et laisse la case vide sinon', () => {
+    const { disciplines, statuts } = chargerTaxonomies()
+    const chantiers = getChantiers().map((c) => ({ slug: c.slug, nom: c.nom }))
+    const index = getIndex()
+
+    render(
+      <CatalogueStatique
+        index={index}
+        disciplines={disciplines}
+        statuts={statuts}
+        chantiers={chantiers}
+      />,
+    )
+
+    // L’index de la colonne se déduit de l’en-tête plutôt que d’être écrit en
+    // dur : un index figé se périmerait au prochain remaniement du tableau, et
+    // le test se mettrait à mesurer une autre colonne sans rien dire.
+    const entetes = screen.getAllByRole('columnheader').map((entete) => entete.textContent)
+    const colonne = entetes.indexOf('Chantier')
+    expect(colonne).toBeGreaterThanOrEqual(0)
+
+    const lignes = screen.getAllByRole('row')
+    const ligneActif = lignes.find((l) => l.textContent?.includes('actif'))
+    expect(ligneActif?.querySelectorAll('td')[colonne]?.textContent).toBe('Le vocabulaire du bilan')
+
+    // Review Focus nº 5 : la case d’une fiche sans chantier reste vide. Un tiret
+    // ou un « — » se lirait comme un nom de chantier dans une colonne de noms.
+    const ligneGroupe = lignes.find((l) => l.textContent?.includes('groupe'))
+    expect(ligneGroupe?.querySelectorAll('td')[colonne]?.textContent).toBe('')
   })
 })
 

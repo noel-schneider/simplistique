@@ -17,7 +17,14 @@ export default function PageFiches() {
     <div className="space-y-6">
       <h1 className="text-2xl font-semibold tracking-tight">Les fiches</h1>
       <Suspense
-        fallback={<CatalogueStatique index={index} disciplines={disciplines} statuts={statuts} />}
+        fallback={
+          <CatalogueStatique
+            index={index}
+            disciplines={disciplines}
+            statuts={statuts}
+            chantiers={chantiers}
+          />
+        }
       >
         <Corpus
           index={index}
