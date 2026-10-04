@@ -19,3 +19,4 @@ node_modules/
 # Divers
 *.pem
 npm-debug.log*
+.vercel
