@@ -2,6 +2,7 @@
 terme: passif
 discipline: comptabilite
 confusion: paire-bancale
+chantier: vocabulaire-du-bilan
 statut: propose
 resume: >
   Fausse symétrie avec « actif » : la paire suggère une opposition entre agir

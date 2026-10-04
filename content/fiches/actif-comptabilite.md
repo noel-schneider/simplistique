@@ -2,6 +2,7 @@
 terme: actif
 discipline: comptabilite
 confusion: faux-ami-courant
+chantier: vocabulaire-du-bilan
 statut: propose
 resume: >
   Adjectif courant employé comme nom pour désigner ce que l’entreprise
