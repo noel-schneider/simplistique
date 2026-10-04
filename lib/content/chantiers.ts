@@ -1,7 +1,7 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import matter from 'gray-matter'
-import { creerSchemaChantier, schemaSlug, type Chantier, type Taxonomies } from './schema'
+import { creerSchemaChantier, decrireErreursDeSchema, schemaSlug, type Chantier, type Taxonomies } from './schema'
 import { chargerTaxonomies, DOSSIER_CONTENU } from './taxonomies'
 
 function lireChantier(dossier: string, fichier: string, taxonomies: Taxonomies): Chantier {
@@ -17,9 +17,7 @@ function lireChantier(dossier: string, fichier: string, taxonomies: Taxonomies):
   const resultat = creerSchemaChantier(taxonomies).safeParse(data)
 
   if (!resultat.success) {
-    const details = resultat.error.issues
-      .map((probleme) => `${probleme.path.join('.') || '(racine)'} : ${probleme.message}`)
-      .join(' ; ')
+    const details = decrireErreursDeSchema(resultat.error.issues, data as Record<string, unknown>)
     throw new Error(`${fichier} : ${details}`)
   }
 

@@ -56,6 +56,27 @@ export type ChantierMeta = {
 
 export type Chantier = ChantierMeta & { corps: string }
 
+/**
+ * Message lisible pour un échec de schéma, partagé par les fiches et les chantiers.
+ * La valeur rejetée est reprise dans le message : sans elle, l'auteur sait quel
+ * champ est fautif mais pas ce qu'il y a écrit, ce qui est l'information utile
+ * quand on relit un front-matter de dix lignes.
+ */
+export function decrireErreursDeSchema(
+  issues: { path: PropertyKey[]; message: string }[],
+  champs: Record<string, unknown>,
+): string {
+  return issues
+    .map((probleme) => {
+      const champ = probleme.path.join('.') || '(racine)'
+      const recu = probleme.path.length > 0 ? champs[String(probleme.path[0])] : undefined
+      return recu === undefined
+        ? `${champ} : ${probleme.message}`
+        : `${champ} : ${probleme.message} (valeur reçue : ${JSON.stringify(recu)})`
+    })
+    .join(' ; ')
+}
+
 export function creerSchemaChantier(taxonomies: Taxonomies): ZodType<Omit<ChantierMeta, 'slug'>> {
   const disciplines = taxonomies.disciplines.map((d) => d.slug) as [string, ...string[]]
 

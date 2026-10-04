@@ -2,7 +2,7 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import matter from 'gray-matter'
 import { chargerTaxonomies, DOSSIER_CONTENU } from './taxonomies'
-import { creerSchemaFiche, schemaSlug, type Fiche, type FicheIndex, type Taxonomies } from './schema'
+import { creerSchemaFiche, decrireErreursDeSchema, schemaSlug, type Fiche, type FicheIndex, type Taxonomies } from './schema'
 
 export { DOSSIER_CONTENU }
 
@@ -19,16 +19,7 @@ function lireFiche(dossier: string, fichier: string, taxonomies: Taxonomies): Fi
   const resultat = creerSchemaFiche(taxonomies).safeParse(data)
 
   if (!resultat.success) {
-    const champs = data as Record<string, unknown>
-    const details = resultat.error.issues
-      .map((probleme) => {
-        const champ = probleme.path.join('.') || '(racine)'
-        const recu = probleme.path.length > 0 ? champs[String(probleme.path[0])] : undefined
-        return recu === undefined
-          ? `${champ} : ${probleme.message}`
-          : `${champ} : ${probleme.message} (valeur reçue : ${JSON.stringify(recu)})`
-      })
-      .join(' ; ')
+    const details = decrireErreursDeSchema(resultat.error.issues, data as Record<string, unknown>)
     throw new Error(`${fichier} : ${details}`)
   }
 
