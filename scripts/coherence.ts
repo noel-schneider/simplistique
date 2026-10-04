@@ -1,5 +1,5 @@
 import { listerTitres, retirerCrochets } from '../lib/content/markdown'
-import { LONGUEUR_MAX_RESUME, type Fiche } from '../lib/content/schema'
+import { LONGUEUR_MAX_RESUME, type Chantier, type Fiche } from '../lib/content/schema'
 import { empreinteAlternative } from '../lib/votes/empreintes'
 
 export type Avertissement = { slug: string; message: string }
@@ -90,6 +90,47 @@ export function verifierCorpus(fiches: Fiche[]): Avertissement[] {
 // du code littéral. Ce contrôle signale l'oubli sans jamais bloquer : la
 // publication initiale, avant que l'adresse ne soit connue, en dépend.
 const MARQUEUR_URL_DEPOT = 'URL-DU-DEPOT'
+
+/**
+ * Trois avertissements qui relèvent du jugement éditorial, et jamais de la
+ * justesse : rien ici n’empêche le site de se construire. Ce qui rend le site
+ * faux — un chantier inexistant, un chantier d’une autre discipline — est
+ * refusé beaucoup plus tôt, au chargement du corpus.
+ */
+export function verifierChantiers(chantiers: Chantier[], fiches: Fiche[]): Avertissement[] {
+  const avertissements: Avertissement[] = []
+
+  for (const chantier of chantiers) {
+    const siennes = fiches.filter((fiche) => fiche.chantier === chantier.slug)
+
+    if (siennes.length === 0) {
+      avertissements.push({
+        slug: chantier.slug,
+        message:
+          'aucune fiche ne désigne ce chantier : un « chantier: » a probablement été oublié dans une fiche',
+      })
+    } else if (siennes.length === 1) {
+      avertissements.push({
+        slug: chantier.slug,
+        message:
+          'une seule fiche désigne ce chantier : le mot suppose un corpus, et une réforme d’un seul terme tient dans la fiche elle-même',
+      })
+    }
+
+    // Même règle que pour les fiches, et par sous-chaîne pour la même raison :
+    // « ## Risques et limites » traite bien le sujet.
+    const titres = listerTitres(chantier.corps).map((titre) => titre.toLowerCase())
+    if (!titres.some((titre) => titre.includes('risques'))) {
+      avertissements.push({
+        slug: chantier.slug,
+        message:
+          'aucune section de niveau 2 dont le titre contient « risques » : une réforme d’ensemble en a plus besoin qu’un mot isolé',
+      })
+    }
+  }
+
+  return avertissements
+}
 
 export function verifierDocuments(documents: { nom: string; texte: string }[]): Avertissement[] {
   return documents

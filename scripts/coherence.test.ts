@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import type { Fiche } from '../lib/content/schema'
-import { verifierCoherence, verifierCorpus, verifierDocuments } from './coherence'
+import type { Chantier, Fiche } from '../lib/content/schema'
+import { verifierChantiers, verifierCoherence, verifierCorpus, verifierDocuments } from './coherence'
 import { getFiches } from '../lib/content/fiches'
 import { DOSSIER_CONTENU } from '../lib/content/taxonomies'
 
@@ -124,5 +124,53 @@ describe('verifierDocuments', () => {
 
   it('ne signale rien pour un document sans marqueur', () => {
     expect(verifierDocuments([{ nom: 'manifeste', texte: 'Rien à signaler ici.' }])).toEqual([])
+  })
+})
+
+describe('verifierChantiers', () => {
+  function chantier(p: Partial<Chantier> = {}): Chantier {
+    return {
+      slug: 'vocabulaire-du-bilan',
+      nom: 'Le vocabulaire du bilan',
+      discipline: 'comptabilite',
+      resume: 'court',
+      cree: new Date('2026-10-04'),
+      modifie: new Date('2026-10-04'),
+      corps: '## Risques\n\ntexte\n',
+      ...p,
+    }
+  }
+
+  function ficheDe(slug: string, chantierSlug?: string): Fiche {
+    return fiche({ slug, chantier: chantierSlug })
+  }
+
+  it('ne signale rien pour un chantier sain', () => {
+    expect(
+      verifierChantiers(
+        [chantier()],
+        [ficheDe('actif-comptabilite', 'vocabulaire-du-bilan'), ficheDe('passif-comptabilite', 'vocabulaire-du-bilan')],
+      ),
+    ).toEqual([])
+  })
+
+  it('signale un chantier qu’aucune fiche ne désigne', () => {
+    const a = verifierChantiers([chantier()], [ficheDe('actif-comptabilite')])
+    expect(a).toHaveLength(1)
+    expect(a[0].slug).toBe('vocabulaire-du-bilan')
+    expect(a[0].message).toMatch(/aucune fiche/i)
+  })
+
+  it('signale un chantier qui n’a qu’une seule fiche', () => {
+    const a = verifierChantiers([chantier()], [ficheDe('actif-comptabilite', 'vocabulaire-du-bilan')])
+    expect(a.map((x) => x.message).join()).toMatch(/une seule fiche/i)
+  })
+
+  it('signale un chantier sans section « risques »', () => {
+    const a = verifierChantiers(
+      [chantier({ corps: '## Pourquoi\n\ntexte\n' })],
+      [ficheDe('actif-comptabilite', 'vocabulaire-du-bilan'), ficheDe('passif-comptabilite', 'vocabulaire-du-bilan')],
+    )
+    expect(a.map((x) => x.message).join()).toMatch(/risques/i)
   })
 })
