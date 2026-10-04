@@ -11,8 +11,13 @@ vi.mock('next/link', () => ({
 }))
 
 describe('generateStaticParams', () => {
-  it('énumère les chantiers du corpus', () => {
-    expect(generateStaticParams()).toContainEqual({ slug: 'vocabulaire-du-bilan' })
+  it('énumère les chantiers du corpus, et eux seuls', () => {
+    const slugs = generateStaticParams().map((params) => params.slug)
+    expect(slugs).toContain('vocabulaire-du-bilan')
+    // L’exclusivité compte autant que l’inclusion : une implémentation qui
+    // concaténerait fiches et chantiers resterait verte sur la seule présence.
+    expect(slugs).not.toContain('actif-comptabilite')
+    expect(slugs).not.toContain('groupe-mathematiques')
   })
 })
 

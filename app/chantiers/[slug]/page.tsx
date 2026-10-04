@@ -44,7 +44,9 @@ export default async function PageChantier({ params }: Params) {
   const nomStatut = (slug: string) =>
     taxonomies.statuts.find((s) => s.slug === slug)?.nom ?? slug
 
-  const fiches = getFiches().filter((fiche) => fiche.chantier === chantier.slug)
+  const fiches = getFiches(undefined, taxonomies).filter(
+    (fiche) => fiche.chantier === chantier.slug,
+  )
 
   return (
     <article>
@@ -65,22 +67,28 @@ export default async function PageChantier({ params }: Params) {
           vers les cas particuliers, jamais l’inverse. */}
       <section className="mt-8 space-y-3 border-t border-stone-200 pt-6">
         <h2 className="text-lg font-semibold tracking-tight">
-          {fiches.length > 1 ? 'Les termes de ce chantier' : 'Le terme de ce chantier'}
+          {fiches.length === 1 ? 'Le terme de ce chantier' : 'Les termes de ce chantier'}
         </h2>
-        {fiches.map((fiche) => (
-          <div key={fiche.slug} className="space-y-1">
-            <p className="flex flex-wrap items-center gap-3">
-              <Link
-                href={`/fiches/${fiche.slug}`}
-                className="font-medium underline hover:text-stone-600"
-              >
-                {fiche.terme}
-              </Link>
-              <BadgeStatut statut={fiche.statut} nom={nomStatut(fiche.statut)} />
-            </p>
-            <p className="text-sm text-stone-600">{fiche.resume}</p>
-          </div>
-        ))}
+        {fiches.length === 0 ? (
+          <p className="text-sm text-stone-500">
+            Aucune fiche ne désigne encore ce chantier.
+          </p>
+        ) : (
+          fiches.map((fiche) => (
+            <div key={fiche.slug} className="space-y-1">
+              <p className="flex flex-wrap items-center gap-3">
+                <Link
+                  href={`/fiches/${fiche.slug}`}
+                  className="font-medium underline hover:text-stone-600"
+                >
+                  {fiche.terme}
+                </Link>
+                <BadgeStatut statut={fiche.statut} nom={nomStatut(fiche.statut)} />
+              </p>
+              <p className="text-sm text-stone-600">{fiche.resume}</p>
+            </div>
+          ))
+        )}
       </section>
     </article>
   )
