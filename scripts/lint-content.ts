@@ -17,8 +17,20 @@ function principal(): void {
     ...verifierDocuments(documents),
   ]
 
+  // Le compte des pages fictives est affiché à chaque vérification, et non
+  // seulement quand il y en a : c’est la seule façon de ne pas s’habituer à leur
+  // présence, et de voir d’un coup d’œil le jour où il devrait tomber à zéro.
+  const demonstrations =
+    fiches.filter((fiche) => fiche.demonstration).length +
+    chantiers.filter((chantier) => chantier.demonstration).length
+
   console.log(
     `${fiches.length} fiche(s), ${chantiers.length} chantier(s), ${taxonomies.disciplines.length} discipline(s) — validation du schéma réussie.`,
+  )
+  console.log(
+    demonstrations === 0
+      ? 'Aucune page de démonstration.'
+      : `${demonstrations} page(s) de démonstration, à retirer avant une mise en avant du site.`,
   )
 
   if (avertissements.length === 0) {

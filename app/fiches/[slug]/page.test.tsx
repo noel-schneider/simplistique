@@ -1,6 +1,7 @@
 import { isValidElement, type ComponentProps, type ReactElement, type ReactNode } from 'react'
 import { describe, expect, it } from 'vitest'
 import { BandeauChantier } from '@/components/bandeau-chantier'
+import { BandeauDemonstration } from '@/components/bandeau-demonstration'
 import { Prose } from '@/components/prose'
 import { Votes } from '@/components/votes'
 import { getFiche } from '@/lib/content/fiches'
@@ -80,6 +81,21 @@ describe('PageFiche', () => {
   it('passe une liste vide pour une fiche sans alternative', async () => {
     const page = await PageFiche({ params: Promise.resolve({ slug: 'groupe-mathematiques' }) })
     expect(trouverVotes(page)?.props.alternatives).toEqual([])
+  })
+
+  it('annonce une fiche de démonstration avant tout le reste', async () => {
+    const page = await PageFiche({ params: Promise.resolve({ slug: 'anneau-mathematiques' }) })
+    const types = elementsDans(page).map((element) => element.type)
+
+    // Avant le bandeau de chantier comme avant le corps : si une page est fictive,
+    // c’est la première chose à savoir, et tout ce qui suit se lit à cette lumière.
+    expect(types).toContain(BandeauDemonstration)
+    expect(types.indexOf(BandeauDemonstration)).toBeLessThan(types.indexOf(Prose))
+  })
+
+  it('n’annonce rien sur une fiche réelle', async () => {
+    const page = await PageFiche({ params: Promise.resolve({ slug: 'actif-comptabilite' }) })
+    expect(elementsDans(page).map((e) => e.type)).not.toContain(BandeauDemonstration)
   })
 
   it('affiche le bandeau du chantier AVANT le corps de la fiche', async () => {

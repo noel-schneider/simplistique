@@ -37,8 +37,10 @@ export type FicheMeta = {
   statut: Statut
   resume: string
   suggestions: string[]
-  /** Le slug d'un chantier de la même discipline, ou rien. */
+  /** Le slug d’un chantier de la même discipline, ou rien. */
   chantier?: string
+  /** Contenu fictif, écrit pour développer le site. Absent = contenu réel. */
+  demonstration?: boolean
   cree: Date
   modifie: Date
 }
@@ -52,6 +54,8 @@ export type ChantierMeta = {
   nom: string
   discipline: string
   resume: string
+  /** Contenu fictif, écrit pour développer le site. Absent = contenu réel. */
+  demonstration?: boolean
   cree: Date
   modifie: Date
 }
@@ -89,6 +93,10 @@ export function creerSchemaChantier(taxonomies: Taxonomies): ZodType<Omit<Chanti
     // gardent un saut de ligne final, qui partirait tel quel dans la
     // méta-description et consommerait un caractère du budget pour rien.
     resume: z.string().trim().min(1).max(LONGUEUR_MAX_RESUME),
+    // Absent vaut faux : le contenu réel n’a pas à se déclarer réel. On n’accepte
+    // que `true`, pour qu’un `demonstration: false` oublié dans un fichier soit
+    // refusé plutôt que de laisser croire à un marquage qui ne marque rien.
+    demonstration: z.literal(true).optional(),
     cree: z.coerce.date(),
     modifie: z.coerce.date(),
   })
@@ -117,6 +125,10 @@ export function creerSchemaFiche(
       // qu'un enum sur le seul champ ne sait pas dire. Et `z.enum` exige une
       // liste non vide, impossible à garantir avec zéro chantier au corpus.
       chantier: z.string().min(1, 'chantier vide : retirer le champ plutôt que le laisser vide').optional(),
+      // Absent vaut faux : le contenu réel n’a pas à se déclarer réel. On n’accepte
+      // que `true`, pour qu’un `demonstration: false` oublié dans un fichier soit
+      // refusé plutôt que de laisser croire à un marquage qui ne marque rien.
+      demonstration: z.literal(true).optional(),
       cree: z.coerce.date(),
       modifie: z.coerce.date(),
     })

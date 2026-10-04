@@ -32,15 +32,22 @@ export default function sitemap(): MetadataRoute.Sitemap {
     lastModified: derniereModifDuCorpus,
   }))
 
-  const pagesFiches: MetadataRoute.Sitemap = fiches.map((fiche) => ({
-    url: `${base}/fiches/${fiche.slug}`,
-    lastModified: fiche.modifie,
-  }))
+  // Les pages de démonstration restent visibles sur le site — c’est leur raison
+  // d’être — mais n’entrent pas dans le plan de site : les faire indexer par un
+  // moteur de recherche coûterait plus cher que ce qu’elles rapportent.
+  const pagesFiches: MetadataRoute.Sitemap = fiches
+    .filter((fiche) => !fiche.demonstration)
+    .map((fiche) => ({
+      url: `${base}/fiches/${fiche.slug}`,
+      lastModified: fiche.modifie,
+    }))
 
-  const pagesChantiers: MetadataRoute.Sitemap = getChantiers().map((chantier) => ({
-    url: `${base}/chantiers/${chantier.slug}`,
-    lastModified: chantier.modifie,
-  }))
+  const pagesChantiers: MetadataRoute.Sitemap = getChantiers()
+    .filter((chantier) => !chantier.demonstration)
+    .map((chantier) => ({
+      url: `${base}/chantiers/${chantier.slug}`,
+      lastModified: chantier.modifie,
+    }))
 
   return [...pagesCorpus, ...pagesDocuments, ...pagesFiches, ...pagesChantiers]
 }

@@ -41,7 +41,7 @@ describe('getFiches sur le corpus réel', () => {
     // indépendamment du chargeur, donc le seul filet contre un sur-comptage —
     // `app/sitemap.test.ts` calcule désormais son attendu avec `getFiches()`
     // lui-même, et ne peut donc pas jouer ce rôle.
-    expect(fiches).toHaveLength(5)
+    expect(fiches).toHaveLength(15)
     expect(new Set(fiches.map((f) => f.slug)).size).toBe(fiches.length)
   })
 
@@ -235,8 +235,20 @@ describe('le champ chantier d’une fiche', () => {
     )
   })
 
-  it('porte le chantier jusque dans l’index', () => {
-    const index = getIndex(DOSSIER_CONTENU, undefined, CHANTIERS)
+  it('porte le chantier jusque dans l’index, avec sa valeur', () => {
+    // Le corpus réel et ses vrais chantiers : la fixture à un seul chantier ne
+    // suffit plus depuis que des fiches en désignent d’autres.
+    const index = getIndex()
+
+    // La clé existe partout, y compris pour une fiche non rattachée : c’est ce
+    // qui prouve que la projection n’oublie pas le champ.
     expect(index.every((entree) => 'chantier' in entree)).toBe(true)
+
+    // Et sa valeur arrive jusqu’au bout : sans cette seconde assertion, remplacer
+    // `chantier: fiche.chantier` par `chantier: undefined` laisserait le test vert.
+    expect(index.find((e) => e.slug === 'actif-comptabilite')?.chantier).toBe(
+      'vocabulaire-du-bilan',
+    )
+    expect(index.find((e) => e.slug === 'groupe-mathematiques')?.chantier).toBeUndefined()
   })
 })

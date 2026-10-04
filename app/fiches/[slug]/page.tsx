@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { cache } from 'react'
 import { BandeauChantier } from '@/components/bandeau-chantier'
+import { BandeauDemonstration } from '@/components/bandeau-demonstration'
 import { EnteteFiche } from '@/components/entete-fiche'
 import { Prose } from '@/components/prose'
 import { Votes } from '@/components/votes'
@@ -59,6 +60,7 @@ export default async function PageFiche({ params }: Params) {
         nomConfusion={nomDe(taxonomies.confusions, fiche.confusion)}
         nomStatut={nomDe(taxonomies.statuts, fiche.statut)}
       />
+      {fiche.demonstration && <BandeauDemonstration />}
       {chantier && <BandeauChantier slug={chantier.slug} nom={chantier.nom} />}
       <Prose html={await rendreMarkdown(fiche.corps)} />
       <Votes

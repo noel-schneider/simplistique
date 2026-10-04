@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { BadgeStatut } from './badge-statut'
+import { PastilleDemonstration } from './pastille-demonstration'
 import type { Discipline, EntreeTaxonomie, FicheIndex } from '@/lib/content/schema'
 
 // Contenu de secours du <Suspense> qui enveloppe <Corpus> dans
@@ -57,6 +58,7 @@ export function CatalogueStatique({
                   <Link href={`/fiches/${fiche.slug}`} className="font-medium underline">
                     {fiche.terme}
                   </Link>
+                  {fiche.demonstration && <PastilleDemonstration />}
                 </td>
                 <td className="px-4 py-2 text-stone-600">
                   {libellesDisciplines.get(fiche.discipline) ?? fiche.discipline}

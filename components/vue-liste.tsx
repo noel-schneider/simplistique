@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useState } from 'react'
 import { BadgeStatut } from './badge-statut'
+import { PastilleDemonstration } from './pastille-demonstration'
 import type { FicheIndex } from '@/lib/content/schema'
 
 export type Libelles = { disciplines: Map<string, string>; statuts: Map<string, string> }
@@ -81,6 +82,7 @@ export function VueListe({ fiches, libelles }: { fiches: FicheIndex[]; libelles:
                 <Link href={`/fiches/${fiche.slug}`} className="font-medium underline">
                   {fiche.terme}
                 </Link>
+                {fiche.demonstration && <PastilleDemonstration />}
               </td>
               <td className="px-4 py-2 text-stone-600">
                 {libelles.disciplines.get(fiche.discipline) ?? fiche.discipline}
