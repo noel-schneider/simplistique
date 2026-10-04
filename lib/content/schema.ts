@@ -45,6 +45,37 @@ export type Fiche = FicheMeta & { corps: string }
 
 export const LONGUEUR_MAX_RESUME = 240
 
+export type ChantierMeta = {
+  slug: string
+  nom: string
+  discipline: string
+  resume: string
+  cree: Date
+  modifie: Date
+}
+
+export type Chantier = ChantierMeta & { corps: string }
+
+export function creerSchemaChantier(taxonomies: Taxonomies): ZodType<Omit<ChantierMeta, 'slug'>> {
+  const disciplines = taxonomies.disciplines.map((d) => d.slug) as [string, ...string[]]
+
+  return z
+    .object({
+      nom: z.string().min(1),
+      discipline: z.enum(disciplines),
+      // Même traitement que le résumé d'une fiche : les scalaires `>` du YAML
+      // gardent un saut de ligne final, qui partirait tel quel dans la
+      // méta-description et consommerait un caractère du budget pour rien.
+      resume: z.string().trim().min(1).max(LONGUEUR_MAX_RESUME),
+      cree: z.coerce.date(),
+      modifie: z.coerce.date(),
+    })
+    .refine((chantier) => chantier.modifie >= chantier.cree, {
+      path: ['modifie'],
+      message: 'modifie est antérieure à cree',
+    })
+}
+
 export function creerSchemaFiche(taxonomies: Taxonomies): ZodType<Omit<FicheMeta, 'slug'>> {
   const disciplines = taxonomies.disciplines.map((d) => d.slug) as [string, ...string[]]
   const confusions = taxonomies.confusions.map((c) => c.slug) as [string, ...string[]]
