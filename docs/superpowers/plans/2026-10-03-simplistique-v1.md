@@ -6,7 +6,7 @@
 
 **Architecture:** Le contenu vit dans des fichiers markdown et YAML versionnés sous `content/`. Un seul module (`lib/content`) les lit, les valide avec Zod et expose des objets typés ; aucun composant d'affichage ne sait que la source est du markdown. Le filtrage est une fonction pure (`lib/filtrage.ts`) appelée par un composant client qui lit et écrit l'état dans l'URL. Tout est rendu statiquement au build : aucun code ne tourne à l'exécution.
 
-**Tech Stack:** Next.js 16.3.8 (App Router, TypeScript), React 19.3.0, Tailwind CSS 4.3.3, Zod 4.6.5, gray-matter 4.0.3, js-yaml 5.4.2, unified 11 / remark-parse 11 / remark-rehype 11 / rehype-slug 6 / rehype-stringify 10, Vitest 5.0.3 + @testing-library/react 16.3.3 + jsdom 30, déploiement Vercel, CI GitHub Actions.
+**Tech Stack:** Next.js 16.3.8 (App Router), React 19.2.8, TypeScript 5.9.3, Tailwind CSS 4.3.3, Zod 4.6.5, gray-matter 4.0.3, js-yaml 5.4.2, unified 11 / remark-parse 11 / remark-rehype 11 / rehype-sanitize 6 / rehype-slug 6 / rehype-stringify 10, Vitest 5.0.3 + @testing-library/react 16.3.3 + jsdom 30, déploiement Vercel, CI GitHub Actions.
 
 **Spec:** `docs/superpowers/specs/2026-10-03-simplistique-design.md`
 
@@ -61,41 +61,34 @@ cd /Users/noel/Documents/simplistique && rm -rf node_modules package-lock.json
 
 - [ ] **Step 2: Figer les versions et ajouter les dépendances**
 
-Remplacer les champs `dependencies` et `devDependencies` de `package.json` par exactement ceci (aucun `^`, aucun `~`) :
+Deux gestes distincts, dans cet ordre.
 
-```json
-  "dependencies": {
-    "next": "16.3.8",
-    "react": "19.3.0",
-    "react-dom": "19.3.0",
-    "zod": "4.6.5",
-    "gray-matter": "4.0.3",
-    "js-yaml": "5.4.2",
-    "unified": "11.0.5",
-    "remark-parse": "11.0.0",
-    "remark-rehype": "11.1.2",
-    "rehype-slug": "6.0.0",
-    "rehype-stringify": "10.0.1"
-  },
-  "devDependencies": {
-    "typescript": "7.0.2",
-    "@types/node": "22.14.0",
-    "@types/react": "19.3.0",
-    "@types/react-dom": "19.3.0",
-    "tailwindcss": "4.3.3",
-    "@tailwindcss/postcss": "4.3.3",
-    "@tailwindcss/typography": "0.5.19",
-    "eslint": "9.39.1",
-    "eslint-config-next": "16.3.8",
-    "vitest": "5.0.3",
-    "@vitejs/plugin-react": "6.1.1",
-    "@testing-library/react": "16.3.3",
-    "@testing-library/user-event": "14.6.7",
-    "@testing-library/jest-dom": "6.9.1",
-    "jsdom": "30.1.1",
-    "tsx": "4.20.6"
-  }
+**a. Figer ce que `create-next-app` a déjà installé.** Garder les versions qu'il a choisies, mais remplacer **tout intervalle par la version exacte réellement installée**, que `npm ls --depth=0` donne. Attention : `create-next-app` n'écrit pas `^20` mais `"20"`, qui est un intervalle (`>=20.0.0 <21.0.0`) tout autant qu'un `^` — il faut donc le remplacer aussi. Cela concerne `next`, `react`, `react-dom`, `typescript`, `@types/react`, `@types/react-dom`, `tailwindcss`, `@tailwindcss/postcss`, `eslint` et `eslint-config-next`.
+
+Ne pas choisir soi-même la version d'`eslint` : un `eslint` fixé à la main risque un conflit de pairs avec `eslint-config-next`, et l'échafaudage a choisi un couple cohérent (eslint 9).
+
+Une exception à « garder ce qu'il a choisi » : **`@types/node` passe à `26.6.4`**. L'échafaudage le fixe en 20.x, ce qui entre en conflit de pairs avec `vitest@5` et ne correspond pas au Node installé (26.x). Masquer ce conflit par un `.npmrc` (`legacy-peer-deps=true`) est interdit : ce réglage serait aussi lu par `npm ci` en intégration continue et éteindrait toutes les alertes de pairs du projet, y compris les vraies.
+
+Vérifier ensuite que les versions obtenues correspondent à la pile annoncée en tête de plan, et signaler tout écart dans le rapport sans le corriger.
+
+**b. Ajouter exactement ces dépendances,** aux versions indiquées, sans intervalle :
+
+```bash
+npm install --save-exact \
+  zod@4.6.5 gray-matter@4.0.3 js-yaml@5.4.2 \
+  unified@11.0.5 remark-parse@11.0.0 remark-rehype@11.1.2 \
+  rehype-slug@6.0.0 rehype-stringify@10.0.1
+
+npm install --save-exact --save-dev \
+  @tailwindcss/typography@0.5.20 \
+  vitest@5.0.3 @vitejs/plugin-react@6.1.1 \
+  @testing-library/react@16.3.3 @testing-library/user-event@14.6.7 \
+  @testing-library/jest-dom@7.0.1 jsdom@30.1.1 tsx@4.23.15
 ```
+
+`js-yaml` embarque ses propres types (`dist/js-yaml.d.ts`) : ne pas installer `@types/js-yaml`, qui ne décrit que la version 4 et entrerait en conflit.
+
+Si l'une de ces versions exactes n'existe plus au moment de l'exécution, prendre la plus proche version publiée de la même majeure, la figer sans intervalle, et noter l'écart dans le rapport et le message de commit.
 
 Remplacer le champ `scripts` par :
 
@@ -111,13 +104,12 @@ Remplacer le champ `scripts` par :
   }
 ```
 
-Puis installer :
+Puis vérifier que l'arbre de dépendances est cohérent :
 
 ```bash
 npm install
+npm ls --depth=0
 ```
-
-Si une version exacte n'existe plus au moment de l'exécution, prendre la plus proche version publiée de la même majeure, la figer sans intervalle, et noter l'écart dans le message de commit.
 
 - [ ] **Step 3: Configurer Vitest**
 
@@ -834,6 +826,7 @@ git commit -m "feat: lecture et validation des fiches markdown"
 **Files:**
 - Create: `lib/content/markdown.ts`
 - Test: `lib/content/markdown.test.ts`
+- Installer : `npm install --save-exact rehype-sanitize@6.0.0`
 
 **Interfaces:**
 - Consumes: rien.
@@ -887,6 +880,22 @@ describe('rendreMarkdown', () => {
     expect(html).not.toContain('<script>')
   })
 
+  it('retire un lien dont le protocole est exécutable', async () => {
+    const html = await rendreMarkdown('[clic](javascript:alert(1))')
+    expect(html).not.toContain('javascript:')
+    expect(html).toContain('clic')
+  })
+
+  it('retire une image dont le protocole est exécutable', async () => {
+    const html = await rendreMarkdown('![x](javascript:alert(1))')
+    expect(html).not.toContain('javascript:')
+  })
+
+  it('conserve un lien http légitime', async () => {
+    const html = await rendreMarkdown('[le dépôt](https://example.org/a)')
+    expect(html).toContain('href="https://example.org/a"')
+  })
+
   it('rend les listes et l\'emphase', async () => {
     const html = await rendreMarkdown('- un *mot*\n- deux')
     expect(html).toContain('<li>')
@@ -919,6 +928,7 @@ Expected: FAIL — `Failed to resolve import "./markdown"`
 - [ ] **Step 3: Écrire `lib/content/markdown.ts`**
 
 ```ts
+import rehypeSanitize from 'rehype-sanitize'
 import rehypeSlug from 'rehype-slug'
 import rehypeStringify from 'rehype-stringify'
 import remarkParse from 'remark-parse'
@@ -934,6 +944,7 @@ export function retirerCrochets(texte: string): string {
 const processeur = unified()
   .use(remarkParse)
   .use(remarkRehype)
+  .use(rehypeSanitize)
   .use(rehypeSlug)
   .use(rehypeStringify)
 
@@ -961,7 +972,11 @@ export function listerTitres(markdown: string): string[] {
 }
 ```
 
-`remark-rehype` sans `allowDangerousHtml` écarte le HTML brut de la source, ce qui satisfait le test d'échappement.
+Deux défenses, et chacune couvre ce que l'autre laisse passer.
+
+`remark-rehype` sans `allowDangerousHtml` écarte le HTML brut de la source : une balise `<script>` écrite dans une fiche disparaît. Mais il ne regarde pas les URL, donc un lien markdown parfaitement régulier `[clic](javascript:alert(1))` produirait un `href` exécutable — et la Tâche 7 affiche ce HTML via `dangerouslySetInnerHTML`. Comme les fiches arriveront par *pull request* de contributeurs extérieurs (§9), `rehype-sanitize` ferme cette porte : son schéma par défaut n'autorise que les protocoles sûrs.
+
+**L'ordre des greffons compte.** `rehype-sanitize` est placé **avant** `rehype-slug`, pas après : son schéma par défaut n'autorise pas l'attribut `id`, donc l'assainir en dernier effacerait les ancres de titres que `rehype-slug` vient de poser. En assainissant d'abord, les identifiants sont ajoutés sur un arbre déjà propre et survivent sans qu'on ait à étendre le schéma.
 
 - [ ] **Step 4: Lancer les tests et vérifier qu'ils passent**
 
@@ -1008,15 +1023,20 @@ export function getIndex(dossier?: string, taxonomies?: Taxonomies): FicheIndex[
 // lib/filtrage.ts
 export type Criteres = { disciplines: string[]; confusions: string[]; statuts: string[]; q: string }
 export type SlugsValides = { disciplines: string[]; confusions: string[]; statuts: string[] }
+export type LibellesRecherche = { disciplines: Map<string, string>; confusions: Map<string, string> }
 export const CRITERES_VIDES: Criteres
 export function normaliser(texte: string): string
 export function analyserCriteres(params: URLSearchParams, valides: SlugsValides): Criteres
 export function ecrireCriteres(criteres: Criteres, vue?: 'carte' | 'liste'): string  // querystring sans « ? »
-export function filtrerFiches(index: FicheIndex[], criteres: Criteres): FicheIndex[]
+export function filtrerFiches(index: FicheIndex[], criteres: Criteres, libelles?: LibellesRecherche): FicheIndex[]
 export function aUnFiltre(criteres: Criteres): boolean
 ```
 
 `FicheIndex` ne porte pas les dates : c'est le seul objet traversé jusqu'au navigateur, autant qu'il reste minimal. `analyserCriteres` reçoit la liste des slugs valides en argument pour que `lib/filtrage.ts` ne lise jamais le disque et reste utilisable dans un composant client.
+
+`analyserCriteres` **élague les espaces de `q`**, parce que c'est le seul point d'entrée des critères dans le système : tout consommateur peut donc comparer `criteres.q` à la chaîne vide sans se demander s'il lui manque un `trim()`. Sans cela, une URL portant `?q=%20%20%20` produit un `q` qui paraît actif, ne filtre rien, et disparaît à la prochaine écriture — trois fonctions en désaccord sur le même état.
+
+`filtrerFiches` accepte en troisième argument, facultatif, les **libellés de taxonomie** : la recherche compare alors aussi le nom affiché de la discipline et du type de confusion. Sans cela, un visiteur qui tape « escalade » dans le champ de recherche n'obtient rien, alors qu'un bouton « Escalade » se trouve juste à côté. Comparer au slug ne suffirait pas, puisque le nom affiché est accentué (« Comptabilité », « Théorie musicale ») — c'est `normaliser` qui réconcilie les deux. L'argument reste facultatif pour que le module fonctionne sans taxonomie.
 
 - [ ] **Step 1: Écrire les tests qui échouent**
 
@@ -1088,6 +1108,19 @@ function fiche(p: Partial<FicheIndex>): FicheIndex {
   }
 }
 
+const LIBELLES = {
+  disciplines: new Map([
+    ['mathematiques', 'Mathématiques'],
+    ['comptabilite', 'Comptabilité'],
+    ['theorie-musicale', 'Théorie musicale'],
+    ['escalade', 'Escalade'],
+  ]),
+  confusions: new Map([
+    ['faux-ami-courant', 'Faux ami courant'],
+    ['polysemie-externe', 'Polysémie externe'],
+  ]),
+}
+
 const CORPUS: FicheIndex[] = [
   fiche({ slug: 'groupe-mathematiques', terme: 'groupe', resume: 'structure algébrique' }),
   fiche({ slug: 'actif-comptabilite', terme: 'actif', discipline: 'comptabilite', statut: 'propose', suggestions: ['avoir'] }),
@@ -1136,6 +1169,14 @@ describe('analyserCriteres', () => {
 
   it('conserve la recherche telle que saisie', () => {
     expect(analyserCriteres(new URLSearchParams('q=Tempé'), valides).q).toBe('Tempé')
+  })
+
+  it('élague les espaces autour de la recherche', () => {
+    expect(analyserCriteres(new URLSearchParams('q=%20%20mesure%20'), valides).q).toBe('mesure')
+  })
+
+  it('traite une recherche faite uniquement d\'espaces comme absente', () => {
+    expect(analyserCriteres(new URLSearchParams('q=%20%20%20'), valides)).toEqual(CRITERES_VIDES)
   })
 })
 
@@ -1188,9 +1229,28 @@ describe('filtrerFiches', () => {
     expect(filtrerFiches(CORPUS, { ...CRITERES_VIDES, q: 'licorne' })).toEqual([])
   })
 
-  it('ne modifie pas le tableau reçu', () => {
-    const copie = [...CORPUS]
-    filtrerFiches(CORPUS, { ...CRITERES_VIDES, q: 'mesure' })
+  it('ignore le nom de la discipline quand aucun libellé n\'est fourni', () => {
+    expect(filtrerFiches(CORPUS, { ...CRITERES_VIDES, q: 'escalade' })).toEqual([])
+  })
+
+  it('trouve par nom de discipline quand les libellés sont fournis', () => {
+    const r = filtrerFiches(CORPUS, { ...CRITERES_VIDES, q: 'escalade' }, LIBELLES)
+    expect(r.map((f) => f.slug)).toEqual(['mesure-escalade'])
+  })
+
+  it('trouve par nom de discipline accentué, tapé sans accent', () => {
+    const r = filtrerFiches(CORPUS, { ...CRITERES_VIDES, q: 'comptabilite' }, LIBELLES)
+    expect(r.map((f) => f.slug)).toEqual(['actif-comptabilite'])
+  })
+
+  it('trouve par nom de type de confusion', () => {
+    const r = filtrerFiches(CORPUS, { ...CRITERES_VIDES, q: 'polysémie' }, LIBELLES)
+    expect(r).toHaveLength(2)
+  })
+
+  it('ne modifie ni le tableau reçu ni les fiches qu\'il contient', () => {
+    const copie = structuredClone(CORPUS)
+    filtrerFiches(CORPUS, { ...CRITERES_VIDES, q: 'mesure' }, LIBELLES)
     expect(CORPUS).toEqual(copie)
   })
 })
@@ -1280,12 +1340,17 @@ export type SlugsValides = {
   statuts: string[]
 }
 
+export type LibellesRecherche = {
+  disciplines: Map<string, string>
+  confusions: Map<string, string>
+}
+
 export const CRITERES_VIDES: Criteres = { disciplines: [], confusions: [], statuts: [], q: '' }
 
 export function normaliser(texte: string): string {
   return texte
     .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
+    .replace(/[\u0300-\u036f]/g, '') // diacritiques, en échappements : ces caractères combinants sont invisibles
     .replace(/œ/gi, 'oe')
     .replace(/æ/gi, 'ae')
     .toLowerCase()
@@ -1307,7 +1372,7 @@ export function analyserCriteres(params: URLSearchParams, valides: SlugsValides)
     disciplines: lireListe(params, 'discipline', valides.disciplines),
     confusions: lireListe(params, 'confusion', valides.confusions),
     statuts: lireListe(params, 'statut', valides.statuts),
-    q: params.get('q') ?? '',
+    q: (params.get('q') ?? '').trim(),
   }
 }
 
@@ -1330,7 +1395,11 @@ export function aUnFiltre(criteres: Criteres): boolean {
   )
 }
 
-export function filtrerFiches(index: FicheIndex[], criteres: Criteres): FicheIndex[] {
+export function filtrerFiches(
+  index: FicheIndex[],
+  criteres: Criteres,
+  libelles?: LibellesRecherche,
+): FicheIndex[] {
   const recherche = normaliser(criteres.q)
 
   return index.filter((fiche) => {
@@ -1339,8 +1408,14 @@ export function filtrerFiches(index: FicheIndex[], criteres: Criteres): FicheInd
     if (criteres.statuts.length && !criteres.statuts.includes(fiche.statut)) return false
     if (!recherche) return true
 
-    const champs = [fiche.terme, fiche.resume, ...fiche.suggestions]
-    return champs.some((champ) => normaliser(champ).includes(recherche))
+    const champs = [
+      fiche.terme,
+      fiche.resume,
+      ...fiche.suggestions,
+      libelles?.disciplines.get(fiche.discipline) ?? '',
+      libelles?.confusions.get(fiche.confusion) ?? '',
+    ]
+    return champs.some((champ) => champ !== '' && normaliser(champ).includes(recherche))
   })
 }
 ```
@@ -1416,7 +1491,16 @@ describe('verifierCoherence', () => {
   it('signale l\'absence de section Risques', () => {
     const a = verifierCoherence(fiche({ corps: '## Pourquoi c\'est confus\n\ntexte\n' }))
     expect(a).toHaveLength(1)
-    expect(a[0]).toEqual({ slug: 'groupe-mathematiques', message: expect.stringMatching(/Risques/) })
+    expect(a[0]).toEqual({ slug: 'groupe-mathematiques', message: expect.stringMatching(/risques/) })
+  })
+
+  it('accepte un titre de section plus long que « Risques »', () => {
+    expect(verifierCoherence(fiche({ corps: '## Risques et limites\n\ntexte\n' }))).toEqual([])
+    expect(verifierCoherence(fiche({ corps: '## Les risques du changement\n\ntexte\n' }))).toEqual([])
+  })
+
+  it('accepte le titre quelle que soit la casse', () => {
+    expect(verifierCoherence(fiche({ corps: '## RISQUES\n\ntexte\n' }))).toEqual([])
   })
 
   it('signale un statut pointe accompagné de suggestions', () => {
@@ -1437,6 +1521,17 @@ describe('verifierCoherence', () => {
   it('signale un resume proche de la limite', () => {
     const a = verifierCoherence(fiche({ resume: 'a'.repeat(230) }))
     expect(a.map((x) => x.message).join()).toMatch(/resume/)
+  })
+
+  it('signale des crochets doubles qui survivent à l\'aplatissement, en situant le passage', () => {
+    const a = verifierCoherence(fiche({ corps: '## Risques\n\nun [[crochet non ferme\n' }))
+    expect(a).toHaveLength(1)
+    expect(a[0].message).toMatch(/crochets doubles/)
+    expect(a[0].message).toContain('[[crochet non ferme')
+  })
+
+  it('ne signale rien pour des crochets bien formés', () => {
+    expect(verifierCoherence(fiche({ corps: '## Risques\n\nla [[clarté]] et [[Intuitivité|intuitif]]\n' }))).toEqual([])
   })
 
   it('signale une date de modification antérieure à la création', () => {
@@ -1468,20 +1563,25 @@ Expected: FAIL — `Failed to resolve import "./coherence"`
 - [ ] **Step 3: Écrire `scripts/coherence.ts`**
 
 ```ts
-import { listerTitres } from '../lib/content/markdown'
+import { listerTitres, retirerCrochets } from '../lib/content/markdown'
 import { LONGUEUR_MAX_RESUME, type Fiche } from '../lib/content/schema'
 
 export type Avertissement = { slug: string; message: string }
 
+// 95 % de la limite dure : assez près pour prévenir avant le refus, assez loin
+// pour ne pas crier sur un resume simplement bien rempli.
 const SEUIL_RESUME = Math.floor(LONGUEUR_MAX_RESUME * 0.95)
 
 export function verifierCoherence(fiche: Fiche): Avertissement[] {
   const avertissements: string[] = []
   const titres = listerTitres(fiche.corps).map((t) => t.toLowerCase())
 
-  if (!titres.includes('risques')) {
+  // Sous-chaîne et non égalité : « ## Risques et limites » ou « ## Les risques du
+  // changement » traitent bien le sujet et ne doivent pas être signalés. Un
+  // avertissement qui se trompe se fait ignorer, et ne garde plus rien.
+  if (!titres.some((titre) => titre.includes('risques'))) {
     avertissements.push(
-      'aucune section « ## Risques » : le manifeste demande d\'identifier les risques de la modification',
+      'aucune section de niveau 2 dont le titre contient « risques » : le manifeste demande d\'identifier les risques de la modification',
     )
   }
 
@@ -1505,6 +1605,15 @@ export function verifierCoherence(fiche: Fiche): Avertissement[] {
 
   if (fiche.modifie.getTime() < fiche.cree.getTime()) {
     avertissements.push('modifie est antérieur à cree')
+  }
+
+  const aplati = retirerCrochets(fiche.corps)
+  const positionCrochets = aplati.indexOf('[[')
+  if (positionCrochets !== -1) {
+    const extrait = aplati.slice(positionCrochets, positionCrochets + 40).split('\n')[0]
+    avertissements.push(
+      `des crochets doubles survivent à l'aplatissement, probablement un « [[ » non fermé ou imbriqué, qui s'affichera tel quel : « ${extrait} »`,
+    )
   }
 
   return avertissements.map((message) => ({ slug: fiche.slug, message }))
@@ -1929,6 +2038,18 @@ describe('EnteteFiche', () => {
     expect(screen.getByText(/aucune alternative/i)).toBeInTheDocument()
   })
 
+  it('met « Suggestion » au singulier quand il n\'y en a qu\'une', () => {
+    render(
+      <EnteteFiche
+        fiche={meta({ statut: 'propose', suggestions: ['avoir'] })}
+        {...libelles}
+        nomStatut="Proposé"
+      />,
+    )
+    expect(screen.getByText(/^Suggestion :$/)).toBeInTheDocument()
+    expect(screen.getByText('avoir')).toBeInTheDocument()
+  })
+
   it('liste les suggestions quand il y en a plusieurs', () => {
     render(
       <EnteteFiche
@@ -1970,7 +2091,7 @@ import type { Statut } from '@/lib/content/schema'
 const CLASSES: Record<Statut, string> = {
   pointe: 'border-amber-500 text-amber-700',
   propose: 'border-emerald-600 text-emerald-700',
-  rejete: 'border-stone-400 text-stone-500',
+  rejete: 'border-stone-400 text-stone-600',
 }
 
 export function BadgeStatut({ statut, nom }: { statut: Statut; nom: string }) {
@@ -2068,6 +2189,13 @@ import { rendreMarkdown } from '@/lib/content/markdown'
 import { chargerTaxonomies } from '@/lib/content/taxonomies'
 
 type Params = { params: Promise<{ slug: string }> }
+
+// Sans cela, `dynamicParams` vaut `true` : un slug absent de la liste ci-dessous
+// déclencherait un rendu de page à la demande côté serveur, qui lirait le disque
+// avant de conclure au 404. À `false`, Next répond 404 sans jamais invoquer la
+// page. C'est ce qu'exigent la contrainte globale « chaque page est générée au
+// build » et la spec §4 « un slug inconnu ne peut pas exister ».
+export const dynamicParams = false
 
 export function generateStaticParams() {
   return getFiches().map((fiche) => ({ slug: fiche.slug }))
@@ -2247,10 +2375,14 @@ const index: FicheIndex[] = [
   fiche({ slug: 'statique-escalade', terme: 'statique', discipline: 'escalade', statut: 'propose', suggestions: ['contrôlé'] }),
 ]
 
+// Un élément neuf à chaque appel : React peut court-circuiter un re-rendu si on
+// lui repasse exactement la même référence d'élément.
+function elementCorpus() {
+  return <Corpus index={index} disciplines={disciplines} confusions={confusions} statuts={statuts} />
+}
+
 function afficher() {
-  return render(
-    <Corpus index={index} disciplines={disciplines} confusions={confusions} statuts={statuts} />,
-  )
+  return render(elementCorpus())
 }
 
 beforeEach(() => {
@@ -2310,6 +2442,38 @@ describe('Corpus — filtres et URL', () => {
     afficher()
     await userEvent.type(screen.getByRole('searchbox'), 'tempe')
     expect(screen.getByRole('link', { name: /tempérament/ })).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: /groupe/ })).not.toBeInTheDocument()
+  })
+
+  it('resynchronise ses filtres quand l’URL change sans passer par lui', () => {
+    recherche = 'discipline=escalade'
+    const { rerender } = afficher()
+    expect(screen.queryByRole('link', { name: /groupe/ })).not.toBeInTheDocument()
+
+    // Lien interne vers /fiches sans paramètre : le segment de route ne change
+    // pas, donc le composant reste monté avec son état.
+    recherche = ''
+    rerender(elementCorpus())
+
+    expect(screen.getByRole('link', { name: /groupe/ })).toBeInTheDocument()
+    expect(screen.getByText(/3 fiches/)).toBeInTheDocument()
+  })
+
+  it('ne réécrit pas un filtre périmé après une resynchronisation', async () => {
+    recherche = 'discipline=escalade'
+    const { rerender } = afficher()
+    recherche = ''
+    rerender(elementCorpus())
+
+    await userEvent.click(screen.getByRole('button', { name: 'Pointé' }))
+    expect(remplacer).toHaveBeenLastCalledWith('/fiches?statut=pointe', { scroll: false })
+  })
+
+  it('trouve une fiche en tapant le nom de sa discipline', async () => {
+    afficher()
+    await userEvent.type(screen.getByRole('searchbox'), 'escalade')
+    expect(screen.getByRole('link', { name: /tempérament/ })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /statique/ })).toBeInTheDocument()
     expect(screen.queryByRole('link', { name: /groupe/ })).not.toBeInTheDocument()
   })
 
@@ -2384,7 +2548,12 @@ export function Filtres({
       />
 
       {groupes.map(({ cle, libelle, entrees }) => (
-        <div key={cle} className="flex flex-wrap items-baseline gap-2">
+        <div
+          key={cle}
+          role="group"
+          aria-label={libelle}
+          className="flex flex-wrap items-baseline gap-2"
+        >
           <span className="text-xs uppercase tracking-wide text-stone-500">{libelle}</span>
           {entrees.map(({ slug, nom }) => {
             const actif = criteres[cle].includes(slug)
@@ -2448,6 +2617,23 @@ const libelles: Libelles = {
   ]),
 }
 
+// Libellés dont l'ordre alphabétique DIFFÈRE de celui des slugs. C'est la seule
+// façon de prouver que le tri porte sur le libellé affiché et non sur le slug :
+// avec les libellés réels ci-dessus, « Escalade » et « escalade » se classent de
+// la même façon, et un tri qui ignorerait complètement les libellés passerait
+// quand même.
+const LIBELLES_DIVERGENTS: Libelles = {
+  disciplines: new Map([
+    ['mathematiques', 'Algèbre'], // slug second, libellé premier
+    ['escalade', 'Varappe'], // slug premier, libellé second
+  ]),
+  statuts: new Map([
+    ['pointe', 'Signalé'], // slug premier, libellé troisième
+    ['propose', 'Avancé'], // slug second, libellé premier
+    ['rejete', 'Écarté'], // slug troisième, libellé second
+  ]),
+}
+
 function fiche(p: Partial<FicheIndex>): FicheIndex {
   return {
     slug: 'x',
@@ -2492,18 +2678,18 @@ describe('trierFiches', () => {
   })
 
   it('trie par libellé de discipline, pas par slug', () => {
-    expect(trierFiches(fiches, 'discipline', true, libelles).map((f) => f.discipline)).toEqual([
+    expect(trierFiches(fiches, 'discipline', true, LIBELLES_DIVERGENTS).map((f) => f.discipline)).toEqual([
+      'mathematiques',
+      'mathematiques',
       'escalade',
-      'mathematiques',
-      'mathematiques',
     ])
   })
 
-  it('trie par libellé de statut', () => {
-    expect(trierFiches(fiches, 'statut', true, libelles).map((f) => f.statut)).toEqual([
-      'pointe',
+  it('trie par libellé de statut, pas par slug', () => {
+    expect(trierFiches(fiches, 'statut', true, LIBELLES_DIVERGENTS).map((f) => f.statut)).toEqual([
       'propose',
       'rejete',
+      'pointe',
     ])
   })
 
@@ -2682,7 +2868,7 @@ Trois points de conception, chacun imposé par la spec ou par le test :
 'use client'
 
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import type { Discipline, EntreeTaxonomie, FicheIndex } from '@/lib/content/schema'
 import {
   analyserCriteres,
@@ -2728,24 +2914,53 @@ export function Corpus({
     [disciplines, confusions, statuts],
   )
 
+  const requeteActuelle = params.toString()
   const vueDemandee = params.get('vue')
   const vueValide = vueDemandee === 'carte' || vueDemandee === 'liste' ? vueDemandee : null
 
   const [criteres, setCriteres] = useState<Criteres>(() =>
-    analyserCriteres(new URLSearchParams(params.toString()), valides),
+    analyserCriteres(new URLSearchParams(requeteActuelle), valides),
   )
   const [vue, setVue] = useState<Vue>(() => vueValide ?? vueParDefaut())
   const [vueExplicite, setVueExplicite] = useState(vueValide !== null)
 
-  const fiches = filtrerFiches(index, criteres)
+  // La requête que NOUS avons écrite en dernier. Tout écart signifie que l'URL a
+  // changé sans passer par `naviguer` — un lien interne vers /fiches depuis la
+  // navigation du site, par exemple, qui laisse ce composant monté. Il faut alors
+  // repartir de l'URL : sinon l'affichage garde des filtres que l'URL ne porte
+  // plus, et la prochaine interaction les réécrirait dedans.
+  const derniereRequeteEcrite = useRef(requeteActuelle)
 
-  const libelles: Libelles = useMemo(
+  useEffect(() => {
+    if (derniereRequeteEcrite.current === requeteActuelle) return
+    derniereRequeteEcrite.current = requeteActuelle
+
+    const prochains = new URLSearchParams(requeteActuelle)
+    const demandee = prochains.get('vue')
+    const valide = demandee === 'carte' || demandee === 'liste' ? demandee : null
+
+    setCriteres(analyserCriteres(prochains, valides))
+    setVue(valide ?? vueParDefaut())
+    setVueExplicite(valide !== null)
+  }, [requeteActuelle, valides])
+
+  // Une seule construction des tables slug -> libellé, consommée à la fois par la
+  // recherche et par l'affichage.
+  const libellesParSlug = useMemo(
     () => ({
       disciplines: new Map(disciplines.map((d) => [d.slug, d.nom])),
+      confusions: new Map(confusions.map((c) => [c.slug, c.nom])),
       statuts: new Map(statuts.map((s) => [s.slug, s.nom])),
     }),
-    [disciplines, statuts],
+    [disciplines, confusions, statuts],
   )
+
+  const fiches = filtrerFiches(index, criteres, libellesParSlug)
+
+  const libelles: Libelles = {
+    disciplines: libellesParSlug.disciplines,
+    statuts: libellesParSlug.statuts,
+  }
 
   function naviguer(prochainsCriteres: Criteres, prochaineVue: Vue) {
     const explicite = vueExplicite || prochaineVue !== vue
@@ -2755,6 +2970,7 @@ export function Corpus({
     setVueExplicite(explicite)
 
     const requete = ecrireCriteres(prochainsCriteres, explicite ? prochaineVue : undefined)
+    derniereRequeteEcrite.current = requete
     router.replace(requete ? `${chemin}?${requete}` : chemin, { scroll: false })
   }
 
@@ -2774,7 +2990,7 @@ export function Corpus({
             </button>
           ))}
         </div>
-        <p className="text-sm text-stone-500">
+        <p role="status" className="text-sm text-stone-500">
           {`${fiches.length} fiche${fiches.length > 1 ? 's' : ''}${
             fiches.length === index.length ? '' : ` sur ${index.length}`
           }`}
@@ -2996,6 +3212,18 @@ describe('VueCarte', () => {
     }
   })
 
+  it('marque chaque point d’une classe qui porte le style de focus', () => {
+    render(<VueCarte fiches={fiches} disciplines={disciplines} libellesStatuts={libellesStatuts} />)
+    for (const lien of screen.getAllByRole('link')) {
+      expect(lien).toHaveClass('point-fiche')
+    }
+  })
+
+  it('dit en clair ce que la couleur et le remplissage encodent', () => {
+    render(<VueCarte fiches={fiches} disciplines={disciplines} libellesStatuts={libellesStatuts} />)
+    expect(screen.getByText(/Chaque couleur désigne une discipline/)).toBeInTheDocument()
+  })
+
   it('décrit chaque point par son terme et son statut', () => {
     render(<VueCarte fiches={fiches} disciplines={disciplines} libellesStatuts={libellesStatuts} />)
     expect(screen.getByRole('link', { name: 'groupe — Pointé' })).toBeInTheDocument()
@@ -3059,6 +3287,7 @@ function Zone({
           return (
             <a
               key={fiche.slug}
+              className="point-fiche"
               href={`/fiches/${fiche.slug}`}
               aria-label={`${fiche.terme} — ${nomStatut}`}
             >
@@ -3100,7 +3329,12 @@ export function VueCarte({
         ))}
       </div>
 
-      <dl className="flex flex-wrap gap-x-6 gap-y-2 border-t border-stone-200 pt-4 text-xs text-stone-500">
+      <p className="border-t border-stone-200 pt-4 text-xs text-stone-500">
+        Chaque couleur désigne une discipline ; le remplissage du point dit le statut de
+        l’analyse.
+      </p>
+
+      <dl className="flex flex-wrap gap-x-6 gap-y-2 text-xs text-stone-500">
         {STATUTS.map((statut) => {
           const style = styleStatut(statut, '#78716c')
           return (
@@ -3122,6 +3356,30 @@ export function VueCarte({
 
 Run: `npm run test:once components/vue-carte.test.tsx`
 Expected: PASS — tous les tests du fichier réussissent
+
+- [ ] **Step 5a: Rendre le focus clavier visible sur les points**
+
+Les points de la carte sont de petites cibles rapprochées (rayon 7, pas de 26). L'anneau de focus natif du navigateur subsiste — Tailwind ne le supprime pas — mais il se dessine sur la boîte englobante et sa couleur par défaut dans Chrome est proche du bleu de la comptabilité (`#3b82c4`). Une navigation au clavier qui fonctionne sans qu'on voie où l'on est n'est pas utilisable.
+
+Ajouter à la fin de `app/globals.css` :
+
+```css
+/* Les points de la carte sont des liens SVG. L'anneau de focus natif se dessine
+   sur la boîte englobante et peut se confondre avec la couleur de la discipline :
+   on double donc le repère par un contour sombre sur le cercle lui-même, qui
+   contraste avec le fond clair comme avec les quatre couleurs de disciplines. */
+.point-fiche:focus-visible {
+  outline: 2px solid #1c1917;
+  outline-offset: 2px;
+}
+
+.point-fiche:focus-visible circle {
+  stroke: #1c1917;
+  stroke-width: 3;
+}
+```
+
+Le contour sur le `<circle>` est la ceinture, l'`outline` les bretelles : si le navigateur gère mal l'un sur du SVG, l'autre reste visible.
 
 - [ ] **Step 5: Brancher la carte dans `components/corpus.tsx`**
 
@@ -3147,17 +3405,40 @@ Puis remplacer le bloc d'affichage final par :
 
 - [ ] **Step 6: Ajouter les tests de bascule dans `components/corpus.test.tsx`**
 
-Ajouter `afterEach` à l'import de `vitest` en tête de fichier :
+Ajouter `afterEach` à l'import de `vitest`, et `vueParDefaut` à celui de `./corpus` :
 
 ```tsx
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 ```
+```tsx
+import { Corpus, vueParDefaut } from './corpus'
+```
 
-Puis ajouter à la fin du fichier :
+**Attention, point vérifié et contre-intuitif : jsdom ne fournit pas `window.matchMedia` dans ce harnais** (`typeof` vaut `'undefined'`, mesuré). Un `vi.spyOn(window, 'matchMedia')` échoue donc, faute de propriété à espionner. Il faut l'injecter, et la retirer après chaque test pour que les autres continuent d'exercer le repli de `vueParDefaut` — repli qui est le comportement réel de tous les tests du projet, et qu'un stub global dans `vitest.setup.ts` effacerait silencieusement.
+
+Ajouter à la fin du fichier :
 
 ```tsx
+// jsdom ne fournit pas matchMedia : on l'injecte pour les deux tests qui ont
+// besoin d'une largeur d'écran, et on le retire ensuite.
+function simulerGrandEcran(grandEcran: boolean) {
+  Object.defineProperty(window, 'matchMedia', {
+    configurable: true,
+    writable: true,
+    value: (requete: string) => ({ matches: grandEcran, media: requete }) as MediaQueryList,
+  })
+}
+
 afterEach(() => {
   vi.restoreAllMocks()
+  delete (window as { matchMedia?: unknown }).matchMedia
+})
+
+describe('vueParDefaut', () => {
+  it('se replie sur la liste quand matchMedia n’est pas disponible', () => {
+    // C'est l'état par défaut de jsdom, donc celui de tous les autres tests.
+    expect(vueParDefaut()).toBe('liste')
+  })
 })
 
 describe('Corpus — bascule entre les deux vues', () => {
@@ -3175,13 +3456,13 @@ describe('Corpus — bascule entre les deux vues', () => {
   })
 
   it('choisit la liste par défaut sur petit écran', () => {
-    vi.spyOn(window, 'matchMedia').mockReturnValue({ matches: false } as MediaQueryList)
+    simulerGrandEcran(false)
     const { container } = afficher()
     expect(container.querySelector('table')).not.toBeNull()
   })
 
   it('choisit la carte par défaut sur grand écran', () => {
-    vi.spyOn(window, 'matchMedia').mockReturnValue({ matches: true } as MediaQueryList)
+    simulerGrandEcran(true)
     const { container } = afficher()
     expect(container.querySelectorAll('circle').length).toBeGreaterThan(0)
     expect(container.querySelector('table')).toBeNull()
@@ -3235,7 +3516,39 @@ git commit -m "feat: vue carte constellations, encodage couleur et statut"
 - Consumes: tout le reste.
 - Produces: un dépôt dont chaque PR est vérifiée, et un README qui dit comment ajouter une fiche.
 
-- [ ] **Step 1: Écrire le workflow d'intégration continue**
+- [ ] **Step 1: Compléter le `.gitignore`**
+
+Le `.gitignore` du dépôt a été écrit à la main avant l'échafaudage, et l'étape de recopie de la Tâche 1 l'a volontairement exclue du `rsync` pour ne pas écraser ses entrées propres au projet (`.superpowers/`, `.worktrees/`). Conséquence : les entrées que `create-next-app` aurait apportées manquent, dont **`.env*`** — un fichier d'environnement contenant des secrets serait donc commité sans avertissement, sur un dépôt destiné à GitHub.
+
+Ajouter à la fin de `.gitignore` :
+
+```gitignore
+
+# TypeScript
+*.tsbuildinfo
+
+# Sorties de build
+/out/
+/build
+/coverage
+
+# Fichiers d'environnement — jamais versionnés
+.env*
+
+# Divers
+*.pem
+npm-debug.log*
+```
+
+Puis vérifier que rien d'indésirable n'est déjà suivi :
+
+```bash
+git ls-files | grep -E '\.env|tsbuildinfo|\.pem$' && echo "ATTENTION : des fichiers à ignorer sont déjà suivis" || echo "rien d'indésirable n'est suivi"
+```
+
+`next-env.d.ts` reste **suivi** volontairement, bien que l'échafaudage l'ignore par défaut : il est déjà commité, Next le régénère à l'identique, et le retirer créerait du bruit sans bénéfice.
+
+- [ ] **Step 2: Écrire le workflow d'intégration continue**
 
 Créer `.github/workflows/ci.yml` :
 
@@ -3263,12 +3576,22 @@ jobs:
       - run: npm run build
 ```
 
-- [ ] **Step 2: Vérifier localement la séquence exacte de la CI**
+- [ ] **Step 3: Vérifier localement la séquence exacte de la CI**
 
 Run: `npm run lint:content && npm run test:once && npm run lint && npm run build`
 Expected: les quatre commandes réussissent d'affilée.
 
-- [ ] **Step 3: Écrire le README**
+- [ ] **Step 4: Déclarer le moteur Node, puis écrire le README**
+
+La contrainte globale exige Node 22 ou plus, mais rien dans le dépôt ne le dit à un contributeur : il découvrirait le problème par un échec de build obscur. Ajouter dans `package.json`, après le champ `private` :
+
+```json
+  "engines": {
+    "node": ">=22"
+  },
+```
+
+C'est le seul endroit du projet où un intervalle de version est voulu : il décrit le moteur attendu, pas une dépendance figée.
 
 Créer `README.md` :
 
@@ -3312,7 +3635,7 @@ Les valeurs de `discipline` et `confusion` doivent exister dans
 | `npm run lint:content` | Avertissements de cohérence des fiches |
 ```
 
-- [ ] **Step 4: Donner un chemin vers la carte sans JavaScript**
+- [ ] **Step 5: Donner un chemin vers la carte sans JavaScript**
 
 La vue carte vit dans un composant client. Sans JavaScript, `/fiches` n'affiche
 que le secours de `<Suspense>`, donc les fiches doivent rester atteignables
@@ -3334,19 +3657,19 @@ après le `</Suspense>` :
       </noscript>
 ```
 
-- [ ] **Step 5: Vérifier le build complet**
+- [ ] **Step 6: Vérifier le build complet**
 
 Run: `npm run build`
 Expected: le build réussit ; toutes les routes sont statiques ; les cinq fiches sont pré-rendues.
 
-- [ ] **Step 6: Commit**
+- [ ] **Step 7: Commit**
 
 ```bash
-git add .github README.md app
+git add .github README.md app .gitignore
 git commit -m "ci: vérification du contenu, des tests et du build sur chaque PR"
 ```
 
-- [ ] **Step 7: Déployer**
+- [ ] **Step 8: Déployer**
 
 À faire par Noël, puisque cela demande ses comptes :
 

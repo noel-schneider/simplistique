@@ -1,0 +1,16 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+/* Les points de la carte sont des liens SVG. L’anneau de focus natif se dessine
+   sur la boîte englobante et peut se confondre avec la couleur de la discipline :
+   on double donc le repère par un contour sombre sur le cercle lui-même, qui
+   contraste avec le fond clair comme avec les quatre couleurs de disciplines. */
+.point-fiche:focus-visible {
+  outline: 2px solid #1c1917;
+  outline-offset: 2px;
+}
+
+.point-fiche:focus-visible circle {
+  stroke: #1c1917;
+  stroke-width: 3;
+}

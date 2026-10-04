@@ -4,3 +4,18 @@ node_modules/
 .vercel/
 .DS_Store
 .worktrees/
+
+# TypeScript
+*.tsbuildinfo
+
+# Sorties de build
+/out/
+/build
+/coverage
+
+# Fichiers d'environnement — jamais versionnés
+.env*
+
+# Divers
+*.pem
+npm-debug.log*

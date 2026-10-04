@@ -1,0 +1,151 @@
+import { listerTitres, retirerCrochets } from '../lib/content/markdown'
+import { LONGUEUR_MAX_RESUME, type Chantier, type Fiche } from '../lib/content/schema'
+import { empreinteAlternative } from '../lib/votes/empreintes'
+
+export type Avertissement = { slug: string; message: string }
+
+// 95 % de la limite dure : assez près pour prévenir avant le refus, assez loin
+// pour ne pas crier sur un resume simplement bien rempli.
+const SEUIL_RESUME = Math.floor(LONGUEUR_MAX_RESUME * 0.95)
+
+// Découpe par graphème (Intl.Segmenter) plutôt que par index de code unité :
+// un index brut peut tomber entre les deux moitiés d'une paire supplétive
+// (émoji, etc.) ou entre une lettre de base et sa marque combinante (un
+// accent décomposé), et rendrait un extrait tronqué au milieu d'un caractère.
+const segmenteurGraphemes = new Intl.Segmenter('fr', { granularity: 'grapheme' })
+
+function tronquerParGraphemes(texte: string, longueur: number): string {
+  const graphemes: string[] = []
+  for (const { segment } of segmenteurGraphemes.segment(texte)) {
+    if (graphemes.length >= longueur) break
+    graphemes.push(segment)
+  }
+  return graphemes.join('')
+}
+
+export function verifierCoherence(fiche: Fiche): Avertissement[] {
+  const avertissements: string[] = []
+  const titres = listerTitres(fiche.corps).map((t) => t.toLowerCase())
+
+  // Sous-chaîne et non égalité : « ## Risques et limites » ou « ## Les risques du
+  // changement » traitent bien le sujet et ne doivent pas être signalés. Un
+  // avertissement qui se trompe se fait ignorer, et ne garde plus rien.
+  if (!titres.some((titre) => titre.includes('risques'))) {
+    avertissements.push(
+      'aucune section de niveau 2 dont le titre contient « risques » : le manifeste demande d\'identifier les risques de la modification',
+    )
+  }
+
+  if (fiche.statut === 'pointe' && fiche.suggestions.length > 0) {
+    avertissements.push(
+      'statut « pointe » alors que des suggestions sont proposées : le statut devrait être « propose »',
+    )
+  }
+
+  if (fiche.statut === 'propose' && fiche.suggestions.length === 0) {
+    avertissements.push(
+      'statut « propose » sans aucune suggestion : le statut devrait être « pointe »',
+    )
+  }
+
+  if (fiche.resume.length >= SEUIL_RESUME) {
+    avertissements.push(
+      `resume de ${fiche.resume.length} caractères, proche de la limite de ${LONGUEUR_MAX_RESUME}`,
+    )
+  }
+
+  if (fiche.modifie.getTime() < fiche.cree.getTime()) {
+    avertissements.push('modifie est antérieur à cree')
+  }
+
+  const aplati = retirerCrochets(fiche.corps)
+  const positionCrochets = aplati.indexOf('[[')
+  if (positionCrochets !== -1) {
+    const extrait = tronquerParGraphemes(aplati.slice(positionCrochets), 40).split('\n')[0]
+    avertissements.push(
+      `des crochets doubles survivent à l'aplatissement, probablement un « [[ » non fermé ou imbriqué, qui s'affichera tel quel : « ${extrait} »`,
+    )
+  }
+
+  // Deux alternatives dont le texte ne diffère que par la casse ou les accents
+  // partagent une empreinte, donc leurs votes fusionneraient en silence.
+  const empreintes = fiche.suggestions.map(empreinteAlternative)
+  if (new Set(empreintes).size !== empreintes.length) {
+    avertissements.push(
+      'deux alternatives ont la même empreinte une fois normalisées : leurs votes seraient comptés ensemble',
+    )
+  }
+
+  return avertissements.map((message) => ({ slug: fiche.slug, message }))
+}
+
+export function verifierCorpus(fiches: Fiche[]): Avertissement[] {
+  return fiches.flatMap(verifierCoherence)
+}
+
+// Le marqueur sert de point d'ancrage dans content/manifeste.md et
+// content/contribuer.md, à remplacer par l'adresse réelle du dépôt une fois
+// publié. Laissé entre chevrons, il est lu comme une balise HTML inconnue et
+// disparaît silencieusement au rendu — entre accents graves, il survit comme
+// du code littéral. Ce contrôle signale l'oubli sans jamais bloquer : la
+// publication initiale, avant que l'adresse ne soit connue, en dépend.
+const MARQUEUR_URL_DEPOT = 'URL-DU-DEPOT'
+
+/**
+ * Trois avertissements qui relèvent du jugement éditorial, et jamais de la
+ * justesse : rien ici n’empêche le site de se construire. Ce qui rend le site
+ * faux — un chantier inexistant, un chantier d’une autre discipline — est
+ * refusé beaucoup plus tôt, au chargement du corpus.
+ */
+export function verifierChantier(chantier: Chantier, fiches: Fiche[]): Avertissement[] {
+  const avertissements: Avertissement[] = []
+
+  const siennes = fiches.filter((fiche) => fiche.chantier === chantier.slug)
+
+  if (siennes.length === 0) {
+    avertissements.push({
+      slug: chantier.slug,
+      message:
+        'aucune fiche ne désigne ce chantier : un « chantier: » a probablement été oublié dans une fiche',
+    })
+  } else if (siennes.length === 1) {
+    avertissements.push({
+      slug: chantier.slug,
+      message:
+        'une seule fiche désigne ce chantier : le mot suppose un corpus, et une réforme d’un seul terme tient dans la fiche elle-même',
+    })
+  }
+
+  // Même règle que pour les fiches, et par sous-chaîne pour la même raison :
+  // « ## Risques et limites » traite bien le sujet.
+  const titres = listerTitres(chantier.corps).map((titre) => titre.toLowerCase())
+  if (!titres.some((titre) => titre.includes('risques'))) {
+    avertissements.push({
+      slug: chantier.slug,
+      message:
+        'aucune section de niveau 2 dont le titre contient « risques » : une réforme d’ensemble en a plus besoin qu’un mot isolé',
+    })
+  }
+
+  if (chantier.modifie.getTime() < chantier.cree.getTime()) {
+    avertissements.push({
+      slug: chantier.slug,
+      message: 'modifie est antérieure à cree',
+    })
+  }
+
+  return avertissements
+}
+
+export function verifierChantiers(chantiers: Chantier[], fiches: Fiche[]): Avertissement[] {
+  return chantiers.flatMap((chantier) => verifierChantier(chantier, fiches))
+}
+
+export function verifierDocuments(documents: { nom: string; texte: string }[]): Avertissement[] {
+  return documents
+    .filter((document) => document.texte.includes(MARQUEUR_URL_DEPOT))
+    .map((document) => ({
+      slug: document.nom,
+      message: `le marqueur « ${MARQUEUR_URL_DEPOT} » est encore présent : à remplacer par l'adresse réelle du dépôt`,
+    }))
+}
