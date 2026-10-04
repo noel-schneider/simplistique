@@ -1,9 +1,10 @@
-import { mkdtempSync, writeFileSync, mkdirSync } from 'node:fs'
+import { mkdtempSync, writeFileSync, mkdirSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { chargerTaxonomies, DOSSIER_CONTENU } from './taxonomies'
-import { getFiche, getFiches, getDocument } from './fiches'
+import { getFiche, getFiches, getDocument, getIndex } from './fiches'
+import type { Fiche, ChantierMeta } from './schema'
 
 const taxonomies = chargerTaxonomies(DOSSIER_CONTENU)
 
@@ -33,15 +34,28 @@ Le corps.
 `
 
 describe('getFiches sur le corpus réel', () => {
-  it('lit toutes les fiches du dépôt', () => {
+  it('lit toutes les fiches du dépôt, et chacune une seule fois', () => {
     const fiches = getFiches(DOSSIER_CONTENU, taxonomies)
-    expect(fiches.length).toBeGreaterThanOrEqual(5)
+    // Compte exact et non plancher : un plancher ne verrait jamais une fiche
+    // lue deux fois. C’est le seul endroit du projet qui encode ce nombre
+    // indépendamment du chargeur, donc le seul filet contre un sur-comptage —
+    // `app/sitemap.test.ts` calcule désormais son attendu avec `getFiches()`
+    // lui-même, et ne peut donc pas jouer ce rôle.
+    expect(fiches).toHaveLength(5)
+    expect(new Set(fiches.map((f) => f.slug)).size).toBe(fiches.length)
   })
 
   it('trie par terme selon l\'ordre alphabétique français', () => {
-    const termes = getFiches(DOSSIER_CONTENU, taxonomies).map((f) => f.terme)
-    const attendu = [...termes].sort((a, b) => a.localeCompare(b, 'fr'))
-    expect(termes).toEqual(attendu)
+    // Les noms de fichiers sont en ordre inverse des termes, sur le modèle de
+    // lib/content/chantiers.test.ts : si le tri disparaissait, `readdirSync`
+    // rendrait `a-…` avant `z-…`, donc le mauvais ordre de termes, et ce test
+    // tomberait. Avec des noms dont l'ordre coïncide avec celui des termes, il
+    // ne mesurerait que l'ordre du système de fichiers.
+    const racine = corpusFactice({
+      'a-mathematiques.md': VALIDE.replace('terme: groupe', 'terme: zèbre'),
+      'z-mathematiques.md': VALIDE.replace('terme: groupe', 'terme: abaque'),
+    })
+    expect(getFiches(racine, taxonomies).map((f) => f.terme)).toEqual(['abaque', 'zèbre'])
   })
 
   it('donne un slug unique à chaque fiche', () => {
@@ -123,6 +137,13 @@ describe('getFiches refuse le contenu invalide', () => {
     const racine = corpusFactice({ 'Théorie Groupe .md': VALIDE })
     expect(() => getFiches(racine, taxonomies)).toThrow(/Théorie Groupe \.md/)
   })
+
+  it('refuse une clé de front-matter inconnue plutôt que de l’ignorer', () => {
+    const racine = corpusFactice({
+      'x-mathematiques.md': VALIDE.replace('statut: pointe', 'statut: pointe\nchantiers: vocabulaire-du-bilan'),
+    })
+    expect(() => getFiches(racine, taxonomies)).toThrow(/chantiers/)
+  })
 })
 
 describe('getFiche', () => {
@@ -138,5 +159,84 @@ describe('getFiche', () => {
 describe('getDocument', () => {
   it('lit le manifeste', () => {
     expect(getDocument('manifeste', DOSSIER_CONTENU).length).toBeGreaterThan(100)
+  })
+})
+
+function lireFicheDeTest(champs: Record<string, unknown>, chantiers: ChantierMeta[]): Fiche {
+  const dossier = mkdtempSync(join(tmpdir(), 'simplistique-fiche-'))
+  try {
+    mkdirSync(join(dossier, 'fiches'), { recursive: true })
+    const entete = Object.entries({
+      terme: 'essai',
+      discipline: 'comptabilite',
+      confusion: 'faux-ami-courant',
+      statut: 'pointe',
+      resume: 'court',
+      suggestions: [],
+      cree: '2026-10-04',
+      modifie: '2026-10-04',
+      ...champs,
+    })
+      .map(([cle, valeur]) => `${cle}: ${JSON.stringify(valeur)}`)
+      .join('\n')
+    writeFileSync(
+      join(dossier, 'fiches', 'essai-comptabilite.md'),
+      `---\n${entete}\n---\n\n## Risques\n\ntexte\n`,
+      'utf8',
+    )
+    const fiche = getFiche('essai-comptabilite', dossier, chargerTaxonomies(DOSSIER_CONTENU), chantiers)
+    if (!fiche) throw new Error('fiche de test introuvable')
+    return fiche
+  } finally {
+    rmSync(dossier, { recursive: true, force: true })
+  }
+}
+
+describe('le champ chantier d’une fiche', () => {
+  const CHANTIERS = [
+    {
+      slug: 'vocabulaire-du-bilan',
+      nom: 'Le vocabulaire du bilan',
+      discipline: 'comptabilite',
+      resume: 'court',
+      cree: new Date('2026-10-04'),
+      modifie: new Date('2026-10-04'),
+    },
+  ]
+
+  it('accepte une fiche sans chantier, et laisse le champ absent', () => {
+    const fiche = getFiche('groupe-mathematiques', DOSSIER_CONTENU, undefined, CHANTIERS)
+    expect(fiche?.chantier).toBeUndefined()
+  })
+
+  it('refuse un chantier qui n’existe pas', () => {
+    expect(() =>
+      lireFicheDeTest({ discipline: 'comptabilite', chantier: 'invente' }, CHANTIERS),
+    ).toThrow(/chantier[\s\S]*invente/)
+  })
+
+  // Review Focus nº 2 : la seconde fiche doit échouer pour elle-même, et non
+  // passer parce qu'une fiche précédente a validé le même chantier.
+  it('refuse un chantier d’une autre discipline', () => {
+    expect(() =>
+      lireFicheDeTest({ discipline: 'mathematiques', chantier: 'vocabulaire-du-bilan' }, CHANTIERS),
+    ).toThrow(/discipline/)
+  })
+
+  // Review Focus nº 3 : présent mais vide n'est pas la même chose qu'absent.
+  it('refuse un chantier vide, et le dit pour ce qu’il est', () => {
+    // L'assertion porte sur le message, et non sur le seul fait qu'une erreur
+    // survienne : si le `.min(1)` disparaissait du schéma, la chaîne vide serait
+    // quand même rejetée — par la branche « chantier inconnu », puisque aucun
+    // chantier n'a `''` pour slug — et un simple `toThrow(/chantier/)` ne verrait
+    // rien du changement.
+    expect(() => lireFicheDeTest({ discipline: 'comptabilite', chantier: '' }, CHANTIERS)).toThrow(
+      /chantier vide/,
+    )
+  })
+
+  it('porte le chantier jusque dans l’index', () => {
+    const index = getIndex(DOSSIER_CONTENU, undefined, CHANTIERS)
+    expect(index.every((entree) => 'chantier' in entree)).toBe(true)
   })
 })

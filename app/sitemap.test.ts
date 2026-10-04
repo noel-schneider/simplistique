@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { getChantiers } from '@/lib/content/chantiers'
 import { getFiches } from '@/lib/content/fiches'
 import sitemap from './sitemap'
 
@@ -10,7 +11,11 @@ describe('sitemap', () => {
     const entrees = sitemap()
     const fiches = getFiches()
 
-    expect(entrees).toHaveLength(9)
+    // Compte exact, pas « au moins » : un corpus listé deux fois ou un groupe de
+    // pages oublié doit se voir. Exprimé comme une somme plutôt qu’en dur, pour
+    // qu’ajouter une fiche ou un chantier ne fasse pas tomber ce test pour rien.
+    // Les quatre : la page d’accueil, le catalogue, le manifeste, contribuer.
+    expect(entrees).toHaveLength(4 + getFiches().length + getChantiers().length)
 
     const urls = entrees.map((e) => e.url)
     for (const fiche of fiches) {
@@ -52,6 +57,19 @@ describe('sitemap', () => {
     for (const chemin of PAGES_SANS_DATE) {
       const entree = entrees.find((e) => e.url.endsWith(chemin))
       expect(entree?.lastModified).toBeUndefined()
+    }
+  })
+
+  it('contient la page de chaque chantier, avec sa date de modification', () => {
+    const entrees = sitemap()
+    const chantiers = getChantiers()
+
+    for (const chantier of chantiers) {
+      const entree = entrees.find((e) => e.url.endsWith(`/chantiers/${chantier.slug}`))
+      expect(entree).toBeDefined()
+      // L’égalité, et non le seul type : c’est elle qui distingue `chantier.modifie`
+      // d’une date de build ou de la date agrégée du corpus.
+      expect(entree?.lastModified).toEqual(chantier.modifie)
     }
   })
 })

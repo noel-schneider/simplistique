@@ -36,13 +36,39 @@ continue qui vérifie, sans discussion possible :
 
 - Le nom de fichier : `content/fiches/<terme>-<discipline>.md`, en minuscules,
   sans accent.
-- Les huit champs du front-matter : `terme`, `discipline`, `confusion`,
-  `statut`, `resume`, `suggestions`, `cree`, `modifie`.
+- Les neuf champs du front-matter : `terme`, `discipline`, `confusion`,
+  `statut`, `resume`, `suggestions`, `cree`, `modifie`, et `chantier` qui est
+  le seul facultatif.
 - `resume` : 240 caractères maximum.
 - `discipline` et `confusion` : doivent exister dans `content/taxonomies/`.
+- `chantier`, s’il est présent : doit désigner un fichier existant de
+  `content/chantiers/`, et ce chantier doit relever de la même discipline que
+  la fiche. Les deux manquements font échouer la construction du site.
+- Aucun champ inconnu : une clé mal orthographiée fait échouer la construction
+  plutôt que d’être ignorée en silence.
 
 La commande `npm run lint:content` reproduit cette vérification en local,
 avant d’ouvrir la pull request.
+
+## Proposer un chantier
+
+Certains mots ne se renomment pas seuls. « Actif » et « passif » n’opposent rien de
+clair, et corriger l’un sans l’autre déplacerait la confusion au lieu de la lever. Un
+**chantier** est le document qui porte la réforme d’ensemble d’un corpus de mots, et
+que chaque fiche concernée désigne par son champ `chantier`.
+
+Une catégorie classe ; un chantier argumente. Deux fiches peuvent partager un type de
+confusion sans que leurs réformes aient le moindre rapport — c’est quand elles doivent
+bouger ensemble qu’un chantier a lieu d’être.
+
+Un chantier est un fichier `content/chantiers/<slug>.md`, dont le nom de fichier fait le
+slug. Son front-matter porte `nom`, `discipline`, `resume` (240 caractères maximum),
+`cree` et `modifie`. Il n’a pas de statut : celui d’une réforme se lit dans ses fiches.
+Son corps suit le même plan qu’une fiche, section « Risques » comprise.
+
+`npm run lint:content` signale un chantier que plus aucune fiche ne désigne, un chantier
+qui n’en a qu’une — le mot suppose un corpus — et un chantier dont le texte n’identifie
+aucun risque.
 
 ## Ce qui sera probablement refusé
 

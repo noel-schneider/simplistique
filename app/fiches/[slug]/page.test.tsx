@@ -1,5 +1,7 @@
 import { isValidElement, type ComponentProps, type ReactElement, type ReactNode } from 'react'
 import { describe, expect, it } from 'vitest'
+import { BandeauChantier } from '@/components/bandeau-chantier'
+import { Prose } from '@/components/prose'
 import { Votes } from '@/components/votes'
 import { getFiche } from '@/lib/content/fiches'
 import PageFiche, { generateMetadata } from './page'
@@ -32,21 +34,24 @@ describe('generateMetadata d\'une fiche', () => {
 })
 
 describe('PageFiche', () => {
-  // Parcours récursif, et non lecture des enfants directs de `<article>` : envelopper
-  // `<Votes>` dans une `<div>` ou l’extraire dans un sous-composant ne change rien pour
-  // un visiteur, et ne doit donc pas faire tomber ce test. Ce qui doit le faire tomber,
-  // c’est la disparition du composant ou la perte de l’identité des alternatives.
+  /**
+   * Tous les éléments de l’arbre, en profondeur d’abord, dans l’ordre où React les
+   * rendrait. On ne lit jamais les seuls enfants directs : envelopper un composant
+   * dans une `<div>` ou l’extraire dans un sous-composant ne change rien pour un
+   * visiteur, et ne doit donc pas faire tomber un test.
+   */
+  function elementsDans(noeud: ReactNode): ReactElement[] {
+    if (Array.isArray(noeud)) return noeud.flatMap(elementsDans)
+    if (!isValidElement(noeud)) return []
+    return [noeud, ...elementsDans((noeud.props as { children?: ReactNode }).children)]
+  }
+
   function trouverVotes(noeud: ReactNode): ReactElement<ComponentProps<typeof Votes>> | null {
-    if (Array.isArray(noeud)) {
-      for (const enfant of noeud) {
-        const trouve = trouverVotes(enfant)
-        if (trouve) return trouve
-      }
-      return null
-    }
-    if (!isValidElement(noeud)) return null
-    if (noeud.type === Votes) return noeud as ReactElement<ComponentProps<typeof Votes>>
-    return trouverVotes((noeud.props as { children?: ReactNode }).children)
+    return (
+      elementsDans(noeud).find(
+        (element): element is ReactElement<ComponentProps<typeof Votes>> => element.type === Votes,
+      ) ?? null
+    )
   }
 
   it('branche <Votes> sur le slug et sur l’empreinte de chaque alternative', async () => {
@@ -75,5 +80,21 @@ describe('PageFiche', () => {
   it('passe une liste vide pour une fiche sans alternative', async () => {
     const page = await PageFiche({ params: Promise.resolve({ slug: 'groupe-mathematiques' }) })
     expect(trouverVotes(page)?.props.alternatives).toEqual([])
+  })
+
+  it('affiche le bandeau du chantier AVANT le corps de la fiche', async () => {
+    const page = await PageFiche({ params: Promise.resolve({ slug: 'actif-comptabilite' }) })
+    const types = elementsDans(page).map((element) => element.type)
+
+    // La position est une exigence de la spec, pas une préférence : un bandeau
+    // placé après les suggestions arriverait quand le lecteur s’est déjà fait un
+    // avis, c’est-à-dire trop tard pour servir à quelque chose.
+    expect(types).toContain(BandeauChantier)
+    expect(types.indexOf(BandeauChantier)).toBeLessThan(types.indexOf(Prose))
+  })
+
+  it('n’affiche aucun bandeau pour une fiche sans chantier', async () => {
+    const page = await PageFiche({ params: Promise.resolve({ slug: 'groupe-mathematiques' }) })
+    expect(elementsDans(page).map((element) => element.type)).not.toContain(BandeauChantier)
   })
 })

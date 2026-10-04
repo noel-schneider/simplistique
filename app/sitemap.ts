@@ -1,4 +1,5 @@
 import type { MetadataRoute } from 'next'
+import { getChantiers } from '@/lib/content/chantiers'
 import { getFiches } from '@/lib/content/fiches'
 import { urlSite } from '@/lib/site'
 
@@ -36,5 +37,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
     lastModified: fiche.modifie,
   }))
 
-  return [...pagesCorpus, ...pagesDocuments, ...pagesFiches]
+  const pagesChantiers: MetadataRoute.Sitemap = getChantiers().map((chantier) => ({
+    url: `${base}/chantiers/${chantier.slug}`,
+    lastModified: chantier.modifie,
+  }))
+
+  return [...pagesCorpus, ...pagesDocuments, ...pagesFiches, ...pagesChantiers]
 }

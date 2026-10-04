@@ -14,6 +14,7 @@ const valides: SlugsValides = {
   disciplines: ['mathematiques', 'comptabilite', 'theorie-musicale', 'escalade'],
   confusions: ['faux-ami-courant', 'polysemie-externe'],
   statuts: ['pointe', 'propose', 'rejete'],
+  chantiers: [],
 }
 
 function fiche(p: Partial<FicheIndex>): FicheIndex {
@@ -192,7 +193,7 @@ describe('ecrireCriteres', () => {
   })
 
   it('fait l\'aller-retour avec analyserCriteres', () => {
-    const criteres = { disciplines: ['escalade'], confusions: [], statuts: ['pointe'], q: 'mesure' }
+    const criteres = { disciplines: ['escalade'], confusions: [], statuts: ['pointe'], chantiers: [], q: 'mesure' }
     expect(analyserCriteres(new URLSearchParams(ecrireCriteres(criteres)), valides)).toEqual(criteres)
   })
 })
@@ -205,5 +206,68 @@ describe('aUnFiltre', () => {
   it('est vrai dès qu\'un critère est posé', () => {
     expect(aUnFiltre({ ...CRITERES_VIDES, q: 'a' })).toBe(true)
     expect(aUnFiltre({ ...CRITERES_VIDES, statuts: ['pointe'] })).toBe(true)
+  })
+})
+
+describe('le critère chantier', () => {
+  const VALIDES = {
+    disciplines: ['comptabilite', 'mathematiques'],
+    confusions: ['faux-ami-courant'],
+    statuts: ['pointe', 'propose'],
+    chantiers: ['vocabulaire-du-bilan'],
+  }
+
+  const INDEX = [
+    { slug: 'actif-comptabilite', terme: 'actif', discipline: 'comptabilite', confusion: 'faux-ami-courant', statut: 'propose' as const, resume: 'a', suggestions: [], chantier: 'vocabulaire-du-bilan' },
+    { slug: 'groupe-mathematiques', terme: 'groupe', discipline: 'mathematiques', confusion: 'faux-ami-courant', statut: 'pointe' as const, resume: 'b', suggestions: [] },
+  ]
+
+  it('lit le paramètre chantier de l’URL', () => {
+    const criteres = analyserCriteres(
+      new URLSearchParams('chantier=vocabulaire-du-bilan'),
+      VALIDES,
+    )
+    expect(criteres.chantiers).toEqual(['vocabulaire-du-bilan'])
+  })
+
+  // Review Focus nº 4 : un slug inconnu est ignoré, comme pour les autres filtres.
+  it('ignore un slug de chantier inconnu', () => {
+    expect(analyserCriteres(new URLSearchParams('chantier=invente'), VALIDES).chantiers).toEqual([])
+  })
+
+  it('réécrit le critère dans l’URL', () => {
+    expect(
+      ecrireCriteres({ ...CRITERES_VIDES, chantiers: ['vocabulaire-du-bilan'] }),
+    ).toBe('chantier=vocabulaire-du-bilan')
+  })
+
+  it('compte comme un filtre actif', () => {
+    expect(aUnFiltre({ ...CRITERES_VIDES, chantiers: ['vocabulaire-du-bilan'] })).toBe(true)
+  })
+
+  it('ne garde que les fiches du chantier demandé', () => {
+    const filtrees = filtrerFiches(INDEX, { ...CRITERES_VIDES, chantiers: ['vocabulaire-du-bilan'] })
+    expect(filtrees.map((f) => f.slug)).toEqual(['actif-comptabilite'])
+  })
+
+  it('exclut une fiche rattachée à un autre chantier', () => {
+    // `ne garde que les fiches du chantier demandé` couvre déjà l’exclusion
+    // d’une fiche sans chantier. Ici c’est l’autre moitié de la condition qui
+    // est en jeu : une fiche rattachée, mais pas à celui qu’on demande.
+    const index = [
+      ...INDEX,
+      {
+        slug: 'mesure-theorie-musicale',
+        terme: 'mesure',
+        discipline: 'theorie-musicale',
+        confusion: 'faux-ami-courant',
+        statut: 'pointe' as const,
+        resume: 'c',
+        suggestions: [],
+        chantier: 'un-autre-chantier',
+      },
+    ]
+    const filtrees = filtrerFiches(index, { ...CRITERES_VIDES, chantiers: ['vocabulaire-du-bilan'] })
+    expect(filtrees.map((f) => f.slug)).toEqual(['actif-comptabilite'])
   })
 })
