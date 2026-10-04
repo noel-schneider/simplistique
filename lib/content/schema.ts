@@ -142,7 +142,7 @@ export function creerSchemaFiche(
         ctx.addIssue({
           code: 'custom',
           path: ['chantier'],
-          message: `le chantier « ${fiche.chantier} » relève de la discipline « ${chantier.discipline} », la fiche de « ${fiche.discipline} » — une fiche ne peut rejoindre qu'un chantier de sa propre discipline`,
+          message: `le chantier « ${fiche.chantier} » relève de la discipline « ${chantier.discipline} », la fiche de « ${fiche.discipline} » — une fiche ne peut rejoindre qu’un chantier de sa propre discipline`,
         })
       }
     })

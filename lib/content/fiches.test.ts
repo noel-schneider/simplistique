@@ -172,7 +172,7 @@ function lireFicheDeTest(champs: Record<string, unknown>, chantiers: ChantierMet
   }
 }
 
-describe('le champ chantier d\'une fiche', () => {
+describe('le champ chantier d’une fiche', () => {
   const CHANTIERS = [
     {
       slug: 'vocabulaire-du-bilan',
@@ -189,7 +189,7 @@ describe('le champ chantier d\'une fiche', () => {
     expect(fiche?.chantier).toBeUndefined()
   })
 
-  it('refuse un chantier qui n\'existe pas', () => {
+  it('refuse un chantier qui n’existe pas', () => {
     expect(() =>
       lireFicheDeTest({ discipline: 'comptabilite', chantier: 'invente' }, CHANTIERS),
     ).toThrow(/chantier[\s\S]*invente/)
@@ -197,20 +197,25 @@ describe('le champ chantier d\'une fiche', () => {
 
   // Review Focus nº 2 : la seconde fiche doit échouer pour elle-même, et non
   // passer parce qu'une fiche précédente a validé le même chantier.
-  it('refuse un chantier d\'une autre discipline', () => {
+  it('refuse un chantier d’une autre discipline', () => {
     expect(() =>
       lireFicheDeTest({ discipline: 'mathematiques', chantier: 'vocabulaire-du-bilan' }, CHANTIERS),
     ).toThrow(/discipline/)
   })
 
   // Review Focus nº 3 : présent mais vide n'est pas la même chose qu'absent.
-  it('refuse un chantier vide', () => {
+  it('refuse un chantier vide, et le dit pour ce qu’il est', () => {
+    // L'assertion porte sur le message, et non sur le seul fait qu'une erreur
+    // survienne : si le `.min(1)` disparaissait du schéma, la chaîne vide serait
+    // quand même rejetée — par la branche « chantier inconnu », puisque aucun
+    // chantier n'a `''` pour slug — et un simple `toThrow(/chantier/)` ne verrait
+    // rien du changement.
     expect(() => lireFicheDeTest({ discipline: 'comptabilite', chantier: '' }, CHANTIERS)).toThrow(
-      /chantier/,
+      /chantier vide/,
     )
   })
 
-  it('porte le chantier jusque dans l\'index', () => {
+  it('porte le chantier jusque dans l’index', () => {
     const index = getIndex(DOSSIER_CONTENU, undefined, CHANTIERS)
     expect(index.every((entree) => 'chantier' in entree)).toBe(true)
   })
