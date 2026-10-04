@@ -129,6 +129,20 @@ describe('Corpus — filtres et URL', () => {
     expect(screen.getByRole('link', { name: /tempérament/ })).toBeInTheDocument()
   })
 
+  it('lit le filtre de chantier depuis l’URL au premier affichage', () => {
+    recherche = 'chantier=vocabulaire-du-bilan'
+    render(
+      <Corpus
+        index={index}
+        disciplines={disciplines}
+        confusions={confusions}
+        statuts={statuts}
+        chantiers={[{ slug: 'vocabulaire-du-bilan', nom: 'Le vocabulaire du bilan' }]}
+      />,
+    )
+    expect(screen.queryByRole('link', { name: /groupe/ })).not.toBeInTheDocument()
+  })
+
   it('ignore une discipline inconnue dans l’URL et affiche tout', () => {
     recherche = 'discipline=klingon'
     afficher()

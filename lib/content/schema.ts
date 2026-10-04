@@ -82,21 +82,16 @@ export function decrireErreursDeSchema(
 export function creerSchemaChantier(taxonomies: Taxonomies): ZodType<Omit<ChantierMeta, 'slug'>> {
   const disciplines = taxonomies.disciplines.map((d) => d.slug) as [string, ...string[]]
 
-  return z
-    .object({
-      nom: z.string().min(1),
-      discipline: z.enum(disciplines),
-      // Même traitement que le résumé d'une fiche : les scalaires `>` du YAML
-      // gardent un saut de ligne final, qui partirait tel quel dans la
-      // méta-description et consommerait un caractère du budget pour rien.
-      resume: z.string().trim().min(1).max(LONGUEUR_MAX_RESUME),
-      cree: z.coerce.date(),
-      modifie: z.coerce.date(),
-    })
-    .refine((chantier) => chantier.modifie >= chantier.cree, {
-      path: ['modifie'],
-      message: 'modifie est antérieure à cree',
-    })
+  return z.strictObject({
+    nom: z.string().min(1),
+    discipline: z.enum(disciplines),
+    // Même traitement que le résumé d'une fiche : les scalaires `>` du YAML
+    // gardent un saut de ligne final, qui partirait tel quel dans la
+    // méta-description et consommerait un caractère du budget pour rien.
+    resume: z.string().trim().min(1).max(LONGUEUR_MAX_RESUME),
+    cree: z.coerce.date(),
+    modifie: z.coerce.date(),
+  })
 }
 
 export function creerSchemaFiche(
@@ -107,7 +102,7 @@ export function creerSchemaFiche(
   const confusions = taxonomies.confusions.map((c) => c.slug) as [string, ...string[]]
 
   return z
-    .object({
+    .strictObject({
       terme: z.string().min(1),
       discipline: z.enum(disciplines),
       confusion: z.enum(confusions),

@@ -173,4 +173,25 @@ describe('verifierChantiers', () => {
     )
     expect(a.map((x) => x.message).join()).toMatch(/risques/i)
   })
+
+  it('signale une date de modification antérieure à la création', () => {
+    const a = verifierChantiers(
+      [chantier({ cree: new Date('2026-10-04'), modifie: new Date('2026-10-01') })],
+      [ficheDe('actif-comptabilite', 'vocabulaire-du-bilan'), ficheDe('passif-comptabilite', 'vocabulaire-du-bilan')],
+    )
+    expect(a.map((x) => x.message).join()).toMatch(/modifie/i)
+  })
+
+  it('signale chaque chantier du corpus, et pas seulement le premier', () => {
+    const avertissements = verifierChantiers(
+      [
+        chantier(),
+        chantier({ slug: 'structures-algebriques', nom: 'Les structures', corps: '## Pourquoi\n\ntexte\n' }),
+      ],
+      [ficheDe('actif-comptabilite'), ficheDe('passif-comptabilite')],
+    )
+    const slugs = new Set(avertissements.map((a) => a.slug))
+    expect(slugs).toContain('vocabulaire-du-bilan')
+    expect(slugs).toContain('structures-algebriques')
+  })
 })

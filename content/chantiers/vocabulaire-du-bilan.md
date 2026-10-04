@@ -10,8 +10,10 @@ modifie: 2026-10-04
 
 ## Pourquoi c’est confus
 
-Un bilan a deux colonnes. L’une recense ce que l’entreprise possède, l’autre ce qu’elle
-doit. On les appelle « actif » et « passif » — deux adjectifs du langage courant,
+Un bilan a deux colonnes. L’une recense ce que l’entreprise possède, l’autre d’où cela
+vient — dettes envers des tiers, mais aussi capitaux apportés par les associés, qui ne
+sont dus à personne d’extérieur. On les appelle « actif » et « passif » — deux adjectifs
+du langage courant,
 substantivés, dont l’opposition ordinaire n’a aucun rapport avec celle qu’ils désignent
 ici. Rien, dans le fait d’être actif plutôt que passif, n’évoque la différence entre
 posséder et devoir.
@@ -30,6 +32,17 @@ comprend sans cours, « avoirs et passif » ne se comprend pas du tout.
 Une réforme cohérente remplace donc les deux ensemble, et choisit deux mots qui
 s’opposent réellement dans la langue ordinaire.
 
+Reste à trancher le second terme, et c’est là qu’un chantier sert à quelque chose qu’une
+fiche isolée ne peut pas faire. « Dettes » est le mot le plus clair, mais il ne couvre
+que la partie exigible : les capitaux propres figurent au passif sans être dus à un
+tiers. « Engagements » les englobe, au prix d’un mot plus abstrait et moins immédiat.
+
+Le choix proposé ici est « avoirs et dettes » pour l’enseignement et la vulgarisation,
+où la clarté du premier contact prime et où les capitaux propres s’introduisent plus
+tard, et « avoirs et engagements » dès qu’il faut être exact sur l’ensemble du passif.
+Les deux fiches gardent donc leurs deux suggestions, et ce n’est pas une indécision :
+c’est que la réponse dépend de ce qu’on écrit.
+
 ## Risques
 
 Le vocabulaire du bilan est inscrit dans le plan comptable, dans la loi fiscale et dans
@@ -40,3 +53,9 @@ Le gain se situe dans l’enseignement et dans la vulgarisation, où rien n’ob
 reprendre les termes officiels pour expliquer ce qu’ils désignent. Un manuel qui écrit
 « avoirs et dettes » en première page, puis signale que la profession dit « actif et
 passif », fait comprendre un bilan en une phrase.
+
+Le risque propre à une réforme de la paire, et non d’un seul mot, est ailleurs : « actif
+et passif » est une paire mnémotechnique que beaucoup de praticiens trouvent commode
+précisément parce qu’elle est symétrique. La remplacer par deux mots qui ne se répondent
+plus formellement fait perdre ce confort-là, et c’est le prix à payer pour que les mots
+disent ce qu’ils désignent.

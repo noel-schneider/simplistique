@@ -46,9 +46,16 @@ describe('getFiches sur le corpus réel', () => {
   })
 
   it('trie par terme selon l\'ordre alphabétique français', () => {
-    const termes = getFiches(DOSSIER_CONTENU, taxonomies).map((f) => f.terme)
-    const attendu = [...termes].sort((a, b) => a.localeCompare(b, 'fr'))
-    expect(termes).toEqual(attendu)
+    // Les noms de fichiers sont en ordre inverse des termes, sur le modèle de
+    // lib/content/chantiers.test.ts : si le tri disparaissait, `readdirSync`
+    // rendrait `a-…` avant `z-…`, donc le mauvais ordre de termes, et ce test
+    // tomberait. Avec des noms dont l'ordre coïncide avec celui des termes, il
+    // ne mesurerait que l'ordre du système de fichiers.
+    const racine = corpusFactice({
+      'a-mathematiques.md': VALIDE.replace('terme: groupe', 'terme: zèbre'),
+      'z-mathematiques.md': VALIDE.replace('terme: groupe', 'terme: abaque'),
+    })
+    expect(getFiches(racine, taxonomies).map((f) => f.terme)).toEqual(['abaque', 'zèbre'])
   })
 
   it('donne un slug unique à chaque fiche', () => {
@@ -129,6 +136,13 @@ describe('getFiches refuse le contenu invalide', () => {
   it('refuse un slug de fichier avec accents, majuscules et espaces, en le citant', () => {
     const racine = corpusFactice({ 'Théorie Groupe .md': VALIDE })
     expect(() => getFiches(racine, taxonomies)).toThrow(/Théorie Groupe \.md/)
+  })
+
+  it('refuse une clé de front-matter inconnue plutôt que de l’ignorer', () => {
+    const racine = corpusFactice({
+      'x-mathematiques.md': VALIDE.replace('statut: pointe', 'statut: pointe\nchantiers: vocabulaire-du-bilan'),
+    })
+    expect(() => getFiches(racine, taxonomies)).toThrow(/chantiers/)
   })
 })
 

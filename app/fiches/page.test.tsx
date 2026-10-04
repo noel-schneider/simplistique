@@ -99,5 +99,10 @@ describe('PageFiches', () => {
 
     const liens = html.match(/<a href="\/fiches\//g) ?? []
     expect(liens).toHaveLength(getIndex().length)
+
+    // Seule assertion qui prouve que la page nourrit réellement ses deux enfants
+    // en chantiers : sans elle, remplacer la liste par un tableau vide laisse
+    // toute la suite au vert, et la colonne affiche le slug brut.
+    expect(html).toContain('Le vocabulaire du bilan')
   })
 })

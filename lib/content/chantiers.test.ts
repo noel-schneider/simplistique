@@ -85,9 +85,14 @@ describe('getChantiers', () => {
     expect(() => getChantiers(dossier, TAXONOMIES)).toThrow(/resume/)
   })
 
-  it("refuse une date de modification antérieure à la création", () => {
+  it("accepte une date de modification antérieure à la création : ce n'est qu'un avertissement, pas un refus", () => {
     ecrire('x.md', VALIDE.replace("modifie: 2026-10-04", "modifie: 2026-10-01"))
-    expect(() => getChantiers(dossier, TAXONOMIES)).toThrow(/modifie/)
+    expect(() => getChantiers(dossier, TAXONOMIES)).not.toThrow()
+  })
+
+  it('refuse une clé de front-matter inconnue plutôt que de l’ignorer', () => {
+    ecrire('x.md', VALIDE.replace('discipline: comptabilite', 'discipline: comptabilite\nchantiers: vocabulaire-du-bilan'))
+    expect(() => getChantiers(dossier, TAXONOMIES)).toThrow(/chantiers/)
   })
 })
 

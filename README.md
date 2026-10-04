@@ -28,6 +28,19 @@ npm run dev
 Les valeurs de `discipline` et `confusion` doivent exister dans
 `content/taxonomies/`. Ajouter une discipline = ajouter une entrée YAML.
 
+## Ajouter un chantier
+
+1. Créer `content/chantiers/<slug>.md`. Le nom du fichier devient le slug.
+   Minuscules, chiffres et tirets uniquement, sans accent.
+2. Remplir le front-matter : `nom`, `discipline`, `resume` (240 caractères
+   max), `cree`, `modifie`.
+3. Développer dans le corps, sur le même plan qu'une fiche, section
+   `## Risques` comprise.
+4. Lancer `npm run lint:content`.
+
+Renommer ou supprimer un chantier fait échouer la construction tant que ses
+fiches ne sont pas corrigées : chacune le désigne par son champ `chantier`.
+
 ## Adresse du site
 
 `lib/site.ts` expose `urlSite()`, la seule source de l'adresse de base du

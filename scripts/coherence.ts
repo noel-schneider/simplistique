@@ -97,39 +97,48 @@ const MARQUEUR_URL_DEPOT = 'URL-DU-DEPOT'
  * faux — un chantier inexistant, un chantier d’une autre discipline — est
  * refusé beaucoup plus tôt, au chargement du corpus.
  */
-export function verifierChantiers(chantiers: Chantier[], fiches: Fiche[]): Avertissement[] {
+export function verifierChantier(chantier: Chantier, fiches: Fiche[]): Avertissement[] {
   const avertissements: Avertissement[] = []
 
-  for (const chantier of chantiers) {
-    const siennes = fiches.filter((fiche) => fiche.chantier === chantier.slug)
+  const siennes = fiches.filter((fiche) => fiche.chantier === chantier.slug)
 
-    if (siennes.length === 0) {
-      avertissements.push({
-        slug: chantier.slug,
-        message:
-          'aucune fiche ne désigne ce chantier : un « chantier: » a probablement été oublié dans une fiche',
-      })
-    } else if (siennes.length === 1) {
-      avertissements.push({
-        slug: chantier.slug,
-        message:
-          'une seule fiche désigne ce chantier : le mot suppose un corpus, et une réforme d’un seul terme tient dans la fiche elle-même',
-      })
-    }
+  if (siennes.length === 0) {
+    avertissements.push({
+      slug: chantier.slug,
+      message:
+        'aucune fiche ne désigne ce chantier : un « chantier: » a probablement été oublié dans une fiche',
+    })
+  } else if (siennes.length === 1) {
+    avertissements.push({
+      slug: chantier.slug,
+      message:
+        'une seule fiche désigne ce chantier : le mot suppose un corpus, et une réforme d’un seul terme tient dans la fiche elle-même',
+    })
+  }
 
-    // Même règle que pour les fiches, et par sous-chaîne pour la même raison :
-    // « ## Risques et limites » traite bien le sujet.
-    const titres = listerTitres(chantier.corps).map((titre) => titre.toLowerCase())
-    if (!titres.some((titre) => titre.includes('risques'))) {
-      avertissements.push({
-        slug: chantier.slug,
-        message:
-          'aucune section de niveau 2 dont le titre contient « risques » : une réforme d’ensemble en a plus besoin qu’un mot isolé',
-      })
-    }
+  // Même règle que pour les fiches, et par sous-chaîne pour la même raison :
+  // « ## Risques et limites » traite bien le sujet.
+  const titres = listerTitres(chantier.corps).map((titre) => titre.toLowerCase())
+  if (!titres.some((titre) => titre.includes('risques'))) {
+    avertissements.push({
+      slug: chantier.slug,
+      message:
+        'aucune section de niveau 2 dont le titre contient « risques » : une réforme d’ensemble en a plus besoin qu’un mot isolé',
+    })
+  }
+
+  if (chantier.modifie.getTime() < chantier.cree.getTime()) {
+    avertissements.push({
+      slug: chantier.slug,
+      message: 'modifie est antérieure à cree',
+    })
   }
 
   return avertissements
+}
+
+export function verifierChantiers(chantiers: Chantier[], fiches: Fiche[]): Avertissement[] {
+  return chantiers.flatMap((chantier) => verifierChantier(chantier, fiches))
 }
 
 export function verifierDocuments(documents: { nom: string; texte: string }[]): Avertissement[] {
