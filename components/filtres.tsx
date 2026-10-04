@@ -2,7 +2,11 @@
 
 import type { Criteres } from '@/lib/filtrage'
 
-type Groupe = { cle: 'disciplines' | 'confusions' | 'statuts'; libelle: string; entrees: { slug: string; nom: string }[] }
+type Groupe = {
+  cle: 'disciplines' | 'confusions' | 'statuts' | 'chantiers'
+  libelle: string
+  entrees: { slug: string; nom: string }[]
+}
 
 export function Filtres({
   criteres,
