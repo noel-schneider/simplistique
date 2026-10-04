@@ -31,11 +31,13 @@ export function Corpus({
   disciplines,
   confusions,
   statuts,
+  chantiers,
 }: {
   index: FicheIndex[]
   disciplines: Discipline[]
   confusions: EntreeTaxonomie[]
   statuts: EntreeTaxonomie[]
+  chantiers: { slug: string; nom: string }[]
 }) {
   const router = useRouter()
   const chemin = usePathname()
@@ -46,8 +48,9 @@ export function Corpus({
       disciplines: disciplines.map((d) => d.slug),
       confusions: confusions.map((c) => c.slug),
       statuts: statuts.map((s) => s.slug),
+      chantiers: chantiers.map((c) => c.slug),
     }),
-    [disciplines, confusions, statuts],
+    [disciplines, confusions, statuts, chantiers],
   )
 
   const vueDemandee = params.get('vue')
@@ -186,6 +189,7 @@ export function Corpus({
           { cle: 'disciplines', libelle: 'Discipline', entrees: disciplines },
           { cle: 'confusions', libelle: 'Confusion', entrees: confusions },
           { cle: 'statuts', libelle: 'Statut', entrees: statuts },
+          { cle: 'chantiers', libelle: 'Chantier', entrees: chantiers },
         ]}
       />
 

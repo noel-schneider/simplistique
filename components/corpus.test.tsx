@@ -54,7 +54,15 @@ const index: FicheIndex[] = [
 // Un élément neuf à chaque appel : React peut court-circuiter un re-rendu si on
 // lui repasse exactement la même référence d’élément.
 function elementCorpus() {
-  return <Corpus index={index} disciplines={disciplines} confusions={confusions} statuts={statuts} />
+  return (
+    <Corpus
+      index={index}
+      disciplines={disciplines}
+      confusions={confusions}
+      statuts={statuts}
+      chantiers={[]}
+    />
+  )
 }
 
 function afficher() {
@@ -95,11 +103,44 @@ describe('Corpus — filtres et URL', () => {
     expect(remplacer).toHaveBeenCalledWith('/fiches?discipline=escalade', { scroll: false })
   })
 
+  it('écrit le filtre de chantier dans l’URL', async () => {
+    // Seul test à prouver que le quatrième groupe de filtres arrive jusqu’à
+    // l’écran : la logique de `lib/filtrage.ts` est couverte par ailleurs, mais
+    // on pourrait la débrancher de l’interface sans qu’aucun autre test bronche.
+    render(
+      <Corpus
+        index={index}
+        disciplines={disciplines}
+        confusions={confusions}
+        statuts={statuts}
+        chantiers={[{ slug: 'vocabulaire-du-bilan', nom: 'Le vocabulaire du bilan' }]}
+      />,
+    )
+    await userEvent.click(screen.getByRole('button', { name: 'Le vocabulaire du bilan' }))
+    expect(remplacer).toHaveBeenCalledWith('/fiches?chantier=vocabulaire-du-bilan', {
+      scroll: false,
+    })
+  })
+
   it('lit le filtre depuis l’URL au premier affichage', () => {
     recherche = 'discipline=escalade'
     afficher()
     expect(screen.queryByRole('link', { name: /groupe/ })).not.toBeInTheDocument()
     expect(screen.getByRole('link', { name: /tempérament/ })).toBeInTheDocument()
+  })
+
+  it('lit le filtre de chantier depuis l’URL au premier affichage', () => {
+    recherche = 'chantier=vocabulaire-du-bilan'
+    render(
+      <Corpus
+        index={index}
+        disciplines={disciplines}
+        confusions={confusions}
+        statuts={statuts}
+        chantiers={[{ slug: 'vocabulaire-du-bilan', nom: 'Le vocabulaire du bilan' }]}
+      />,
+    )
+    expect(screen.queryByRole('link', { name: /groupe/ })).not.toBeInTheDocument()
   })
 
   it('ignore une discipline inconnue dans l’URL et affiche tout', () => {

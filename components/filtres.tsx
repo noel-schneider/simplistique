@@ -2,7 +2,11 @@
 
 import type { Criteres } from '@/lib/filtrage'
 
-type Groupe = { cle: 'disciplines' | 'confusions' | 'statuts'; libelle: string; entrees: { slug: string; nom: string }[] }
+type Groupe = {
+  cle: 'disciplines' | 'confusions' | 'statuts' | 'chantiers'
+  libelle: string
+  entrees: { slug: string; nom: string }[]
+}
 
 export function Filtres({
   criteres,
@@ -39,32 +43,36 @@ export function Filtres({
         className="w-full rounded border border-stone-300 px-3 py-2 text-sm"
       />
 
-      {groupes.map(({ cle, libelle, entrees }) => (
-        <div
-          key={cle}
-          role="group"
-          aria-label={libelle}
-          className="flex flex-wrap items-baseline gap-2"
-        >
-          <span className="text-xs uppercase tracking-wide text-stone-500">{libelle}</span>
-          {entrees.map(({ slug, nom }) => {
-            const actif = criteres[cle].includes(slug)
-            return (
-              <button
-                key={slug}
-                type="button"
-                aria-pressed={actif}
-                onClick={() => basculer(cle, slug)}
-                className={`rounded-full border px-2.5 py-0.5 text-xs ${
-                  actif ? 'border-stone-900 bg-stone-900 text-stone-50' : 'border-stone-300 text-stone-600'
-                }`}
-              >
-                {nom}
-              </button>
-            )
-          })}
-        </div>
-      ))}
+      {groupes.map(({ cle, libelle, entrees }) => {
+        if (entrees.length === 0) return null
+
+        return (
+          <div
+            key={cle}
+            role="group"
+            aria-label={libelle}
+            className="flex flex-wrap items-baseline gap-2"
+          >
+            <span className="text-xs uppercase tracking-wide text-stone-500">{libelle}</span>
+            {entrees.map(({ slug, nom }) => {
+              const actif = criteres[cle].includes(slug)
+              return (
+                <button
+                  key={slug}
+                  type="button"
+                  aria-pressed={actif}
+                  onClick={() => basculer(cle, slug)}
+                  className={`rounded-full border px-2.5 py-0.5 text-xs ${
+                    actif ? 'border-stone-900 bg-stone-900 text-stone-50' : 'border-stone-300 text-stone-600'
+                  }`}
+                >
+                  {nom}
+                </button>
+              )
+            })}
+          </div>
+        )
+      })}
 
       {filtreActif && (
         <button type="button" onClick={onEffacer} className="text-xs text-stone-500 underline">

@@ -1,7 +1,9 @@
 # Contribuer
 
-Le corpus est ouvert. Il n’y a pas encore de comptes ni de votes sur ce site :
-tout passe par le dépôt, où la discussion reste publique et tracée.
+Le corpus est ouvert, et il n’y a pas de comptes sur ce site. Les propositions
+passent par le dépôt, où la discussion reste publique et tracée ; le vote, lui,
+se fait anonymement depuis chaque fiche (voir « Ce que ce site enregistre »,
+plus bas).
 
 ## Proposer une analyse
 
@@ -34,13 +36,39 @@ continue qui vérifie, sans discussion possible :
 
 - Le nom de fichier : `content/fiches/<terme>-<discipline>.md`, en minuscules,
   sans accent.
-- Les huit champs du front-matter : `terme`, `discipline`, `confusion`,
-  `statut`, `resume`, `suggestions`, `cree`, `modifie`.
+- Les neuf champs du front-matter : `terme`, `discipline`, `confusion`,
+  `statut`, `resume`, `suggestions`, `cree`, `modifie`, et `chantier` qui est
+  le seul facultatif.
 - `resume` : 240 caractères maximum.
 - `discipline` et `confusion` : doivent exister dans `content/taxonomies/`.
+- `chantier`, s’il est présent : doit désigner un fichier existant de
+  `content/chantiers/`, et ce chantier doit relever de la même discipline que
+  la fiche. Les deux manquements font échouer la construction du site.
+- Aucun champ inconnu : une clé mal orthographiée fait échouer la construction
+  plutôt que d’être ignorée en silence.
 
 La commande `npm run lint:content` reproduit cette vérification en local,
 avant d’ouvrir la pull request.
+
+## Proposer un chantier
+
+Certains mots ne se renomment pas seuls. « Actif » et « passif » n’opposent rien de
+clair, et corriger l’un sans l’autre déplacerait la confusion au lieu de la lever. Un
+**chantier** est le document qui porte la réforme d’ensemble d’un corpus de mots, et
+que chaque fiche concernée désigne par son champ `chantier`.
+
+Une catégorie classe ; un chantier argumente. Deux fiches peuvent partager un type de
+confusion sans que leurs réformes aient le moindre rapport — c’est quand elles doivent
+bouger ensemble qu’un chantier a lieu d’être.
+
+Un chantier est un fichier `content/chantiers/<slug>.md`, dont le nom de fichier fait le
+slug. Son front-matter porte `nom`, `discipline`, `resume` (240 caractères maximum),
+`cree` et `modifie`. Il n’a pas de statut : celui d’une réforme se lit dans ses fiches.
+Son corps suit le même plan qu’une fiche, section « Risques » comprise.
+
+`npm run lint:content` signale un chantier que plus aucune fiche ne désigne, un chantier
+qui n’en a qu’une — le mot suppose un corpus — et un chantier dont le texte n’identifie
+aucun risque.
 
 ## Ce qui sera probablement refusé
 
@@ -58,3 +86,23 @@ avant d’ouvrir la pull request.
 La simplistique suggère des usages, elle n’impose pas de changements. Le but
 est d’abaisser la barrière à l’entrée des disciplines et de bâtir des ponts
 entre elles — pas de corriger la langue de ceux qui les pratiquent.
+
+## Ce que ce site enregistre
+
+Vous pouvez voter sur une fiche et sur ses alternatives sans créer de compte. Pour
+qu’une même personne ne vote pas deux fois, le serveur calcule une empreinte à partir de
+votre adresse réseau et de votre navigateur.
+
+**Votre adresse n’est jamais enregistrée par ce site.** Seule cette empreinte l’est. Elle
+est calculée avec une clé secrète qui ne quitte pas le serveur : sans cette clé, elle ne
+remonte pas à votre adresse. Elle ne permet ni de vous recontacter, ni de savoir ce que
+vous avez lu — seulement ce que vous avez voté.
+
+Rien n’est stocké dans votre navigateur. Aucun cookie, aucun traceur, aucune mesure
+d’audience.
+
+Un vote peut être annulé depuis la fiche où il a été émis, tant que vous y revenez
+avec le même navigateur et la même connexion : l’empreinte change avec eux, et le site
+n’a aucun autre moyen de reconnaître que ce vote est le vôtre. Une mise à jour de votre
+navigateur suffit à la changer aussi — c’est son numéro de version exact qui entre dans
+le calcul, pas son nom.

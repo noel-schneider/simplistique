@@ -1,11 +1,15 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { cache } from 'react'
+import { BandeauChantier } from '@/components/bandeau-chantier'
 import { EnteteFiche } from '@/components/entete-fiche'
 import { Prose } from '@/components/prose'
+import { Votes } from '@/components/votes'
+import { getChantier } from '@/lib/content/chantiers'
 import { getFiche, getFiches } from '@/lib/content/fiches'
 import { rendreMarkdown } from '@/lib/content/markdown'
 import { chargerTaxonomies } from '@/lib/content/taxonomies'
+import { empreinteAlternative } from '@/lib/votes/empreintes'
 
 type Params = { params: Promise<{ slug: string }> }
 
@@ -45,6 +49,7 @@ export default async function PageFiche({ params }: Params) {
   const taxonomies = taxonomiesDeLaRequete()
   const fiche = getFiche((await params).slug, undefined, taxonomies)
   if (!fiche) notFound()
+  const chantier = fiche.chantier ? getChantier(fiche.chantier, undefined, taxonomies) : null
 
   return (
     <article>
@@ -54,7 +59,15 @@ export default async function PageFiche({ params }: Params) {
         nomConfusion={nomDe(taxonomies.confusions, fiche.confusion)}
         nomStatut={nomDe(taxonomies.statuts, fiche.statut)}
       />
+      {chantier && <BandeauChantier slug={chantier.slug} nom={chantier.nom} />}
       <Prose html={await rendreMarkdown(fiche.corps)} />
+      <Votes
+        fiche={fiche.slug}
+        alternatives={fiche.suggestions.map((texte) => ({
+          texte,
+          empreinte: empreinteAlternative(texte),
+        }))}
+      />
     </article>
   )
 }

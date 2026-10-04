@@ -12,13 +12,16 @@ export function CatalogueStatique({
   index,
   disciplines,
   statuts,
+  chantiers,
 }: {
   index: FicheIndex[]
   disciplines: Discipline[]
   statuts: EntreeTaxonomie[]
+  chantiers: { slug: string; nom: string }[]
 }) {
   const libellesDisciplines = new Map(disciplines.map((d) => [d.slug, d.nom]))
   const libellesStatuts = new Map(statuts.map((s) => [s.slug, s.nom]))
+  const libellesChantiers = new Map(chantiers.map((c) => [c.slug, c.nom]))
 
   return (
     <div className="space-y-3">
@@ -38,6 +41,9 @@ export function CatalogueStatique({
               </th>
               <th scope="col" className="px-4 py-2 font-normal">
                 Statut
+              </th>
+              <th scope="col" className="px-4 py-2 font-normal">
+                Chantier
               </th>
               <th scope="col" className="py-2 font-normal">
                 Suggestion
@@ -60,6 +66,9 @@ export function CatalogueStatique({
                     statut={fiche.statut}
                     nom={libellesStatuts.get(fiche.statut) ?? fiche.statut}
                   />
+                </td>
+                <td className="px-4 py-2 text-stone-600">
+                  {fiche.chantier ? libellesChantiers.get(fiche.chantier) ?? fiche.chantier : ''}
                 </td>
                 <td className="py-2 text-stone-600">
                   {fiche.suggestions.length > 0 ? fiche.suggestions.join(', ') : '—'}
