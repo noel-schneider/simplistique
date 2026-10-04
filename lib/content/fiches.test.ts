@@ -1,9 +1,10 @@
-import { mkdtempSync, writeFileSync, mkdirSync } from 'node:fs'
+import { mkdtempSync, writeFileSync, mkdirSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { chargerTaxonomies, DOSSIER_CONTENU } from './taxonomies'
-import { getFiche, getFiches, getDocument } from './fiches'
+import { getFiche, getFiches, getDocument, getIndex } from './fiches'
+import type { Fiche, ChantierMeta } from './schema'
 
 const taxonomies = chargerTaxonomies(DOSSIER_CONTENU)
 
@@ -138,5 +139,79 @@ describe('getFiche', () => {
 describe('getDocument', () => {
   it('lit le manifeste', () => {
     expect(getDocument('manifeste', DOSSIER_CONTENU).length).toBeGreaterThan(100)
+  })
+})
+
+function lireFicheDeTest(champs: Record<string, unknown>, chantiers: ChantierMeta[]): Fiche {
+  const dossier = mkdtempSync(join(tmpdir(), 'simplistique-fiche-'))
+  try {
+    mkdirSync(join(dossier, 'fiches'), { recursive: true })
+    const entete = Object.entries({
+      terme: 'essai',
+      discipline: 'comptabilite',
+      confusion: 'faux-ami-courant',
+      statut: 'pointe',
+      resume: 'court',
+      suggestions: [],
+      cree: '2026-10-04',
+      modifie: '2026-10-04',
+      ...champs,
+    })
+      .map(([cle, valeur]) => `${cle}: ${JSON.stringify(valeur)}`)
+      .join('\n')
+    writeFileSync(
+      join(dossier, 'fiches', 'essai-comptabilite.md'),
+      `---\n${entete}\n---\n\n## Risques\n\ntexte\n`,
+      'utf8',
+    )
+    const fiche = getFiche('essai-comptabilite', dossier, chargerTaxonomies(DOSSIER_CONTENU), chantiers)
+    if (!fiche) throw new Error('fiche de test introuvable')
+    return fiche
+  } finally {
+    rmSync(dossier, { recursive: true, force: true })
+  }
+}
+
+describe('le champ chantier d\'une fiche', () => {
+  const CHANTIERS = [
+    {
+      slug: 'vocabulaire-du-bilan',
+      nom: 'Le vocabulaire du bilan',
+      discipline: 'comptabilite',
+      resume: 'court',
+      cree: new Date('2026-10-04'),
+      modifie: new Date('2026-10-04'),
+    },
+  ]
+
+  it('accepte une fiche sans chantier, et laisse le champ absent', () => {
+    const fiche = getFiche('groupe-mathematiques', DOSSIER_CONTENU, undefined, CHANTIERS)
+    expect(fiche?.chantier).toBeUndefined()
+  })
+
+  it('refuse un chantier qui n\'existe pas', () => {
+    expect(() =>
+      lireFicheDeTest({ discipline: 'comptabilite', chantier: 'invente' }, CHANTIERS),
+    ).toThrow(/chantier[\s\S]*invente/)
+  })
+
+  // Review Focus nº 2 : la seconde fiche doit échouer pour elle-même, et non
+  // passer parce qu'une fiche précédente a validé le même chantier.
+  it('refuse un chantier d\'une autre discipline', () => {
+    expect(() =>
+      lireFicheDeTest({ discipline: 'mathematiques', chantier: 'vocabulaire-du-bilan' }, CHANTIERS),
+    ).toThrow(/discipline/)
+  })
+
+  // Review Focus nº 3 : présent mais vide n'est pas la même chose qu'absent.
+  it('refuse un chantier vide', () => {
+    expect(() => lireFicheDeTest({ discipline: 'comptabilite', chantier: '' }, CHANTIERS)).toThrow(
+      /chantier/,
+    )
+  })
+
+  it('porte le chantier jusque dans l\'index', () => {
+    const index = getIndex(DOSSIER_CONTENU, undefined, CHANTIERS)
+    expect(index.every((entree) => 'chantier' in entree)).toBe(true)
   })
 })

@@ -37,6 +37,8 @@ export type FicheMeta = {
   statut: Statut
   resume: string
   suggestions: string[]
+  /** Le slug d'un chantier de la même discipline, ou rien. */
+  chantier?: string
   cree: Date
   modifie: Date
 }
@@ -97,23 +99,53 @@ export function creerSchemaChantier(taxonomies: Taxonomies): ZodType<Omit<Chanti
     })
 }
 
-export function creerSchemaFiche(taxonomies: Taxonomies): ZodType<Omit<FicheMeta, 'slug'>> {
+export function creerSchemaFiche(
+  taxonomies: Taxonomies,
+  chantiers: ChantierMeta[] = [],
+): ZodType<Omit<FicheMeta, 'slug'>> {
   const disciplines = taxonomies.disciplines.map((d) => d.slug) as [string, ...string[]]
   const confusions = taxonomies.confusions.map((c) => c.slug) as [string, ...string[]]
 
-  return z.object({
-    terme: z.string().min(1),
-    discipline: z.enum(disciplines),
-    confusion: z.enum(confusions),
-    statut: z.enum(STATUTS),
-    // Les scalaires `>` du YAML gardent un saut de ligne final, qui partirait
-    // tel quel dans <meta name="description"> et consommerait un caractère
-    // du budget de 240 pour rien.
-    resume: z.string().trim().min(1).max(LONGUEUR_MAX_RESUME),
-    suggestions: z.array(z.string().min(1)),
-    cree: z.coerce.date(),
-    modifie: z.coerce.date(),
-  })
+  return z
+    .object({
+      terme: z.string().min(1),
+      discipline: z.enum(disciplines),
+      confusion: z.enum(confusions),
+      statut: z.enum(STATUTS),
+      // Les scalaires `>` du YAML gardent un saut de ligne final, qui partirait
+      // tel quel dans <meta name="description"> et consommerait un caractère
+      // du budget de 240 pour rien.
+      resume: z.string().trim().min(1).max(LONGUEUR_MAX_RESUME),
+      suggestions: z.array(z.string().min(1)),
+      // Pas un `z.enum` : l'appariement à vérifier porte sur deux champs à la
+      // fois — le chantier doit exister ET relever de la même discipline — ce
+      // qu'un enum sur le seul champ ne sait pas dire. Et `z.enum` exige une
+      // liste non vide, impossible à garantir avec zéro chantier au corpus.
+      chantier: z.string().min(1, 'chantier vide : retirer le champ plutôt que le laisser vide').optional(),
+      cree: z.coerce.date(),
+      modifie: z.coerce.date(),
+    })
+    .superRefine((fiche, ctx) => {
+      if (fiche.chantier === undefined) return
+
+      const chantier = chantiers.find((c) => c.slug === fiche.chantier)
+      if (!chantier) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['chantier'],
+          message: `chantier inconnu « ${fiche.chantier} » — aucun fichier content/chantiers/${fiche.chantier}.md`,
+        })
+        return
+      }
+
+      if (chantier.discipline !== fiche.discipline) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['chantier'],
+          message: `le chantier « ${fiche.chantier} » relève de la discipline « ${chantier.discipline} », la fiche de « ${fiche.discipline} » — une fiche ne peut rejoindre qu'un chantier de sa propre discipline`,
+        })
+      }
+    })
 }
 
 export type FicheIndex = Omit<FicheMeta, 'cree' | 'modifie'>
