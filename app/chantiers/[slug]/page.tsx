@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { cache } from 'react'
 import { BadgeStatut } from '@/components/badge-statut'
+import { BandeauDemonstration } from '@/components/bandeau-demonstration'
 import { Prose } from '@/components/prose'
 import { getChantier, getChantiers } from '@/lib/content/chantiers'
 import { getFiches } from '@/lib/content/fiches'
@@ -50,6 +51,7 @@ export default async function PageChantier({ params }: Params) {
 
   return (
     <article>
+      {chantier.demonstration && <BandeauDemonstration />}
       <header className="mb-8 space-y-4 border-b border-stone-200 pb-6">
         <h1 className="text-3xl font-semibold tracking-tight">{chantier.nom}</h1>
         <p className="text-lg leading-relaxed text-stone-700">{chantier.resume}</p>

@@ -99,7 +99,7 @@ describe('getChantiers', () => {
 describe('getChantiers sur le corpus réel', () => {
   it('lit tous les chantiers du dépôt, et chacun une seule fois', () => {
     const chantiers = getChantiers(DOSSIER_CONTENU, TAXONOMIES)
-    expect(chantiers).toHaveLength(1)
+    expect(chantiers).toHaveLength(3)
     expect(new Set(chantiers.map((c) => c.slug)).size).toBe(chantiers.length)
   })
 })

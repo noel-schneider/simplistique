@@ -145,4 +145,25 @@ describe('VueListe', () => {
     expect(screen.getByRole('columnheader', { name: /Statut/ })).toHaveAttribute('aria-sort', 'ascending')
     expect(screen.getByRole('columnheader', { name: /Terme/ })).toHaveAttribute('aria-sort', 'none')
   })
+
+  it('marque les seules fiches de démonstration', () => {
+    render(
+      <VueListe
+        fiches={[
+          fiche({ slug: 'anneau-mathematiques', terme: 'anneau', demonstration: true }),
+          fiche({ slug: 'groupe-mathematiques', terme: 'groupe' }),
+        ]}
+        libelles={libelles}
+      />,
+    )
+
+    // Par cellule et non par page : une pastille rendue au bon compte mais sur
+    // la mauvaise ligne désignerait une analyse réelle comme fictive.
+    const premieresCellules = screen
+      .getAllByRole('row')
+      .slice(1)
+      .map((ligne) => ligne.querySelector('td')!.textContent!)
+
+    expect(premieresCellules).toEqual(['anneaudémo', 'groupe'])
+  })
 })
