@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import Script from 'next/script'
 import { Navigation } from '@/components/navigation'
 import { urlSite } from '@/lib/site'
 import './globals.css'
@@ -34,6 +35,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           .
         </footer>
       </body>
+      {/* Statistiques de visite Umami auto-hébergées, limitées au domaine de prod */}
+      <Script
+        src="https://stats.noel-schneider.eu/script.js"
+        data-website-id="19092fc4-317e-402a-aca5-b5726ab12ebc"
+        data-domains="simplistique.noel-schneider.eu"
+      />
     </html>
   )
 }
