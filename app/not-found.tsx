@@ -5,7 +5,7 @@ export default function NonTrouve() {
     <div className="space-y-4">
       <h1 className="text-2xl font-semibold tracking-tight">Cette page n’existe pas</h1>
       <p className="text-stone-700">
-        Le terme que vous cherchez n’a peut-être pas encore de fiche — ce qui est une invitation.
+        Ce terme n’a peut-être pas encore de fiche — ce qui est une invitation à le proposer.
       </p>
       <p>
         <Link href="/fiches" className="underline">

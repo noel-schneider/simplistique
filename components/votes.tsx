@@ -84,7 +84,7 @@ export function Votes({ fiche, alternatives }: { fiche: string; alternatives: Al
       </p>
 
       <Ligne
-        libelle="Ce terme vous a-t-il gêné ?"
+        libelle="Ce terme gêne-t-il ?"
         nomDuVote="Ce terme m’a gêné"
         compte={etat.fiche}
         vote={etat.miens.fiche}
@@ -93,7 +93,7 @@ export function Votes({ fiche, alternatives }: { fiche: string; alternatives: Al
 
       {alternatives.length > 0 && (
         <div className="space-y-1">
-          <p className="text-sm text-stone-600">Quelle alternative préférez-vous ?</p>
+          <p className="text-sm text-stone-600">Alternative préférée</p>
           {alternatives.map((a) => (
             <Ligne
               key={a.empreinte}
@@ -152,9 +152,9 @@ export function Votes({ fiche, alternatives }: { fiche: string; alternatives: Al
       // ou qui avait la page ouverte avant un redéploiement voit le compteur revenir
       // en arrière et conclut que le site est cassé.
       if (r.status === 429) {
-        setMessage('Vous avez voté beaucoup de fois cette heure-ci. Réessayez plus tard.')
+        setMessage('Beaucoup de votes depuis cette connexion cette heure-ci. Nouvel essai possible plus tard.')
       } else if (r.status === 404) {
-        setMessage('Cette fiche a changé depuis l’ouverture de la page. Rechargez-la.')
+        setMessage('Cette fiche a changé depuis l’ouverture de la page : il faut la recharger.')
       }
 
       // 409 : le serveur sait que ce visiteur a déjà voté, le navigateur

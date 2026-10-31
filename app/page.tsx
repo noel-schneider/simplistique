@@ -41,9 +41,9 @@ export default function Accueil() {
         </Link>
       </div>
       {alaUne.length > 0 && (
-        <section aria-labelledby="le-saviez-vous" className="space-y-3 pt-4">
-          <h2 id="le-saviez-vous" className="text-xl font-semibold tracking-tight">
-            Le saviez-vous ?
+        <section aria-labelledby="a-la-une" className="space-y-3 pt-4">
+          <h2 id="a-la-une" className="text-xl font-semibold tracking-tight">
+            Ce qu’on croit comprendre
           </h2>
           <ul className="grid gap-4 sm:grid-cols-3">
             {alaUne.map((fiche) => (

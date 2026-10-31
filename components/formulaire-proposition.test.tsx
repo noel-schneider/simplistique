@@ -55,11 +55,11 @@ describe('FormulaireProposition', () => {
     expect(screen.getByLabelText(/Pourquoi/)).toHaveAccessibleDescription(/20 caractères minimum/)
   })
 
-  it('affiche « Merci, ta proposition est arrivée » après 201', async () => {
+  it('affiche « Merci, la proposition est arrivée » après 201', async () => {
     render(<FormulaireProposition />)
     const u = await remplir()
     await u.click(screen.getByRole('button', { name: 'Envoyer' }))
-    expect(await screen.findByText('Merci, ta proposition est arrivée')).toBeInTheDocument()
+    expect(await screen.findByText('Merci, la proposition est arrivée')).toBeInTheDocument()
   })
 
   it('affiche les champs en erreur après 400', async () => {
@@ -75,13 +75,13 @@ describe('FormulaireProposition', () => {
     expect(champ).toHaveValue(POURQUOI)
   })
 
-  it('affiche « Trop de propositions d’un coup, réessaie dans une heure » après 429', async () => {
+  it('affiche « Trop de propositions d’un coup : nouvel envoi possible dans une heure » après 429', async () => {
     fetchMock.mockImplementation(() => reponse({ erreur: 'trop' }, 429))
     render(<FormulaireProposition />)
     const u = await remplir()
     await u.click(screen.getByRole('button', { name: 'Envoyer' }))
     expect(
-      await screen.findByText('Trop de propositions d’un coup, réessaie dans une heure'),
+      await screen.findByText('Trop de propositions d’un coup : nouvel envoi possible dans une heure'),
     ).toBeInTheDocument()
   })
 

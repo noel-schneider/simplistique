@@ -27,7 +27,7 @@ const LIBELLES: Record<Nom, string> = {
   discipline: 'Discipline',
   pourquoi: 'Pourquoi il induit en erreur',
   suggestion: 'Une suggestion',
-  contact: 'Un moyen de te répondre',
+  contact: 'Contact',
 }
 
 const VIDE: Champs = { terme: '', discipline: '', pourquoi: '', suggestion: '', contact: '', site: '' }
@@ -82,7 +82,7 @@ export function FormulaireProposition() {
   if (etat.phase === 'merci') {
     return (
       <p role="status" className="rounded border border-stone-200 p-4 text-stone-800">
-        Merci, ta proposition est arrivée
+        Merci, la proposition est arrivée
       </p>
     )
   }
@@ -132,12 +132,12 @@ export function FormulaireProposition() {
         requis: true,
         long: true,
         max: 2000,
-        aide: 'Décris le malentendu : ce que tu as compris, et ce que le mot voulait dire (20 caractères minimum)',
+        aide: 'Le malentendu : ce que le mot laisse comprendre, et ce qu’il veut dire en réalité (20 caractères minimum)',
       })}
       {champ('suggestion', { max: 200 })}
       {champ('contact', {
         max: 200,
-        aide: 'Une adresse e-mail ou un pseudo, si tu veux une réponse. Rien d’obligatoire.',
+        aide: 'Une adresse e-mail ou un pseudo, pour recevoir une réponse. Facultatif.',
       })}
 
       {/* Champ piège : un robot remplit tout ce qu’il trouve, une personne ne le voit pas.
@@ -166,13 +166,13 @@ export function FormulaireProposition() {
       )}
       {etat.phase === 'trop' && (
         <p role="alert" className="text-sm text-red-800">
-          Trop de propositions d’un coup, réessaie dans une heure
+          Trop de propositions d’un coup : nouvel envoi possible dans une heure
         </p>
       )}
       {etat.phase === 'indisponible' && (
         <p role="alert" className="text-sm text-red-800">
-          L’envoi n’est pas disponible pour l’instant. Ta saisie est conservée : réessaie un peu plus
-          tard.
+          L’envoi n’est pas disponible pour l’instant. La saisie est conservée : un nouvel essai un peu
+          plus tard devrait fonctionner.
         </p>
       )}
 
@@ -185,9 +185,8 @@ export function FormulaireProposition() {
       </button>
 
       <p className="text-sm text-stone-600">
-        Ce qui est enregistré : le texte que tu saisis, une empreinte non réversible de ta connexion
-        (pour limiter les envois à cinq par heure) et la date. Le moyen de te répondre n’est gardé que
-        si tu le donnes.
+        Ce qui est enregistré : le texte saisi, une empreinte non réversible de la connexion (pour
+        limiter les envois à cinq par heure) et la date. Le contact n’est gardé que s’il est donné.
       </p>
     </form>
   )
