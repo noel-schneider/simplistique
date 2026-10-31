@@ -24,6 +24,15 @@ const BORNES: Record<Champ, { requis: boolean; min: number; max: number }> = {
 
 const CHAMPS = Object.keys(BORNES) as Champ[]
 
+/**
+ * C0 sauf `\t` et `\n`, DEL et C1. Rien de ce qu’on tape dans un formulaire n’en
+ * produit ; en base, ils ne serviraient qu’à piéger le terminal du modérateur
+ * (séquences ANSI) ou à tronquer un affichage (NUL). `\r` seul en fait partie ;
+ * `\r\n`, que certains navigateurs envoient pour un saut de ligne, est ramené à
+ * `\n` avant le contrôle.
+ */
+const CONTROLE = /[\u0000-\u0008\u000b-\u001f\u007f-\u009f]/u
+
 // Par points de code et non par unités UTF-16 : un emoji compte pour un caractère,
 // comme le voit le visiteur.
 function longueur(texte: string): number {
@@ -62,10 +71,10 @@ export function validerProposition(
       champs.push(champ)
       continue
     }
-    const valeur = brute.trim()
+    const valeur = brute.replaceAll('\r\n', '\n').trim()
     const { requis, min, max } = BORNES[champ]
     const n = longueur(valeur)
-    if ((requis && n === 0) || (n > 0 && n < min) || n > max) champs.push(champ)
+    if ((requis && n === 0) || (n > 0 && n < min) || n > max || CONTROLE.test(valeur)) champs.push(champ)
     proposition[champ] = valeur
   }
 

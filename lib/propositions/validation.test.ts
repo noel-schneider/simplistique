@@ -106,6 +106,30 @@ describe('validerProposition', () => {
     })
   })
 
+  it('refuse les caractères de contrôle (NUL, ESC, DEL, C1)', () => {
+    for (const valeur of ['Act\u0000if', 'Actif\x1b[2J', 'Actif\u007f', 'Actif\u0085', 'Act\rif']) {
+      expect(validerProposition({ terme: valeur, pourquoi: POURQUOI }), JSON.stringify(valeur)).toEqual({
+        ok: false,
+        erreur: 'invalide',
+        champs: ['terme'],
+      })
+    }
+    // Un champ facultatif n’y échappe pas.
+    expect(validerProposition({ terme: 'Actif', pourquoi: POURQUOI, contact: 'moi\u0000' })).toEqual({
+      ok: false,
+      erreur: 'invalide',
+      champs: ['contact'],
+    })
+  })
+
+  it('accepte \\n et \\t, et normalise \\r\\n en \\n', () => {
+    const pourquoi = `${POURQUOI}\r\n\tdeuxième ligne\ntroisième`
+    expect(validerProposition({ terme: 'Actif', pourquoi })).toMatchObject({
+      ok: true,
+      proposition: { pourquoi: `${POURQUOI}\n\tdeuxième ligne\ntroisième` },
+    })
+  })
+
   it('corps non objet → invalide', () => {
     for (const corps of [null, undefined, 'texte', 42, ['terme']]) {
       expect(validerProposition(corps)).toEqual({

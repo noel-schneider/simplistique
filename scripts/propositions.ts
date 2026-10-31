@@ -1,5 +1,6 @@
 import { depotPostgres } from '../lib/propositions/depot-postgres'
 import { executeurNeon } from '../lib/votes/depot-postgres'
+import { neutraliserControles as n } from './affichage-propositions'
 
 async function principal(): Promise<void> {
   const url = process.env.DATABASE_URL
@@ -40,14 +41,15 @@ async function principal(): Promise<void> {
     return
   }
   console.log(`${lignes.length} proposition(s) en attente :`)
+  // Tout champ vient d’un inconnu : il passe par `n` avant d’atteindre le terminal.
   for (const p of lignes) {
     console.log(`\n#${p.id} — ${p.creeLe.toISOString()}`)
-    console.log(`  Terme : ${p.terme}`)
-    console.log(`  Discipline : ${p.discipline || '(non précisée)'}`)
-    console.log(`  Pourquoi : ${p.pourquoi}`)
-    console.log(`  Suggestion : ${p.suggestion || '(aucune)'}`)
+    console.log(`  Terme : ${n(p.terme)}`)
+    console.log(`  Discipline : ${n(p.discipline) || '(non précisée)'}`)
+    console.log(`  Pourquoi : ${n(p.pourquoi)}`)
+    console.log(`  Suggestion : ${n(p.suggestion) || '(aucune)'}`)
     // Le contact n’apparaît qu’ici : il est destiné au modérateur, nulle part ailleurs.
-    console.log(`  Contact : ${p.contact || '(aucun)'}`)
+    console.log(`  Contact : ${n(p.contact) || '(aucun)'}`)
   }
   console.log('\nPour clore une proposition : npm run propositions -- --traiter <id>')
 }

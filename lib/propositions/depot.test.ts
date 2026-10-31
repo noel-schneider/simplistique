@@ -42,4 +42,14 @@ describe('depotEnMemoire (propositions)', () => {
     expect(await depot.nombreDepuis(ALICE, new Date(Date.now() - 60_000))).toBe(2)
     expect(await depot.nombreDepuis(ALICE, new Date(Date.now() + 60_000))).toBe(0)
   })
+
+  it('compte toutes les propositions récentes, tous auteurs confondus', async () => {
+    const depot = depotEnMemoire()
+    await depot.ajouter(proposition('Actif'), ALICE)
+    await depot.ajouter(proposition('Anneau'), BOB)
+    const [{ id }] = await depot.nonTraitees()
+    await depot.marquerTraitee(id)
+    expect(await depot.nombreTotalDepuis(new Date(Date.now() - 60_000))).toBe(2)
+    expect(await depot.nombreTotalDepuis(new Date(Date.now() + 60_000))).toBe(0)
+  })
 })

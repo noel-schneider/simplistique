@@ -11,6 +11,8 @@ export type PropositionEnregistree = Proposition & { id: number; creeLe: Date }
 export interface DepotDePropositions {
   ajouter(p: Proposition, auteur: string): Promise<void>
   nombreDepuis(auteur: string, depuis: Date): Promise<number>
+  /** Tous auteurs confondus, pour le plafond global. */
+  nombreTotalDepuis(depuis: Date): Promise<number>
   nonTraitees(): Promise<PropositionEnregistree[]>
   marquerTraitee(id: number): Promise<'traitee' | 'absente'>
 }
@@ -33,6 +35,10 @@ export function depotEnMemoire(): DepotDePropositions {
 
     async nombreDepuis(auteur, depuis) {
       return lignes.filter((l) => l.auteur === auteur && l.creeLe >= depuis).length
+    },
+
+    async nombreTotalDepuis(depuis) {
+      return lignes.filter((l) => l.creeLe >= depuis).length
     },
 
     async nonTraitees() {

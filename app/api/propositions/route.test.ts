@@ -64,6 +64,21 @@ describe('POST /api/propositions', () => {
     expect(await r.json()).toEqual({ erreur: 'invalide', champs: ['terme', 'pourquoi'] })
   })
 
+  it('répond 400 à un caractère de contrôle, sans rien écrire', async () => {
+    for (const terme of ['Act\u0000if', 'Actif\x1b[2J']) {
+      const r = await POST(requete({ ...CORPS, terme }))
+      expect(r.status).toBe(400)
+      expect(await r.json()).toEqual({ erreur: 'invalide', champs: ['terme'] })
+    }
+    expect(await depotCourant.nonTraitees()).toEqual([])
+  })
+
+  it('stocke \\r\\n en \\n et garde \\t', async () => {
+    const r = await POST(requete({ ...CORPS, pourquoi: `${CORPS.pourquoi}\r\n\tsuite` }))
+    expect(r.status).toBe(201)
+    expect(await depotCourant.nonTraitees()).toMatchObject([{ pourquoi: `${CORPS.pourquoi}\n\tsuite` }])
+  })
+
   it('répond comme un succès au piège, sans rien écrire', async () => {
     // Un code différent apprendrait au robot que le champ `site` le trahit.
     const r = await POST(requete({ ...CORPS, site: 'http://spam' }))

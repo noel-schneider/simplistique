@@ -48,12 +48,13 @@ describe('instructionsDeToutesLesMigrations', () => {
 
   it('découpe les migrations réelles en instructions CREATE idempotentes, votes d’abord', () => {
     const instructions = instructionsDeToutesLesMigrations()
-    // 3 pour les votes, 2 pour les propositions.
-    expect(instructions).toHaveLength(5)
+    // 3 pour les votes, 2 pour les propositions, 1 pour l’index par date (003).
+    expect(instructions).toHaveLength(6)
     for (const instruction of instructions) {
       expect(instruction).toMatch(/^CREATE (TABLE|INDEX) IF NOT EXISTS /)
     }
     expect(instructions[0]).toContain('votes')
     expect(instructions.some((i) => i.startsWith('CREATE TABLE IF NOT EXISTS propositions'))).toBe(true)
+    expect(instructions.at(-1)).toContain('propositions_par_date')
   })
 })

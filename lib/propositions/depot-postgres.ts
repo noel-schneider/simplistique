@@ -23,6 +23,15 @@ export function depotPostgres(executer: Executeur): DepotDePropositions {
       return Number(lignes[0]?.n ?? 0)
     },
 
+    async nombreTotalDepuis(depuis) {
+      // Servie par l’index `propositions_par_date` (migration 003) : celui de 002
+      // commence par `auteur` et ne sert pas une requête qui n’en filtre aucun.
+      const lignes = await executer('SELECT count(*)::int AS n FROM propositions WHERE cree_le >= $1', [
+        depuis.toISOString(),
+      ])
+      return Number(lignes[0]?.n ?? 0)
+    },
+
     async nonTraitees() {
       // `auteur` n’est volontairement pas lu : la modération n’en a pas l’usage.
       const lignes = await executer(

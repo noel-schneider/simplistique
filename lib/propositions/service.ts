@@ -9,6 +9,14 @@ import { validerProposition } from './validation'
  */
 export const LIMITE_PROPOSITIONS_PAR_HEURE = 5
 
+/**
+ * La limite par auteur ne tient que tant que l’empreinte tient : un robot qui
+ * change d’adresse ou de navigateur à chaque envoi la contourne. Ce plafond, tous
+ * auteurs confondus, borne ce qu’il peut écrire en une heure ; cinquante reste
+ * très au-dessus de ce qu’un site de cette taille reçoit honnêtement.
+ */
+export const LIMITE_PROPOSITIONS_GLOBALE_PAR_HEURE = 50
+
 export type IssueDeProposition =
   | { type: 'ok' }
   | { type: 'invalide'; champs: string[] }
@@ -27,6 +35,9 @@ export async function soumettre(
 
   const depuis = new Date(Date.now() - 60 * 60 * 1000)
   if ((await depot.nombreDepuis(auteur, depuis)) >= LIMITE_PROPOSITIONS_PAR_HEURE) {
+    return { type: 'trop' }
+  }
+  if ((await depot.nombreTotalDepuis(depuis)) >= LIMITE_PROPOSITIONS_GLOBALE_PAR_HEURE) {
     return { type: 'trop' }
   }
 

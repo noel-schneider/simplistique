@@ -68,4 +68,20 @@ describe.skipIf(!URL_TEST)('depotPostgres (propositions) contre un vrai PostgreS
     expect(await depot.nombreDepuis(ALICE, new Date(Date.now() - 60_000))).toBe(2)
     expect(await depot.nombreDepuis(ALICE, new Date(Date.now() + 60_000))).toBe(0)
   })
+
+  it('compte toutes les propositions récentes, tous auteurs confondus', async () => {
+    await depot.ajouter(proposition('Actif'), ALICE)
+    await depot.ajouter(proposition('Anneau'), BOB)
+    await client.query("UPDATE propositions SET cree_le = now() - interval '2 hours' WHERE terme = 'Anneau'")
+    expect(await depot.nombreTotalDepuis(new Date(Date.now() - 60 * 60_000))).toBe(1)
+    expect(await depot.nombreTotalDepuis(new Date(Date.now() - 3 * 60 * 60_000))).toBe(2)
+  })
+
+  it('la migration 003 crée l’index sur cree_le', async () => {
+    const { rows } = await client.query(
+      "SELECT indexdef FROM pg_indexes WHERE tablename = 'propositions' AND indexname = 'propositions_par_date'",
+    )
+    expect(rows).toHaveLength(1)
+    expect(rows[0].indexdef).toContain('(cree_le)')
+  })
 })
