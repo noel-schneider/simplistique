@@ -1,6 +1,6 @@
 import { depotPostgres } from '../lib/propositions/depot-postgres'
 import { executeurNeon } from '../lib/votes/depot-postgres'
-import { neutraliserControles as n } from './affichage-propositions'
+import { lireIdentifiant, neutraliserControles as n } from './affichage-propositions'
 
 async function principal(): Promise<void> {
   const url = process.env.DATABASE_URL
@@ -13,8 +13,8 @@ async function principal(): Promise<void> {
   const args = process.argv.slice(2)
 
   if (args[0] === '--traiter') {
-    const id = Number(args[1])
-    if (!Number.isInteger(id) || id <= 0 || args.length !== 2) {
+    const id = lireIdentifiant(args[1])
+    if (id === null || args.length !== 2) {
       console.error('Usage : npm run propositions -- --traiter <id>')
       process.exitCode = 1
       return

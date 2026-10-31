@@ -143,6 +143,18 @@ describe('VueListe', () => {
     expect(termesAffiches()).toEqual(['corps', 'groupe', 'statique'])
   })
 
+  it('pose les insécables françaises dans le terme affiché', () => {
+    render(
+      <VueListe
+        fiches={[fiche({ slug: 'pluie', terme: '30 % de risque de pluie' })]}
+        libelles={libelles}
+      />,
+    )
+    expect(screen.getByRole('link', { name: /de risque de pluie/ }).textContent).toBe(
+      '30 % de risque de pluie',
+    )
+  })
+
   it('lie chaque terme à sa fiche', () => {
     render(<VueListe fiches={fiches} libelles={libelles} />)
     expect(screen.getByRole('link', { name: 'groupe' })).toHaveAttribute(
