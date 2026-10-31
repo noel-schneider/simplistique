@@ -1,11 +1,19 @@
 # Contribuer
 
-Le corpus est ouvert, et il n’y a pas de comptes sur ce site. Les propositions
-passent par le dépôt, où la discussion reste publique et tracée ; le vote, lui,
+Le corpus est ouvert, et il n’y a pas de comptes sur ce site. Un mot qui t’a induit en
+erreur se signale en deux minutes depuis [la page Proposer](/proposer) ; une fiche
+complète passe par le dépôt, où la discussion reste publique et tracée. Le vote, lui,
 se fait anonymement depuis chaque fiche (voir « Ce que ce site enregistre »,
 plus bas).
 
-## Proposer une analyse
+## Proposer un terme en deux minutes
+
+Rends-toi sur [la page Proposer](/proposer) : le terme, une phrase ou deux sur le
+malentendu, et c’est tout. La suggestion de remplacement, la discipline et un moyen de te
+répondre sont facultatifs. Pas de compte, pas de GitHub. Une proposition n’est pas une
+fiche : elle est lue, puis éventuellement instruite pour en devenir une.
+
+## Proposer une analyse complète
 
 Ouvrir une *issue* ou une *pull request* sur
 [github.com/noel-schneider/simplistique](https://github.com/noel-schneider/simplistique).
@@ -142,3 +150,9 @@ avec le même navigateur et la même connexion : l’empreinte change avec eux, 
 n’a aucun autre moyen de reconnaître que ce vote est le vôtre. Une mise à jour de votre
 navigateur suffit à la changer aussi — c’est son numéro de version exact qui entre dans
 le calcul, pas son nom.
+
+Une proposition envoyée depuis [la page Proposer](/proposer) enregistre le texte que tu
+saisis, la date, et la même sorte d’empreinte non réversible, qui ne sert qu’à limiter
+les envois à cinq par heure. Ton adresse n’est pas enregistrée. Le moyen de te répondre
+n’est conservé que si tu le donnes ; il n’est lu que par la personne qui modère, et
+affiché nulle part ailleurs.

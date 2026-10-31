@@ -4,7 +4,7 @@ import { getMotifs } from '@/lib/content/motifs'
 import { getFiches } from '@/lib/content/fiches'
 import sitemap from './sitemap'
 
-const PAGES_SANS_DATE = ['/manifeste', '/contribuer']
+const PAGES_SANS_DATE = ['/manifeste', '/contribuer', '/proposer']
 const PAGES_DATEES_DU_CORPUS = ['/', '/fiches', '/motifs']
 
 // Le plan de site ne publie que le contenu réel : les pages de démonstration
@@ -14,17 +14,17 @@ const fichesPubliees = () => getFiches().filter((fiche) => !fiche.demonstration)
 const chantiersPublies = () => getChantiers().filter((c) => !c.demonstration)
 
 describe('sitemap', () => {
-  it('liste les cinq pages statiques et les fiches publiées', () => {
+  it('liste les six pages statiques et les fiches publiées', () => {
     const entrees = sitemap()
     const fiches = fichesPubliees()
 
     // Compte exact, pas « au moins » : un corpus listé deux fois ou un groupe de
     // pages oublié doit se voir. Exprimé comme une somme plutôt qu’en dur, pour
     // qu’ajouter une fiche ou un chantier ne fasse pas tomber ce test pour rien.
-    // Les cinq : la page d’accueil, le catalogue, les motifs, le manifeste,
-    // contribuer. Les motifs n’ont pas de marque de démonstration : tous publiés.
+    // Les six : la page d’accueil, le catalogue, les motifs, le manifeste,
+    // contribuer, proposer. Les motifs n’ont pas de marque de démonstration : tous publiés.
     expect(entrees).toHaveLength(
-      5 + fichesPubliees().length + chantiersPublies().length + getMotifs().length,
+      6 + fichesPubliees().length + chantiersPublies().length + getMotifs().length,
     )
 
     const urls = entrees.map((e) => e.url)

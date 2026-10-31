@@ -60,8 +60,9 @@ l’hébergement, pas dans le code.
 | `npm run test:once` | Toute la suite de tests |
 | `npm run lint` | ESLint, utilisé par l’intégration continue |
 | `npm run lint:content` | Avertissements de cohérence des fiches |
-| `npm run migrer` | Crée la table des votes et ses index ; sans effet si elle existe déjà |
+| `npm run migrer` | Crée les tables des votes et des propositions, et leurs index ; sans effet si elles existent déjà |
 | `npm run votes:orphelins` | Signale les votes dont la fiche ou l’alternative a disparu du corpus |
+| `npm run propositions` | Liste les propositions de termes non traitées (contact compris) ; `-- --traiter <id>` en marque une comme traitée |
 
 ## Variables d’environnement
 
@@ -75,8 +76,8 @@ La mise en service des votes — créer la base, poser le sel, migrer, déployer
 décrite pas à pas dans [docs/mise-en-service-des-votes.md](docs/mise-en-service-des-votes.md),
 avec ce qui casse si une étape manque.
 
-Les deux commandes qui touchent la base — `npm run migrer` et
-`npm run votes:orphelins` — lisent `.env.local` s’il existe. Sans lui, passez la
+Les trois commandes qui touchent la base — `npm run migrer`,
+`npm run votes:orphelins` et `npm run propositions` — lisent `.env.local` s’il existe. Sans lui, passez la
 variable sur la même ligne : `DATABASE_URL='...' npm run migrer`. Ne collez pas la
 chaîne de connexion avec ses guillemets : elle ne serait pas analysable comme URL.
 

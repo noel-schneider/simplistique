@@ -14,6 +14,7 @@
     "test:once": "vitest run",
     "lint:content": "tsx scripts/lint-content.ts",
     "migrer": "tsx --env-file-if-exists=.env.local scripts/migrer.ts",
+    "propositions": "tsx --env-file-if-exists=.env.local scripts/propositions.ts",
     "verifier:statique": "tsx scripts/verifier-statique.ts",
     "votes:orphelins": "tsx --env-file-if-exists=.env.local scripts/votes-orphelins.ts"
   },

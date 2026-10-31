@@ -15,13 +15,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     fiches[0]?.modifie ?? new Date(0),
   )
 
-  // `/manifeste` et `/contribuer` sont des documents sans date de
+  // `/manifeste`, `/contribuer` et `/proposer` sont des pages sans date de
   // modification connue : `lastModified` est optionnel dans la spec des
   // plans de site, et l'omettre est plus honnête que d'inventer une date
   // (ni la date du build, qui change sans que le contenu ait bougé, ni la
   // date de modification du fichier sur disque, qui ne reflète que l'heure
   // du dernier clone).
-  const pagesDocuments: MetadataRoute.Sitemap = ['/manifeste', '/contribuer'].map((chemin) => ({
+  const pagesDocuments: MetadataRoute.Sitemap = ['/manifeste', '/contribuer', '/proposer'].map((chemin) => ({
     url: `${base}${chemin}`,
   }))
 

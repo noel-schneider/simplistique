@@ -33,6 +33,12 @@ export default function Accueil() {
         >
           Lire le manifeste
         </Link>
+        <Link
+          href="/proposer"
+          className="rounded border border-stone-300 px-4 py-2 text-sm hover:border-stone-500"
+        >
+          Proposer un terme
+        </Link>
       </div>
       {alaUne.length > 0 && (
         <section aria-labelledby="le-saviez-vous" className="space-y-3 pt-4">
