@@ -132,7 +132,7 @@ export function FormulaireProposition() {
         requis: true,
         long: true,
         max: 2000,
-        aide: 'Décris le malentendu : ce que tu as compris, et ce que le mot voulait dire',
+        aide: 'Décris le malentendu : ce que tu as compris, et ce que le mot voulait dire (20 caractères minimum)',
       })}
       {champ('suggestion', { max: 200 })}
       {champ('contact', {

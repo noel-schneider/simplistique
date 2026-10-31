@@ -14,9 +14,10 @@
  * échouerait sur une machine qui n’a pas encore construit le site — ce qui est
  * précisément le cas de l’intégration continue, où les tests passent avant le build.
  *
- * On n’analyse pas le texte de la sortie, qui change avec les versions de Next, et on
- * n’écrit ici aucune liste de routes : ajouter une fiche ou une page ne demande donc
- * aucune mise à jour de ce fichier.
+ * On n’analyse pas le texte de la sortie, qui change avec les versions de Next, et la
+ * seule liste de routes écrite ici est celle des routes dynamiques autorisées : ajouter
+ * une fiche ou une page ne demande donc aucune mise à jour de ce fichier, ajouter une
+ * route d’API si.
  */
 export const ROUTES_DYNAMIQUES = ['/api/votes', '/api/propositions']
 

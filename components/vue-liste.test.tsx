@@ -103,6 +103,25 @@ describe('trierFiches', () => {
     ])
   })
 
+  it('trie la preuve par rang (intuition < documentée < mesurée), pas par libellé', () => {
+    // Par libellé, « Documentée » passerait avant « Intuition d’auteur ».
+    const parPreuve = [
+      fiche({ slug: 'a', terme: 'a', preuve: 'mesuree' }),
+      fiche({ slug: 'b', terme: 'b', preuve: 'documentee' }),
+      fiche({ slug: 'c', terme: 'c', preuve: 'intuition' }),
+    ]
+    expect(trierFiches(parPreuve, 'preuve', true, libelles).map((f) => f.preuve)).toEqual([
+      'intuition',
+      'documentee',
+      'mesuree',
+    ])
+    expect(trierFiches(parPreuve, 'preuve', false, libelles).map((f) => f.preuve)).toEqual([
+      'mesuree',
+      'documentee',
+      'intuition',
+    ])
+  })
+
   it('trie par libellé de statut, pas par slug', () => {
     expect(trierFiches(fiches, 'statut', true, LIBELLES_DIVERGENTS).map((f) => f.statut)).toEqual([
       'propose',

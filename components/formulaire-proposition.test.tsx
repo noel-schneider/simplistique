@@ -49,6 +49,12 @@ describe('FormulaireProposition', () => {
     })
   })
 
+  it('annonce le minimum de 20 caractères dans l’aide de « pourquoi »', () => {
+    render(<FormulaireProposition />)
+    // Sans l’indication, l’auteur ne découvre le minimum qu’au refus du serveur.
+    expect(screen.getByLabelText(/Pourquoi/)).toHaveAccessibleDescription(/20 caractères minimum/)
+  })
+
   it('affiche « Merci, ta proposition est arrivée » après 201', async () => {
     render(<FormulaireProposition />)
     const u = await remplir()

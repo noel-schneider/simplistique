@@ -5,7 +5,7 @@ import { useState } from 'react'
 import { BadgePreuve } from './badge-preuve'
 import { BadgeStatut } from './badge-statut'
 import { PastilleDemonstration } from './pastille-demonstration'
-import type { FicheIndex } from '@/lib/content/schema'
+import { PREUVES, type FicheIndex } from '@/lib/content/schema'
 
 export type Libelles = {
   disciplines: Map<string, string>
@@ -29,12 +29,19 @@ export function trierFiches(
 ): FicheIndex[] {
   const valeur = (fiche: FicheIndex): string => {
     if (colonne === 'discipline') return libelles.disciplines.get(fiche.discipline) ?? fiche.discipline
-    if (colonne === 'preuve') return libelles.preuves.get(fiche.preuve) ?? fiche.preuve
     if (colonne === 'statut') return libelles.statuts.get(fiche.statut) ?? fiche.statut
     return fiche.terme
   }
 
-  const triees = [...fiches].sort((a, b) => valeur(a).localeCompare(valeur(b), 'fr'))
+  // La preuve est une échelle, pas un nom : trier ses libellés par ordre
+  // alphabétique mettrait « Documentée » avant « Intuition ». Le rang dans
+  // `PREUVES` est l’ordre de la plus faible à la plus forte.
+  const comparer =
+    colonne === 'preuve'
+      ? (a: FicheIndex, b: FicheIndex) => PREUVES.indexOf(a.preuve) - PREUVES.indexOf(b.preuve)
+      : (a: FicheIndex, b: FicheIndex) => valeur(a).localeCompare(valeur(b), 'fr')
+
+  const triees = [...fiches].sort(comparer)
   return croissant ? triees : triees.reverse()
 }
 
