@@ -82,3 +82,39 @@
   description: >
     Les noms de maladies sont lus par les patients autant que par les
     soignants, et un mauvais nom peut aggraver la stigmatisation.
+- slug: fiscalite
+  nom: Fiscalité
+  couleur: '#7a5c9e'
+  description: >
+    Le vocabulaire que chaque contribuable lit une fois par an sur son avis
+    d'impôt, et que peu comprennent vraiment.
+- slug: banque
+  nom: Banque
+  couleur: '#3d7d5a'
+  description: >
+    Les mots des relevés de compte et des plaquettes tarifaires, où un terme
+    flou se paie parfois en frais.
+- slug: alimentation
+  nom: Alimentation
+  couleur: '#c9772b'
+  description: >
+    Les mentions des étiquettes, lues en quelques secondes au supermarché,
+    et dont le sens décide de ce qu'on mange ou de ce qu'on jette.
+- slug: meteorologie
+  nom: Météorologie
+  couleur: '#4a8fc9'
+  description: >
+    Des prévisions consultées chaque jour par des millions de personnes,
+    dans un vocabulaire de probabilités que presque personne n'a appris.
+- slug: sante
+  nom: Santé et assurance maladie
+  couleur: '#a8566f'
+  description: >
+    Le vocabulaire des remboursements de soins, que chaque patient croise
+    sans l'avoir choisi.
+- slug: travail
+  nom: Travail
+  couleur: '#8c7a4a'
+  description: >
+    Les mots de la fiche de paie et du contrat, qui décident de ce que
+    chacun croit gagner.
