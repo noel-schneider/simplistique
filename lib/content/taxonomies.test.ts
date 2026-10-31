@@ -13,6 +13,43 @@ function dossierFactice(fichiers: Record<string, string>): string {
   return racine
 }
 
+function lineaire(hex: string): number[] {
+  return [1, 3, 5].map((i) => {
+    const c = parseInt(hex.slice(i, i + 2), 16) / 255
+    return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4
+  })
+}
+
+function contraste(a: string, b: string): number {
+  const [la, lb] = [a, b]
+    .map((hex) => {
+      const [r, g, bl] = lineaire(hex)
+      return 0.2126 * r + 0.7152 * g + 0.0722 * bl
+    })
+    .sort((x, y) => y - x)
+  return (la + 0.05) / (lb + 0.05)
+}
+
+// Distance euclidienne dans l'espace OKLab, où un écart vaut à peu près la
+// même différence perçue quelle que soit la teinte.
+function ecartOklab(a: string, b: string): number {
+  const oklab = (hex: string) => {
+    const [r, g, bl] = lineaire(hex)
+    const [l, m, s] = [
+      0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * bl,
+      0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * bl,
+      0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * bl,
+    ].map(Math.cbrt)
+    return [
+      0.2104542553 * l + 0.793617785 * m - 0.0040720468 * s,
+      1.9779984951 * l - 2.428592205 * m + 0.4505937099 * s,
+      0.0259040371 * l + 0.7827717662 * m - 0.808675766 * s,
+    ]
+  }
+  const [x, y] = [oklab(a), oklab(b)]
+  return Math.hypot(x[0] - y[0], x[1] - y[1], x[2] - y[2])
+}
+
 const STATUTS_VALIDES = `
 - { slug: pointe, nom: Pointé, description: a }
 - { slug: propose, nom: Proposé, description: b }
@@ -49,6 +86,23 @@ describe('chargerTaxonomies', () => {
   it('donne une couleur à chaque discipline réelle', () => {
     for (const d of chargerTaxonomies(DOSSIER_CONTENU).disciplines) {
       expect(d.couleur).toMatch(/^#[0-9a-f]{6}$/i)
+    }
+  })
+
+  // La carte range les zones par famille : deux disciplines voisines ne doivent
+  // pas se confondre, et un point « pointé » (contour seul) doit rester visible
+  // sur le fond bg-stone-50.
+  it('garde des couleurs lisibles et distinctes au sein de chaque famille', () => {
+    const disciplines = chargerTaxonomies(DOSSIER_CONTENU).disciplines
+    for (const d of disciplines) {
+      expect(contraste(d.couleur, '#fafaf9'), d.slug).toBeGreaterThanOrEqual(3)
+    }
+    for (const a of disciplines) {
+      for (const b of disciplines) {
+        if (a.slug < b.slug && a.famille === b.famille) {
+          expect(ecartOklab(a.couleur, b.couleur), `${a.slug} / ${b.slug}`).toBeGreaterThanOrEqual(0.15)
+        }
+      }
     }
   })
 
