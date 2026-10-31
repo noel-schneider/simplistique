@@ -38,7 +38,7 @@ continue qui vérifie, sans discussion possible :
   sans accent.
 - Les champs du front-matter. Requis : `terme`, `discipline`, `confusion`,
   `statut`, `preuve`, `resume`, `suggestions`, `cree`, `modifie`. Facultatifs :
-  `chantier` et `sources`.
+  `chantier`, `sources` et `precedents`.
 - `preuve` : le niveau d’appui de l’analyse, parmi trois valeurs.
   `intuition` : l’analyse vient de l’auteur de la fiche. `documentee` : un
   spécialiste de la discipline a écrit que ce nom pose problème. `mesuree` :
@@ -49,6 +49,10 @@ continue qui vérifie, sans discussion possible :
   `seconde-main` si vous la connaissez par un autre texte ; le site affiche
   cette mention au lecteur. Une fiche `documentee` ou `mesuree` sans aucune
   source provoque un avertissement.
+- `precedents` : une liste de renommages déjà adoptés ailleurs, chacun avec
+  `lieu`, `annee` (mêmes bornes que pour une source) et `description`. Le site
+  les affiche dans un encadré « Déjà fait ailleurs » avant le texte. Ne
+  mentionnez que ce que la fiche dit déjà.
 - `resume` : 240 caractères maximum.
 - `discipline` et `confusion` : doivent exister dans `content/taxonomies/`.
 - `chantier`, s’il est présent : doit désigner un fichier existant de

@@ -18,6 +18,10 @@ sources:
     annee: 2012
     titre: "“Why Do We Have to Learn This Stuff?” — A New Genetics for 21st Century Students"
     lecture: seconde-main
+precedents:
+  - lieu: Japon
+    annee: 2017
+    description: "la Société japonaise de génétique remplace les mots signifiant « supérieur » et « inférieur » par des termes signifiant « apparent » et « latent »"
 cree: 2026-10-31
 modifie: 2026-10-31
 ---

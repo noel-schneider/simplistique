@@ -24,6 +24,10 @@ sources:
     annee: 2018
     objet: "estimation de la part du gaspillage alimentaire liée au marquage des dates"
     lecture: seconde-main
+precedents:
+  - lieu: France
+    annee: 2022
+    description: "mention autorisée « Pour une dégustation optimale, à consommer de préférence avant… », complétée par « Ce produit peut être consommé après cette date »"
 cree: 2026-10-31
 modifie: 2026-10-31
 ---

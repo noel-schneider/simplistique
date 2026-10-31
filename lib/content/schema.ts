@@ -22,6 +22,13 @@ export type Source = {
   lecture: Lecture
 }
 
+// Un renommage déjà adopté quelque part : un lieu, une année, ce qui a changé.
+export type Precedent = {
+  lieu: string
+  annee: number
+  description: string
+}
+
 // Réutilisée telle quelle pour valider le nom de fichier d'une fiche (voir
 // `lireFiche` dans lib/content/fiches.ts), dont le slug n'est pas un champ de
 // schéma mais le nom de fichier brut.
@@ -58,6 +65,8 @@ export type FicheMeta = {
   preuve: Preuve
   /** Absent du front-matter = aucune source. */
   sources: Source[]
+  /** Absent du front-matter = aucun précédent. */
+  precedents: Precedent[]
   resume: string
   suggestions: string[]
   /** Le slug d’un chantier de la même discipline, ou rien. */
@@ -140,15 +149,27 @@ const urlWeb = z
 
 const ANNEE_MIN_SOURCE = 1500
 
-function creerSchemaSource() {
-  // Calculée à l’appel et non à l’import : la borne haute suit l’année courante
-  // (+ 1 pour un ouvrage annoncé), sans valeur figée dans le code.
+// Partagée par les sources et les précédents. Calculée à l’appel et non à
+// l’import : la borne haute suit l’année courante (+ 1 pour un ouvrage
+// annoncé), sans valeur figée dans le code.
+function creerSchemaAnnee() {
   const anneeMax = new Date().getFullYear() + 1
+  return z.number().int().min(ANNEE_MIN_SOURCE).max(anneeMax)
+}
 
+function creerSchemaPrecedent() {
+  return z.strictObject({
+    lieu: z.string().min(1),
+    annee: creerSchemaAnnee(),
+    description: z.string().min(1),
+  })
+}
+
+function creerSchemaSource() {
   return z
     .strictObject({
       auteur: z.string().min(1),
-      annee: z.number().int().min(ANNEE_MIN_SOURCE).max(anneeMax),
+      annee: creerSchemaAnnee(),
       titre: z.string().min(1).optional(),
       objet: z.string().min(1).optional(),
       url: urlWeb.optional(),
@@ -176,6 +197,7 @@ export function creerSchemaFiche(
       statut: z.enum(STATUTS),
       preuve: z.enum(PREUVES),
       sources: z.array(creerSchemaSource()).default([]),
+      precedents: z.array(creerSchemaPrecedent()).default([]),
       // Les scalaires `>` du YAML gardent un saut de ligne final, qui partirait
       // tel quel dans <meta name="description"> et consommerait un caractère
       // du budget de 240 pour rien.
@@ -216,6 +238,6 @@ export function creerSchemaFiche(
     })
 }
 
-// Sans `sources` : l’index part au navigateur avec la page des fiches, et les
-// références ne servent que sur la page de la fiche.
-export type FicheIndex = Omit<FicheMeta, 'cree' | 'modifie' | 'sources'>
+// Sans `sources` ni `precedents` : l’index part au navigateur avec la page des
+// fiches, et ces champs ne servent que sur la page de la fiche.
+export type FicheIndex = Omit<FicheMeta, 'cree' | 'modifie' | 'sources' | 'precedents'>

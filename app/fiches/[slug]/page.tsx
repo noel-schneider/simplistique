@@ -4,6 +4,7 @@ import { cache } from 'react'
 import { BandeauChantier } from '@/components/bandeau-chantier'
 import { BandeauDemonstration } from '@/components/bandeau-demonstration'
 import { EnteteFiche } from '@/components/entete-fiche'
+import { Precedents } from '@/components/precedents'
 import { Prose } from '@/components/prose'
 import { Sources } from '@/components/sources'
 import { Votes } from '@/components/votes'
@@ -64,6 +65,7 @@ export default async function PageFiche({ params }: Params) {
       />
       {fiche.demonstration && <BandeauDemonstration />}
       {chantier && <BandeauChantier slug={chantier.slug} nom={chantier.nom} />}
+      <Precedents precedents={fiche.precedents} />
       <Prose html={await rendreMarkdown(fiche.corps)} />
       <Sources sources={fiche.sources} />
       <Votes

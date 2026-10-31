@@ -20,6 +20,7 @@ function meta(p: Partial<FicheMeta> = {}): FicheMeta {
     statut: 'pointe',
     preuve: 'documentee',
     sources: [],
+    precedents: [],
     resume: 'Un mot courant au sens technique étranger.',
     suggestions: [],
     cree: new Date('2026-10-03'),

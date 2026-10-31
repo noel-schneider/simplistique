@@ -89,3 +89,39 @@ describe('preuve et sources dans le schéma', () => {
     expect(schema.safeParse(avec(1989.5)).success).toBe(false)
   })
 })
+
+describe('precedents dans le schéma', () => {
+  const PRECEDENT = { lieu: 'Japon', annee: 2002, description: 'Renommage en « trouble de l’intégration »' }
+
+  it('accepte precedents absents et les rend comme []', () => {
+    const r = schema.safeParse(BASE)
+    expect(r.success).toBe(true)
+    if (r.success) expect(r.data.precedents).toEqual([])
+  })
+
+  it('accepte un précédent complet', () => {
+    const r = schema.safeParse({ ...BASE, precedents: [PRECEDENT] })
+    expect(r.success).toBe(true)
+    if (r.success) expect(r.data.precedents).toEqual([PRECEDENT])
+  })
+
+  it('refuse un précédent sans description', () => {
+    const sansDescription: Record<string, unknown> = { ...PRECEDENT }
+    delete sansDescription.description
+    expect(message({ ...BASE, precedents: [sansDescription] })).toMatch(/description/)
+  })
+
+  it('refuse une clé inconnue', () => {
+    expect(message({ ...BASE, precedents: [{ ...PRECEDENT, pays: 'JP' }] })).toMatch(/pays/)
+  })
+
+  it('applique les mêmes bornes d’année que les sources', () => {
+    const avec = (annee: number) => ({ ...BASE, precedents: [{ ...PRECEDENT, annee }] })
+    const suivante = new Date().getFullYear() + 1
+    expect(schema.safeParse(avec(1500)).success).toBe(true)
+    expect(schema.safeParse(avec(suivante)).success).toBe(true)
+    expect(schema.safeParse(avec(1499)).success).toBe(false)
+    expect(schema.safeParse(avec(suivante + 1)).success).toBe(false)
+    expect(schema.safeParse(avec(2002.5)).success).toBe(false)
+  })
+})

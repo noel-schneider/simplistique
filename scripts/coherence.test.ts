@@ -13,6 +13,7 @@ function fiche(p: Partial<Fiche> = {}): Fiche {
     statut: 'pointe',
     preuve: 'intuition',
     sources: [],
+    precedents: [],
     resume: 'court',
     suggestions: [],
     cree: new Date('2026-10-03'),

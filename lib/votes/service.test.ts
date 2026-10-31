@@ -16,6 +16,7 @@ function fiche(suggestions: string[] = ['avoir', 'ressources']): Fiche {
     statut: suggestions.length ? 'propose' : 'pointe',
     preuve: 'intuition',
     sources: [],
+    precedents: [],
     resume: 'court',
     suggestions,
     cree: new Date('2026-10-03'),

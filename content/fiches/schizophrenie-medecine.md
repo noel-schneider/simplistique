@@ -15,6 +15,10 @@ sources:
     titre: "Renaming schizophrenia: a Japanese perspective"
     url: https://pmc.ncbi.nlm.nih.gov/articles/PMC1472254
     lecture: originale
+precedents:
+  - lieu: Japon
+    annee: 2002
+    description: "la Société japonaise de psychiatrie et de neurologie remplace « maladie de l’esprit scindé » par un terme signifiant « trouble de l’intégration »"
 cree: 2026-10-31
 modifie: 2026-10-31
 ---
