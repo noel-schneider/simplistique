@@ -14,15 +14,18 @@ sources:
   - auteur: "Ernst Mayr"
     annee: 1961
     titre: "Cause and Effect in Biology"
-    lecture: seconde-main
+    url: https://doi.org/10.1126/science.134.3489.1501
+    lecture: originale
   - auteur: "Laland et coll."
     annee: 2011
-    titre: "Cause and Effect in Biology Revisited: Is Mayr’s Proximate–Ultimate Dichotomy Still Useful?"
-    lecture: seconde-main
+    titre: "Cause and Effect in Biology Revisited: Is Mayr’s Proximate-Ultimate Dichotomy Still Useful?"
+    url: https://doi.org/10.1126/science.1210879
+    lecture: originale
   - auteur: "Scott-Phillips, Dickins et West"
     annee: 2011
     titre: "Evolutionary Theory and the Ultimate–Proximate Distinction in the Human Behavioral Sciences"
-    lecture: seconde-main
+    url: https://doi.org/10.1177/1745691610393528
+    lecture: originale
 cree: 2026-10-31
 modifie: 2026-10-31
 ---
@@ -62,9 +65,11 @@ dépassée, ce qui dépasse la question du nom.
 
 ## D’où ça vient
 
-Ernst Mayr a posé la distinction en 1961 (« Cause and Effect in Biology »,
-*Science*). Cinquante ans plus tard, Laland et ses collègues la remettent en
-cause dans la même revue (2011), en défendant une causalité réciproque. La
-même année, Scott-Phillips, Dickins et West la défendent (*Perspectives on
-Psychological Science*, 2011), en montrant que les deux niveaux sont souvent
-confondus dans les sciences du comportement.
+Ernst Mayr a fait connaître la distinction en 1961 (« Cause and Effect in
+Biology », *Science*). Cinquante ans plus tard, Laland et ses collègues en
+contestent la version de Mayr dans la même revue (2011), en défendant une
+causalité réciproque, tout en admettant qu’il faudra toujours répondre au
+pourquoi et au comment. La même année, Scott-Phillips, Dickins et West la
+défendent (*Perspectives on Psychological Science*, 2011), en montrant que
+les deux niveaux sont souvent confondus dans la littérature évolutionniste sur
+le comportement humain (coopération, culture, épigénétique).

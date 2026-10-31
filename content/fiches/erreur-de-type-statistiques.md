@@ -13,8 +13,10 @@ suggestions:
 sources:
   - auteur: "Tom Stafford"
     annee: 2015
-    objet: "propos sur les erreurs de type I et de type II"
-    lecture: seconde-main
+    titre: "No more Type I/II error confusion"
+    objet: "billet du blog Mind Hacks, 16 novembre 2015"
+    url: https://mindhacks.com/2015/11/16/no-more-type-iii-error-confusion/
+    lecture: originale
 motifs:
   - positif-et-negatif
 cree: 2026-10-31

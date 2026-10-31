@@ -14,10 +14,12 @@ sources:
   - auteur: "Wasserstein, Schirm et Lazar"
     annee: 2019
     titre: "Moving to a World Beyond “p < 0.05”"
-    lecture: seconde-main
+    url: https://doi.org/10.1080/00031305.2019.1583913
+    lecture: originale
   - auteur: "Amrhein, Greenland et McShane"
     annee: 2019
     titre: "Scientists rise up against statistical significance"
+    url: https://doi.org/10.1038/d41586-019-00857-9
     lecture: seconde-main
 cree: 2026-10-31
 modifie: 2026-10-31
@@ -58,10 +60,11 @@ cherchent justement à abandonner.
 
 ## D’où ça vient
 
-La critique vient de la discipline elle-même. En 2019, un numéro spécial de
-*The American Statistician* (Wasserstein, Schirm et Lazar) appelle à cesser
-d’employer « statistically significant ». La même année, une tribune signée
-par plus de 800 chercheurs dans *Nature* (Amrhein, Greenland et McShane) relève
-qu’environ la moitié des articles examinés lisent « non significatif » comme
-« absence d’effet ». La formule *statistically discernible* a été défendue
+La critique vient de la discipline elle-même. En 2019, l’éditorial d’un
+numéro spécial de *The American Statistician* (43 articles ; Wasserstein,
+Schirm et Lazar) conclut qu’il est temps de cesser d’employer « statistically
+significant ». La même année, une tribune signée par plus de 800 chercheurs
+dans *Nature* (Amrhein, Greenland et McShane) rappelle qu’une analyse de 791
+articles de cinq revues a trouvé qu’environ la moitié concluent à une absence
+d’effet à partir d’un résultat non significatif. La formule *statistically discernible* a été défendue
 notamment par le psychologue Stephen Benning.

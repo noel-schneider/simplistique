@@ -7,15 +7,15 @@ preuve: mesuree
 resume: >
   « Passer dans la tranche supérieure » ne fait pas payer plus d’impôt sur tout
   le revenu : seuls les euros au-dessus du seuil sont taxés au taux supérieur.
-accroche: "En 2024, 49 % des Britanniques interrogés croyaient que le taux supérieur s’applique à tout le revenu."
+accroche: "En 2024, 49 % des Britanniques interrogés pensaient qu’1 £ de plus, qui fait passer dans la tranche à 40 %, coûte beaucoup d’impôt en plus."
 suggestions:
   - part du revenu taxée à X %
 sources:
   - auteur: "Tax Policy Associates"
     annee: 2024
-    objet: "sondage sur la compréhension des tranches d’impôt"
+    objet: "sondage WeThink pour Tax Policy Associates sur la compréhension des tranches d’impôt, article du 5 juillet 2024"
     url: https://taxpolicy.org.uk/2024/07/05/half-the-british-public-doesnt-understand-income-tax-new-data/
-    lecture: seconde-main
+    lecture: originale
 motifs:
   - taux-et-niveau
 cree: 2026-10-31
@@ -56,6 +56,8 @@ faire perdre de l’argent.
 L’administration fiscale française affiche désormais le taux moyen et le taux
 marginal sur l’avis d’impôt, et explique la différence sur impots.gouv.fr.
 Aucun sondage français sur cette confusion n’a été trouvé. À l’étranger, elle
-est mesurée : en 2024, un sondage commandé par Tax Policy Associates montre
-que 49 % des Britanniques croient que le taux supérieur s’applique à tout le
-revenu, et des enquêtes américaines aboutissent à des résultats comparables.
+est mesurée : en 2024, dans un sondage réalisé par WeThink pour Tax Policy
+Associates, 49 % des Britanniques interrogés pensent qu’1 £ de revenu en plus,
+qui fait passer dans la tranche à 40 %, entraîne beaucoup d’impôt en plus.
+Tax Policy Associates en conclut que la moitié des électeurs croient que le
+taux supérieur s’applique à tout le revenu.

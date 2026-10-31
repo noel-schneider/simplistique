@@ -13,7 +13,13 @@ sources:
   - auteur: "Gwénaële Calvès"
     annee: 2004
     titre: "La discrimination positive"
-    objet: "coll. Que sais-je ?, PUF"
+    objet: "PUF, coll. « Que sais-je ? », n° 3712"
+    lecture: seconde-main
+  - auteur: "Gwénaële Calvès"
+    annee: 2005
+    titre: "Qu’est-ce que la discrimination positive ?"
+    objet: "Alternatives Économiques, janvier 2005, repris par l’Observatoire des inégalités"
+    url: https://www.inegalites.fr/Qu-est-ce-que-la-discrimination-positive
     lecture: seconde-main
 motifs:
   - positif-et-negatif
@@ -58,5 +64,7 @@ des « mesures prévoyant des avantages spécifiques », et les directives
 d’égalité de traitement parlent d’« action positive ». Au Québec, le terme
 officiel est « programme d’accès à l’égalité ». En France, la juriste
 Gwénaële Calvès a analysé l’expression et ses usages (*La discrimination
-positive*, 2004, PUF, coll. « Que sais-je ? »). L’Observatoire des inégalités
-qualifie le débat français d’« extrême confusion ».
+positive*, 2004, PUF, coll. « Que sais-je ? »). Dans un article de 2005, repris
+par l’Observatoire des inégalités, elle rappelle que l’*affirmative action*
+recouvre « une série de mesures préférentielles qui poursuivent un triple
+objectif ».

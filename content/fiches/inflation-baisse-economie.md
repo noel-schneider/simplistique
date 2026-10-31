@@ -11,9 +11,11 @@ accroche: "Quand l’inflation baisse, les prix montent moins vite, mais un peu 
 suggestions:
   - les prix augmentent moins vite
 sources:
-  - auteur: "Runge, da Silva Gomes et Hughes"
-    annee: 2022
-    objet: "enquête YouGov réalisée pour le NIESR sur un titre annonçant une baisse de l’inflation"
+  - auteur: "Johnny Runge, Eliza da Silva Gomes et Mike Hughes"
+    annee: 2023
+    titre: "Public Understanding of Economics and Economic Statistics After the COVID-19 Pandemic"
+    objet: "ESCoE Discussion Paper 2023-13, enquête YouGov d’août 2022"
+    url: https://www.escoe.ac.uk/publications/public-understanding-of-economics-and-economic-statistics-after-the-covid-19-pandemic/
     lecture: seconde-main
 motifs:
   - taux-et-niveau
@@ -48,10 +50,11 @@ aussi que l’inflation reste positive, ce qui n’est pas toujours vrai.
 
 ## D’où ça vient
 
-En 2022, une enquête YouGov réalisée au Royaume-Uni pour des chercheurs du
-NIESR (Runge, da Silva Gomes et Hughes) teste un titre annonçant une baisse de
-l’inflation. Environ la moitié des personnes interrogées comprennent que les
-prix montent moins vite, et un peu plus d’un tiers croient que les prix ont
-baissé. En France, la Banque de France documente un écart persistant entre
+En août 2022, une enquête YouGov menée au Royaume-Uni auprès de 2 007 adultes
+par des chercheurs du NIESR, pour l’ESCoE (financé par l’ONS), teste une
+phrase annonçant que l’inflation est passée de 10,1 % à 6,1 %. Seuls 44 % des
+personnes interrogées comprennent que les prix montent encore, mais moins
+vite, et 36 % croient que les prix ont baissé (Runge, da Silva Gomes et
+Hughes, 2023). En France, la Banque de France documente un écart persistant entre
 l’inflation perçue et l’inflation mesurée, sans isoler la part qui tient au
 vocabulaire.

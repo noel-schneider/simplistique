@@ -16,6 +16,7 @@ sources:
   - auteur: "Ian Hacking"
     annee: 1990
     titre: "The Taming of Chance"
+    url: https://doi.org/10.1017/CBO9780511819766
     lecture: seconde-main
 motifs:
   - normal-et-naturel
@@ -56,5 +57,6 @@ liée à l’histoire du mot mais distincte.
 La distinction est au cœur de *Le normal et le pathologique* de Georges
 Canguilhem (1943, augmenté en 1966). Selon lui, il n’y a pas de fait normal
 ou pathologique en soi : la norme est posée, pas constatée. Ian Hacking (*The
-Taming of Chance*, 1990) montre comment la statistique du XIXe siècle a fait
-passer « normal » du sens de moyenne au sens de norme à atteindre.
+Taming of Chance*, 1990) montre comment, au XIXe siècle, « normal », d’abord
+terme médical opposé à « pathologique », en est venu, avec la statistique, à
+désigner à la fois la moyenne et l’état idéal.

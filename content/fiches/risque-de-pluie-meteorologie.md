@@ -12,10 +12,10 @@ accroche: "En 2005, sur cinq villes interrogées, seuls les New-Yorkais comprena
 suggestions:
   - il pleut 3 jours sur 10 comme celui-ci
 sources:
-  - auteur: "Gerd Gigerenzer et coll."
+  - auteur: "Gerd Gigerenzer, Ralph Hertwig, Eva van den Broek, Barbara Fasolo et Konstantinos V. Katsikopoulos"
     annee: 2005
-    titre: "A 30% chance of rain tomorrow"
-    url: https://econpapers.repec.org/RePEc:wly:riskan:v:25:y:2005:i:3:p:623-629
+    titre: "“A 30% chance of rain tomorrow”: how does the public understand probabilistic weather forecasts?"
+    url: https://doi.org/10.1111/j.1539-6924.2005.00608.x
     lecture: seconde-main
 cree: 2026-10-31
 modifie: 2026-10-31
@@ -29,15 +29,16 @@ fois sur dix. C’est une probabilité sur un seul événement : pleuvra-t-il ou
 non demain ?
 
 Le pourcentage ne dit pas à quoi il s’applique, et chacun complète à sa façon.
-Certains comprennent qu’il pleuvra 30 % de la journée, d’autres sur 30 % de la
-région, d’autres encore qu’il tombera 30 % de la quantité habituelle.
+Certains comprennent qu’il pleuvra 30 % du temps, d’autres sur 30 % de la
+région.
 
 ## Suggestion
 
 Dire la classe de référence en toutes lettres : « il pleut 3 jours sur 10
-comme celui-ci ». C’est la reformulation recommandée par les chercheurs qui
-ont étudié le problème. Elle tient en peu de mots et coupe court aux
-interprétations par la durée ou la surface.
+comme celui-ci ». Les chercheurs qui ont étudié le problème recommandent de
+préciser la classe de référence, et cette formule en est l’application
+directe. Elle tient en peu de mots et coupe court aux interprétations par la
+durée ou la surface.
 
 ## Risques
 
@@ -52,6 +53,6 @@ touchée, ce que la reformulation simplifie.
 En 2005, Gerd Gigerenzer et ses collègues interrogent des passants à
 Amsterdam, Athènes, Berlin, Milan et New York (« A 30% chance of rain
 tomorrow », *Risk Analysis*). Seuls les New-Yorkais donnent majoritairement
-l’interprétation des météorologues. Dans chacune des villes européennes,
-c’est au contraire l’interprétation jugée la moins plausible. Les auteurs
+l’interprétation des météorologues. Dans les villes européennes, c’est au
+contraire l’interprétation jugée la moins plausible. Les auteurs
 concluent qu’il faut préciser à quoi s’applique la probabilité.

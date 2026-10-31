@@ -5,8 +5,9 @@ confusion: nom-historique
 statut: propose
 preuve: documentee
 resume: >
-  Nom donné par dénigrement à des nombres aussi réels que les autres. Gauss
-  jugeait déjà ce vocabulaire responsable de leur réputation d’obscurité.
+  Nom donné à des nombres auxquels « aucune quantité » ne correspondrait, alors
+  qu’ils sont aussi réels que les autres. Gauss jugeait déjà ce vocabulaire
+  responsable de leur réputation d’obscurité.
 accroche: "Gauss écrit que l’obscurité entourant les nombres imaginaires tient à une terminologie mal adaptée."
 suggestions:
   - nombre latéral
@@ -14,10 +15,12 @@ sources:
   - auteur: "René Descartes"
     annee: 1637
     titre: "La Géométrie"
-    lecture: seconde-main
+    url: https://www.gutenberg.org/ebooks/26400
+    lecture: originale
   - auteur: "Carl Friedrich Gauss"
     annee: 1831
-    objet: "mémoire sur les résidus biquadratiques, vers 1831"
+    objet: "compte rendu par Gauss de sa Theoria residuorum biquadraticorum, commentatio secunda, Göttingische gelehrte Anzeigen, 23 avril 1831 (Werke II, p. 177-178)"
+    url: https://archive.org/details/bub_gb_qg9_iiEO0mQC
     lecture: seconde-main
 cree: 2026-10-31
 modifie: 2026-10-31
@@ -50,8 +53,10 @@ serait par ailleurs bancale, puisque « réel » resterait.
 ## D’où ça vient
 
 Descartes emploie le mot en 1637 dans *La Géométrie*, pour qualifier des
-racines qu’il juge impossibles à se représenter. Vers 1831, dans un mémoire
-sur les résidus biquadratiques, Gauss écrit que l’obscurité qui entoure ces
+racines auxquelles ne correspond aucune quantité : on peut les « imaginer »,
+écrit-il, mais il n’y a « aucune quantité qui corresponde à celles qu’on
+imagine ». En 1831, dans le compte rendu de son second mémoire sur les
+résidus biquadratiques, Gauss écrit que l’obscurité qui entoure ces
 nombres tient à une terminologie mal adaptée. Il ajoute que si l’on avait
 parlé d’unités directe, inverse et latérale, cette obscurité n’aurait pas
 existé.

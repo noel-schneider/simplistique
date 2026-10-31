@@ -13,7 +13,7 @@ sources:
     annee: 2016
     titre: "The Heritability Fallacy"
     url: https://scholarship.claremont.edu/pitzer_fac_pub/193
-    lecture: seconde-main
+    lecture: originale
 cree: 2026-10-31
 modifie: 2026-10-31
 ---
@@ -51,4 +51,5 @@ Le concept s’est construit au début du XXe siècle, avec la génétique des
 populations, et le terme s’est fixé dans les années 1930-1940, notamment chez
 Jay Lush en sélection animale. En 2016, David S. Moore et David Shenk le
 qualifient de « l’un des termes les plus trompeurs de l’histoire des
-sciences » (« The Heritability Fallacy », *WIREs Cognitive Science*).
+sciences », tel qu’il est employé aujourd’hui en génétique du comportement
+humain (« The Heritability Fallacy », *WIREs Cognitive Science*).

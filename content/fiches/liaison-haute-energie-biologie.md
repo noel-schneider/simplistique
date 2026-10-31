@@ -13,6 +13,7 @@ sources:
   - auteur: "Hill et Morales"
     annee: 1951
     titre: "On “High Energy Phosphate Bonds” of Biochemical Interest"
+    url: https://doi.org/10.1021/ja01148a072
     lecture: seconde-main
   - auteur: "Dreyfus et coll."
     annee: 2012
