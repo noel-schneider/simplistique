@@ -10,7 +10,7 @@ resume: >
 suggestions: []
 sources:
   - auteur: "Georges Canguilhem"
-    annee: 1943
+    annee: 1966
     titre: "Le normal et le pathologique"
     lecture: seconde-main
   - auteur: "Ian Hacking"

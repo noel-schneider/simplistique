@@ -34,9 +34,11 @@ mot devenu péjoratif, et l’expression se contredit.
 
 ## Ce qu’on peut en tirer
 
-Les fiches proposent chaque fois de nommer ce que fait la chose plutôt que
-son signe : « boucle de renforcement » et « boucle d’équilibrage »,
-« renforcement par fuite » ou « par évitement », « recul du PIB » ou « baisse
-de l’activité », « action positive ». Mais le signe a aussi un sens précis
-dans le jargon des spécialistes, et les fiches précisent que le renommage vise
-d’abord la vulgarisation et l’enseignement.
+Plusieurs fiches proposent de nommer ce que fait la chose plutôt que son
+signe : « boucle de renforcement » et « boucle d’équilibrage », « renforcement
+par fuite » ou « par évitement », « recul du PIB » ou « baisse de l’activité ».
+D’autres gardent un signe mais le rendent explicite : « faux positif » et
+« faux négatif », « action positive ». Le signe garde aussi un sens précis chez
+les spécialistes : la fiche « rétroaction positive / négative » rappelle que
+les ingénieurs le manipulent sans contresens, et que son renommage vise d’abord
+la vulgarisation et l’enseignement.

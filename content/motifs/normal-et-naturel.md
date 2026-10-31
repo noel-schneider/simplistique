@@ -24,9 +24,11 @@ imposé, l’a lui-même regretté. La fiche « naturel » (philosophie) en donn
 version morale et sanitaire : l’argument « c’est naturel » profite du
 voisinage de plusieurs sens, et l’amanite phalloïde est bio, locale et de
 saison, tout en restant mortelle. La fiche « sophisme naturaliste »
-(philosophie) montre que le nom de l’erreur est lui-même un faux ami, car il
-ne désigne pas l’argument « c’est naturel donc c’est bien », appelé « appel à
-la nature ».
+(philosophie) montre que le nom de l’erreur est lui-même un faux ami. Chez
+G. E. Moore, l’expression désigne le fait de définir le bien par une autre
+propriété, naturelle ou non ; dans l’usage courant, elle a fini par désigner
+l’« appel à la nature » (« c’est naturel, donc c’est bien »), qui est autre
+chose.
 
 ## Ce qu’on peut en tirer
 
