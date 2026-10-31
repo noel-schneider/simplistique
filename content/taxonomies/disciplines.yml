@@ -22,3 +22,45 @@
   description: >
     Discipline jeune au jargon encore mouvant, où les termes se fixent en ce
     moment même.
+- slug: statistiques
+  nom: Statistiques
+  couleur: '#c2417a'
+  description: >
+    Discipline outil de toutes les sciences empiriques, dont le vocabulaire
+    déborde dans la presse et le débat public, avec ses contresens.
+- slug: systemique
+  nom: Systémique
+  couleur: '#d4a017'
+  description: >
+    Étude des systèmes et de leurs boucles, partagée entre l'automatique, la
+    biologie et l'écologie, chacune avec ses habitudes de vocabulaire.
+- slug: droit
+  nom: Droit
+  couleur: '#6b7a8f'
+  description: >
+    Vocabulaire fixé par les textes, où un mot mal choisi se retrouve gravé
+    dans la loi et dans le débat politique.
+- slug: philosophie
+  nom: Philosophie
+  couleur: '#8a6d3b'
+  description: >
+    Les mots que la philosophie analyse sont souvent ceux de tout le monde,
+    et leurs ambiguïtés passent dans chaque argument.
+- slug: biologie
+  nom: Biologie
+  couleur: '#4a9d3f'
+  description: >
+    Discipline foisonnante, dont certains couples de termes datent du milieu
+    du XXe siècle et sont encore discutés.
+- slug: psychologie
+  nom: Psychologie
+  couleur: '#d65c5c'
+  description: >
+    Vocabulaire hérité en partie de la clinique et de la psychanalyse,
+    réemployé par la psychologie scientifique.
+- slug: economie
+  nom: Économie
+  couleur: '#2f8fa8'
+  description: >
+    Termes techniques que chacun manipule au quotidien sans toujours savoir
+    ce qu'ils découpent.
