@@ -1,3 +1,4 @@
+import { typographier } from '@/lib/typographie'
 import { STATUTS, type Discipline, type EntreeTaxonomie, type FicheIndex, type Statut } from '@/lib/content/schema'
 
 const RAYON = 7
@@ -52,14 +53,15 @@ function Zone({
         {fiches.map((fiche, i) => {
           const style = styleStatut(fiche.statut, discipline.couleur)
           const nomStatut = libellesStatuts.get(fiche.statut) ?? fiche.statut
+          const terme = typographier(fiche.terme)
           return (
             <a
               key={fiche.slug}
               className="point-fiche"
               href={`/fiches/${fiche.slug}`}
-              aria-label={`${fiche.terme} — ${nomStatut}`}
+              aria-label={`${terme} — ${nomStatut}`}
             >
-              <title>{`${fiche.terme} — ${nomStatut}`}</title>
+              <title>{`${terme} — ${nomStatut}`}</title>
               <circle
                 cx={(i % COLONNES) * PAS + PAS / 2}
                 cy={Math.floor(i / COLONNES) * PAS + PAS / 2}

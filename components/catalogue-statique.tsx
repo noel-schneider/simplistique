@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { BadgeStatut } from './badge-statut'
 import { PastilleDemonstration } from './pastille-demonstration'
+import { typographier } from '@/lib/typographie'
 import type { Discipline, EntreeTaxonomie, FicheIndex } from '@/lib/content/schema'
 
 // Contenu de secours du <Suspense> qui enveloppe <Corpus> dans
@@ -56,7 +57,7 @@ export function CatalogueStatique({
               <tr key={fiche.slug} className="border-b border-stone-200 align-baseline">
                 <td className="py-2 pr-4">
                   <Link href={`/fiches/${fiche.slug}`} className="font-medium underline">
-                    {fiche.terme}
+                    {typographier(fiche.terme)}
                   </Link>
                   {fiche.demonstration && <PastilleDemonstration />}
                 </td>
@@ -73,7 +74,7 @@ export function CatalogueStatique({
                   {fiche.chantier ? libellesChantiers.get(fiche.chantier) ?? fiche.chantier : ''}
                 </td>
                 <td className="py-2 text-stone-600">
-                  {fiche.suggestions.length > 0 ? fiche.suggestions.join(', ') : '—'}
+                  {fiche.suggestions.length > 0 ? typographier(fiche.suggestions.join(', ')) : '—'}
                 </td>
               </tr>
             ))}
