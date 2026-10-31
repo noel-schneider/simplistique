@@ -3,12 +3,18 @@ terme: erreur de type I / type II
 discipline: statistiques
 confusion: jargon-opaque
 statut: propose
+preuve: documentee
 resume: >
   Deux erreurs fondamentales, numérotées sans logique : rien dans « type I » ne
   dit qu’il s’agit d’une fausse alarme, ni dans « type II » d’un oubli.
 suggestions:
   - faux positif / faux négatif
   - fausse alarme / omission
+sources:
+  - auteur: "Tom Stafford"
+    annee: 2015
+    titre: "Propos sur les erreurs de type I et de type II (Mind Hacks)"
+    lecture: seconde-main
 cree: 2026-10-31
 modifie: 2026-10-31
 ---

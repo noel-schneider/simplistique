@@ -3,7 +3,7 @@
 import type { Criteres } from '@/lib/filtrage'
 
 type Groupe = {
-  cle: 'disciplines' | 'confusions' | 'statuts' | 'chantiers'
+  cle: 'disciplines' | 'confusions' | 'statuts' | 'preuves' | 'chantiers'
   libelle: string
   entrees: { slug: string; nom: string }[]
 }

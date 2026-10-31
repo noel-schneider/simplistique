@@ -3,11 +3,21 @@ terme: assouplissement quantitatif
 discipline: economie
 confusion: jargon-opaque
 statut: propose
+preuve: documentee
 resume: >
   Le nom ne dit pas ce que fait la banque centrale, et il nourrit l’idée fausse
   d’une « planche à billets ». Bernanke jugeait lui-même le terme inapproprié.
 suggestions:
   - assouplissement du crédit
+sources:
+  - auteur: "Ben Bernanke"
+    annee: 2010
+    titre: "Propos sur l’emploi de l’expression « quantitative easing » pour la politique de la Fed"
+    lecture: seconde-main
+  - auteur: "Silvana Tenreyro"
+    annee: 2023
+    titre: "Propos sur l’image de la planche à billets et l’échange d’actifs"
+    lecture: seconde-main
 cree: 2026-10-31
 modifie: 2026-10-31
 ---

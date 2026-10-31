@@ -3,6 +3,7 @@ terme: ticket modérateur
 discipline: sante
 confusion: jargon-opaque
 statut: pointe
+preuve: intuition
 resume: >
   Ni ticket ni modération visibles : le terme désigne la part des soins qui
   reste à payer après le remboursement de l’Assurance maladie.

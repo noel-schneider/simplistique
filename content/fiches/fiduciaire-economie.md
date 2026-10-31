@@ -3,6 +3,7 @@ terme: monnaie fiduciaire / monnaie scripturale
 discipline: economie
 confusion: jargon-opaque
 statut: pointe
+preuve: intuition
 resume: >
   « Fiduciaire » désigne les billets et pièces, « scripturale » l’argent sur
   les comptes : aucun des deux mots ne laisse deviner ce qu’il désigne.

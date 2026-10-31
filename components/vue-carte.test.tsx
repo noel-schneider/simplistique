@@ -22,6 +22,7 @@ function fiche(p: Partial<FicheIndex>): FicheIndex {
     discipline: 'mathematiques',
     confusion: 'faux-ami-courant',
     statut: 'pointe',
+    preuve: 'documentee',
     resume: '',
     suggestions: [],
     ...p,

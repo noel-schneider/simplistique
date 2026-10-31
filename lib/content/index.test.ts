@@ -19,7 +19,7 @@ describe('getIndex', () => {
 
   it('expose exactement les champs attendus', () => {
     expect(Object.keys(index[0]).sort()).toEqual(
-      ['chantier', 'confusion', 'demonstration', 'discipline', 'resume', 'slug', 'statut',
+      ['chantier', 'confusion', 'demonstration', 'discipline', 'preuve', 'resume', 'slug', 'statut',
       'suggestions', 'terme'],
     )
   })

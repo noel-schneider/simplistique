@@ -3,10 +3,17 @@ terme: ouvert / fermé
 discipline: mathematiques
 confusion: paire-bancale
 statut: pointe
+preuve: documentee
 resume: >
   En topologie, « ouvert » et « fermé » ne sont pas contraires : un ensemble peut
   être les deux à la fois, ou ni l’un ni l’autre.
 suggestions: []
+sources:
+  - auteur: "Evelyn Lamb"
+    annee: 2013
+    titre: "Can a Closed Set Be Open? (Scientific American)"
+    url: https://www.scientificamerican.com/blog/roots-of-unity/can-a-closed-set-be-open-can-an-open-set-be-closed-when-math-and-language-collide
+    lecture: originale
 cree: 2026-10-31
 modifie: 2026-10-31
 ---

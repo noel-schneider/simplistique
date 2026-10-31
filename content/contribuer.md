@@ -36,9 +36,19 @@ continue qui vérifie, sans discussion possible :
 
 - Le nom de fichier : `content/fiches/<terme>-<discipline>.md`, en minuscules,
   sans accent.
-- Les neuf champs du front-matter : `terme`, `discipline`, `confusion`,
-  `statut`, `resume`, `suggestions`, `cree`, `modifie`, et `chantier` qui est
-  le seul facultatif.
+- Les champs du front-matter. Requis : `terme`, `discipline`, `confusion`,
+  `statut`, `preuve`, `resume`, `suggestions`, `cree`, `modifie`. Facultatifs :
+  `chantier` et `sources`.
+- `preuve` : le niveau d’appui de l’analyse, parmi trois valeurs.
+  `intuition` : l’analyse vient de l’auteur de la fiche. `documentee` : un
+  spécialiste de la discipline a écrit que ce nom pose problème. `mesuree` :
+  une enquête ou une expérience chiffre la confusion.
+- `sources` : une liste de références, chacune avec `auteur`, `annee` (entier,
+  1500 ou plus), `titre`, `lecture` et, si possible, `url` (adresse http ou
+  https). `lecture` vaut `originale` si vous avez lu la source elle-même, ou
+  `seconde-main` si vous la connaissez par un autre texte ; le site affiche
+  cette mention au lecteur. Une fiche `documentee` ou `mesuree` sans aucune
+  source provoque un avertissement.
 - `resume` : 240 caractères maximum.
 - `discipline` et `confusion` : doivent exister dans `content/taxonomies/`.
 - `chantier`, s’il est présent : doit désigner un fichier existant de

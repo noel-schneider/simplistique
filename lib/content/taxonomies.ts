@@ -5,6 +5,7 @@ import type { ZodType } from 'zod'
 import {
   schemaDiscipline,
   schemaEntreeTaxonomie,
+  PREUVES,
   STATUTS,
   type Discipline,
   type EntreeTaxonomie,
@@ -64,8 +65,17 @@ export function chargerTaxonomies(dossier: string = DOSSIER_CONTENU): Taxonomies
     throw new Error(`statuts.yml : doit contenir exactement ${attendus}, trouvé ${trouves || '(rien)'}`)
   }
 
+  const preuves = chargerListe<EntreeTaxonomie>(dossier, 'preuves.yml', schemaEntreeTaxonomie)
+  const preuvesAttendues = [...PREUVES].sort().join(',')
+  const preuvesTrouvees = preuves.map((p) => p.slug).sort().join(',')
+  if (preuvesAttendues !== preuvesTrouvees) {
+    throw new Error(
+      `preuves.yml doit contenir exactement ${preuvesAttendues}, trouvé ${preuvesTrouvees || '(rien)'}`,
+    )
+  }
+
   if (disciplines.length === 0) throw new Error('disciplines.yml : au moins une discipline est requise')
   if (confusions.length === 0) throw new Error('confusions.yml : au moins un type de confusion est requis')
 
-  return { disciplines, confusions, statuts }
+  return { disciplines, confusions, statuts, preuves }
 }

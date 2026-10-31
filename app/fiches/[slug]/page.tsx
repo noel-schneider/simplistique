@@ -5,6 +5,7 @@ import { BandeauChantier } from '@/components/bandeau-chantier'
 import { BandeauDemonstration } from '@/components/bandeau-demonstration'
 import { EnteteFiche } from '@/components/entete-fiche'
 import { Prose } from '@/components/prose'
+import { Sources } from '@/components/sources'
 import { Votes } from '@/components/votes'
 import { getChantier } from '@/lib/content/chantiers'
 import { getFiche, getFiches } from '@/lib/content/fiches'
@@ -59,10 +60,12 @@ export default async function PageFiche({ params }: Params) {
         nomDiscipline={nomDe(taxonomies.disciplines, fiche.discipline)}
         nomConfusion={nomDe(taxonomies.confusions, fiche.confusion)}
         nomStatut={nomDe(taxonomies.statuts, fiche.statut)}
+        nomPreuve={nomDe(taxonomies.preuves, fiche.preuve)}
       />
       {fiche.demonstration && <BandeauDemonstration />}
       {chantier && <BandeauChantier slug={chantier.slug} nom={chantier.nom} />}
       <Prose html={await rendreMarkdown(fiche.corps)} />
+      <Sources sources={fiche.sources} />
       <Votes
         fiche={fiche.slug}
         alternatives={fiche.suggestions.map((texte) => ({

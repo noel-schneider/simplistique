@@ -3,6 +3,7 @@ terme: à consommer de préférence avant
 discipline: alimentation
 confusion: paire-bancale
 statut: propose
+preuve: mesuree
 resume: >
   Deux dates presque identiques sur les étiquettes, l’une de sécurité, l’autre
   de qualité. Moins d’un Européen sur deux sait les distinguer, et des tonnes
@@ -10,6 +11,19 @@ resume: >
 suggestions:
   - pour une dégustation optimale, avant… / peut être consommé après cette date
   - meilleur avant… / souvent bon après
+sources:
+  - auteur: "Parlement européen et Conseil"
+    annee: 2011
+    titre: "Règlement (UE) n° 1169/2011 (INCO)"
+    lecture: seconde-main
+  - auteur: "Commission européenne"
+    annee: 2015
+    titre: "Eurobaromètre : compréhension de la mention « à consommer de préférence avant »"
+    lecture: seconde-main
+  - auteur: "Commission européenne"
+    annee: 2018
+    titre: "Estimation de la part du gaspillage alimentaire liée au marquage des dates"
+    lecture: seconde-main
 cree: 2026-10-31
 modifie: 2026-10-31
 ---

@@ -26,6 +26,11 @@ const disciplines = [
   { slug: 'escalade', nom: 'Escalade', couleur: '#3fa08a', description: 'b' },
 ]
 const confusions = [{ slug: 'faux-ami-courant', nom: 'Faux ami courant', description: 'c' }]
+const preuves = [
+  { slug: 'intuition', nom: 'Intuition d’auteur', description: 'g' },
+  { slug: 'documentee', nom: 'Documentée par des spécialistes', description: 'h' },
+  { slug: 'mesuree', nom: 'Mesurée', description: 'i' },
+]
 const statuts = [
   { slug: 'pointe', nom: 'Pointé', description: 'd' },
   { slug: 'propose', nom: 'Proposé', description: 'e' },
@@ -39,6 +44,7 @@ function fiche(p: Partial<FicheIndex>): FicheIndex {
     discipline: 'mathematiques',
     confusion: 'faux-ami-courant',
     statut: 'pointe',
+    preuve: 'documentee',
     resume: '',
     suggestions: [],
     ...p,
@@ -60,6 +66,7 @@ function elementCorpus() {
       disciplines={disciplines}
       confusions={confusions}
       statuts={statuts}
+      preuves={preuves}
       chantiers={[]}
     />
   )
@@ -113,6 +120,7 @@ describe('Corpus — filtres et URL', () => {
         disciplines={disciplines}
         confusions={confusions}
         statuts={statuts}
+        preuves={preuves}
         chantiers={[{ slug: 'vocabulaire-du-bilan', nom: 'Le vocabulaire du bilan' }]}
       />,
     )
@@ -137,6 +145,7 @@ describe('Corpus — filtres et URL', () => {
         disciplines={disciplines}
         confusions={confusions}
         statuts={statuts}
+        preuves={preuves}
         chantiers={[{ slug: 'vocabulaire-du-bilan', nom: 'Le vocabulaire du bilan' }]}
       />,
     )

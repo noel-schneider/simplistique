@@ -14,6 +14,7 @@ const valides: SlugsValides = {
   disciplines: ['mathematiques', 'comptabilite', 'theorie-musicale', 'escalade'],
   confusions: ['faux-ami-courant', 'polysemie-externe'],
   statuts: ['pointe', 'propose', 'rejete'],
+  preuves: ['intuition', 'documentee', 'mesuree'],
   chantiers: [],
 }
 
@@ -24,6 +25,7 @@ function fiche(p: Partial<FicheIndex>): FicheIndex {
     discipline: 'mathematiques',
     confusion: 'faux-ami-courant',
     statut: 'pointe',
+    preuve: 'documentee',
     resume: '',
     suggestions: [],
     ...p,
@@ -193,7 +195,7 @@ describe('ecrireCriteres', () => {
   })
 
   it('fait l\'aller-retour avec analyserCriteres', () => {
-    const criteres = { disciplines: ['escalade'], confusions: [], statuts: ['pointe'], chantiers: [], q: 'mesure' }
+    const criteres = { disciplines: ['escalade'], confusions: [], statuts: ['pointe'], preuves: [], chantiers: [], q: 'mesure' }
     expect(analyserCriteres(new URLSearchParams(ecrireCriteres(criteres)), valides)).toEqual(criteres)
   })
 })
@@ -214,12 +216,13 @@ describe('le critère chantier', () => {
     disciplines: ['comptabilite', 'mathematiques'],
     confusions: ['faux-ami-courant'],
     statuts: ['pointe', 'propose'],
+    preuves: ['intuition', 'documentee', 'mesuree'],
     chantiers: ['vocabulaire-du-bilan'],
   }
 
   const INDEX = [
-    { slug: 'actif-comptabilite', terme: 'actif', discipline: 'comptabilite', confusion: 'faux-ami-courant', statut: 'propose' as const, resume: 'a', suggestions: [], chantier: 'vocabulaire-du-bilan' },
-    { slug: 'groupe-mathematiques', terme: 'groupe', discipline: 'mathematiques', confusion: 'faux-ami-courant', statut: 'pointe' as const, resume: 'b', suggestions: [] },
+    { slug: 'actif-comptabilite', terme: 'actif', discipline: 'comptabilite', confusion: 'faux-ami-courant', statut: 'propose' as const, preuve: 'intuition' as const, resume: 'a', suggestions: [], chantier: 'vocabulaire-du-bilan' },
+    { slug: 'groupe-mathematiques', terme: 'groupe', discipline: 'mathematiques', confusion: 'faux-ami-courant', statut: 'pointe' as const, preuve: 'documentee' as const, resume: 'b', suggestions: [] },
   ]
 
   it('lit le paramètre chantier de l’URL', () => {
@@ -262,6 +265,7 @@ describe('le critère chantier', () => {
         discipline: 'theorie-musicale',
         confusion: 'faux-ami-courant',
         statut: 'pointe' as const,
+        preuve: 'intuition' as const,
         resume: 'c',
         suggestions: [],
         chantier: 'un-autre-chantier',
@@ -269,5 +273,31 @@ describe('le critère chantier', () => {
     ]
     const filtrees = filtrerFiches(index, { ...CRITERES_VIDES, chantiers: ['vocabulaire-du-bilan'] })
     expect(filtrees.map((f) => f.slug)).toEqual(['actif-comptabilite'])
+  })
+})
+
+describe('le critère preuve', () => {
+  const INDEX = [
+    fiche({ slug: 'a', terme: 'a', preuve: 'intuition' }),
+    fiche({ slug: 'b', terme: 'b', preuve: 'mesuree' }),
+  ]
+
+  it('filtre par preuve', () => {
+    const filtrees = filtrerFiches(INDEX, { ...CRITERES_VIDES, preuves: ['mesuree'] })
+    expect(filtrees.map((f) => f.slug)).toEqual(['b'])
+  })
+
+  it('ignore une preuve inconnue dans l’URL', () => {
+    expect(analyserCriteres(new URLSearchParams('preuve=forte'), valides).preuves).toEqual([])
+  })
+
+  it('écrit ?preuve= et le relit', () => {
+    const requete = ecrireCriteres({ ...CRITERES_VIDES, preuves: ['documentee', 'mesuree'] })
+    expect(requete).toBe('preuve=documentee%2Cmesuree')
+    expect(analyserCriteres(new URLSearchParams(requete), valides).preuves).toEqual([
+      'documentee',
+      'mesuree',
+    ])
+    expect(aUnFiltre({ ...CRITERES_VIDES, preuves: ['mesuree'] })).toBe(true)
   })
 })

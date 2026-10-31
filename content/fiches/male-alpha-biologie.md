@@ -3,11 +3,22 @@ terme: mâle alpha
 discipline: biologie
 confusion: nom-historique
 statut: propose
+preuve: documentee
 resume: >
   Terme issu de loups captifs réunis artificiellement. Dans la nature, une
   meute est une famille, et ses « alphas » sont simplement les parents.
 suggestions:
   - mâle reproducteur / femelle reproductrice
+sources:
+  - auteur: "David Mech"
+    annee: 1970
+    titre: "The Wolf"
+    lecture: seconde-main
+  - auteur: "David Mech"
+    annee: 1999
+    titre: "Alpha status, dominance, and division of labor in wolf packs (Canadian Journal of Zoology)"
+    url: https://pubs.usgs.gov/publication/1001725
+    lecture: seconde-main
 cree: 2026-10-31
 modifie: 2026-10-31
 ---

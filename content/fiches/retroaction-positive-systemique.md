@@ -3,12 +3,19 @@ terme: rétroaction positive / négative
 discipline: systemique
 confusion: faux-ami-courant
 statut: propose
+preuve: documentee
 resume: >
   « Positive » veut dire « qui amplifie », pas « bénéfique » : un cercle vicieux
   est une rétroaction positive, et le thermostat une rétroaction négative.
 suggestions:
   - boucle de renforcement / boucle d’équilibrage
   - boucle amplificatrice / boucle stabilisatrice
+sources:
+  - auteur: "Mark Milanick"
+    annee: 2020
+    titre: "Confusing Science Vocabulary: When Negative Is Positive! (Journal of College Science Teaching)"
+    url: https://www.nsta.org/journal-college-science-teaching/journal-college-science-teaching-januaryfebruary-2020/confusing
+    lecture: originale
 cree: 2026-10-31
 modifie: 2026-10-31
 ---

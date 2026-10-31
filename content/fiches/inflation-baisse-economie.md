@@ -3,11 +3,17 @@ terme: l’inflation baisse
 discipline: economie
 confusion: faux-ami-courant
 statut: propose
+preuve: mesuree
 resume: >
   Quand l’inflation baisse, les prix ne baissent pas : ils montent moins vite.
   Une part importante du public comprend l’inverse.
 suggestions:
   - les prix augmentent moins vite
+sources:
+  - auteur: "Runge, da Silva Gomes et Hughes"
+    annee: 2022
+    titre: "Enquête YouGov (NIESR) sur la compréhension d’un titre annonçant une baisse de l’inflation"
+    lecture: seconde-main
 cree: 2026-10-31
 modifie: 2026-10-31
 ---

@@ -4,6 +4,7 @@ discipline: comptabilite
 confusion: faux-ami-courant
 chantier: vocabulaire-du-bilan
 statut: propose
+preuve: intuition
 resume: >
   Adjectif courant employé comme nom pour désigner ce que l’entreprise
   possède, sans que rien dans le mot ne l’indique.

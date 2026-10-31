@@ -3,6 +3,7 @@ terme: discrimination positive
 discipline: droit
 confusion: faux-ami-courant
 statut: propose
+preuve: documentee
 resume: >
   « Discrimination » a pris dans l’usage le sens de traitement injuste :
   l’expression désigne donc son correctif par le nom du tort qu’il corrige.

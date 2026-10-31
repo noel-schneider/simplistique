@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { Chantier, Fiche } from '../lib/content/schema'
+import type { Chantier, Fiche, Source } from '../lib/content/schema'
 import { verifierChantiers, verifierCoherence, verifierCorpus, verifierDocuments } from './coherence'
 import { getFiches } from '../lib/content/fiches'
 import { DOSSIER_CONTENU } from '../lib/content/taxonomies'
@@ -11,6 +11,8 @@ function fiche(p: Partial<Fiche> = {}): Fiche {
     discipline: 'mathematiques',
     confusion: 'faux-ami-courant',
     statut: 'pointe',
+    preuve: 'intuition',
+    sources: [],
     resume: 'court',
     suggestions: [],
     cree: new Date('2026-10-03'),
@@ -19,6 +21,43 @@ function fiche(p: Partial<Fiche> = {}): Fiche {
     ...p,
   }
 }
+
+describe('preuve et sources', () => {
+  const source = (p: Partial<Source> = {}): Source => ({
+    auteur: 'Okun',
+    annee: 1989,
+    titre: 'Le mot « relativité »',
+    lecture: 'originale',
+    ...p,
+  })
+
+  it('avertit si preuve documentee ou mesuree sans source', () => {
+    for (const preuve of ['documentee', 'mesuree'] as const) {
+      const a = verifierCoherence(fiche({ preuve, sources: [] }))
+      expect(a.map((x) => x.message).join()).toMatch(/source/)
+    }
+  })
+
+  it('liste chaque source lue de seconde main', () => {
+    const a = verifierCoherence(
+      fiche({
+        preuve: 'documentee',
+        sources: [
+          source({ auteur: 'Sidman', annee: 2006, lecture: 'seconde-main' }),
+          source({ auteur: 'Carroll', annee: 2003, lecture: 'seconde-main' }),
+          source({ auteur: 'Okun', annee: 1989 }),
+        ],
+      }),
+    )
+    expect(a).toHaveLength(2)
+    expect(a[0].message).toMatch(/Sidman.*2006/)
+    expect(a[1].message).toMatch(/Carroll.*2003/)
+  })
+
+  it('n’avertit pas une intuition sans source', () => {
+    expect(verifierCoherence(fiche({ preuve: 'intuition', sources: [] }))).toEqual([])
+  })
+})
 
 describe('verifierCoherence', () => {
   it('ne signale rien sur une fiche saine', () => {
@@ -106,8 +145,13 @@ describe('verifierCoherence', () => {
 })
 
 describe('verifierCorpus', () => {
-  it('ne signale rien sur le corpus réel du dépôt', () => {
-    expect(verifierCorpus(getFiches(DOSSIER_CONTENU))).toEqual([])
+  it('ne signale rien sur le corpus réel du dépôt, hors rappels sur les sources', () => {
+    // Les sources de seconde main sont listées à dessein à chaque vérification :
+    // c’est la file de relecture. Tout autre avertissement reste une anomalie.
+    const autres = verifierCorpus(getFiches(DOSSIER_CONTENU)).filter(
+      (a) => !/source/.test(a.message),
+    )
+    expect(autres).toEqual([])
   })
 
   it('rend une liste vide pour un corpus vide', () => {

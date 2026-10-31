@@ -4,6 +4,7 @@ export type Criteres = {
   disciplines: string[]
   confusions: string[]
   statuts: string[]
+  preuves: string[]
   chantiers: string[]
   q: string
 }
@@ -12,6 +13,7 @@ export type SlugsValides = {
   disciplines: string[]
   confusions: string[]
   statuts: string[]
+  preuves: string[]
   chantiers: string[]
 }
 
@@ -24,6 +26,7 @@ export const CRITERES_VIDES: Criteres = {
   disciplines: [],
   confusions: [],
   statuts: [],
+  preuves: [],
   chantiers: [],
   q: '',
 }
@@ -53,6 +56,7 @@ export function analyserCriteres(params: URLSearchParams, valides: SlugsValides)
     disciplines: lireListe(params, 'discipline', valides.disciplines),
     confusions: lireListe(params, 'confusion', valides.confusions),
     statuts: lireListe(params, 'statut', valides.statuts),
+    preuves: lireListe(params, 'preuve', valides.preuves),
     chantiers: lireListe(params, 'chantier', valides.chantiers),
     q: (params.get('q') ?? '').trim(),
   }
@@ -64,6 +68,7 @@ export function ecrireCriteres(criteres: Criteres, vue?: 'carte' | 'liste'): str
   if (criteres.disciplines.length) params.set('discipline', criteres.disciplines.join(','))
   if (criteres.confusions.length) params.set('confusion', criteres.confusions.join(','))
   if (criteres.statuts.length) params.set('statut', criteres.statuts.join(','))
+  if (criteres.preuves.length) params.set('preuve', criteres.preuves.join(','))
   if (criteres.chantiers.length) params.set('chantier', criteres.chantiers.join(','))
   if (criteres.q.trim()) params.set('q', criteres.q.trim())
   return params.toString()
@@ -74,6 +79,7 @@ export function aUnFiltre(criteres: Criteres): boolean {
     criteres.disciplines.length > 0 ||
     criteres.confusions.length > 0 ||
     criteres.statuts.length > 0 ||
+    criteres.preuves.length > 0 ||
     criteres.chantiers.length > 0 ||
     criteres.q.trim() !== ''
   )
@@ -90,6 +96,7 @@ export function filtrerFiches(
     if (criteres.disciplines.length && !criteres.disciplines.includes(fiche.discipline)) return false
     if (criteres.confusions.length && !criteres.confusions.includes(fiche.confusion)) return false
     if (criteres.statuts.length && !criteres.statuts.includes(fiche.statut)) return false
+    if (criteres.preuves.length && !criteres.preuves.includes(fiche.preuve)) return false
     if (criteres.chantiers.length && (!fiche.chantier || !criteres.chantiers.includes(fiche.chantier)))
       return false
     if (!recherche) return true

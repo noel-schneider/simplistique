@@ -3,11 +3,18 @@ terme: renforcement négatif
 discipline: psychologie
 confusion: faux-ami-courant
 statut: propose
+preuve: documentee
 resume: >
   Confondu avec la punition alors qu’il augmente un comportement : « négatif »
   veut dire qu’on retire quelque chose de désagréable, pas que c’est mauvais.
 suggestions:
   - renforcement par fuite / par évitement
+sources:
+  - auteur: "Murray Sidman"
+    annee: 2006
+    titre: "Propos sur le concept de renforcement négatif (The Behavior Analyst)"
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC2223177/
+    lecture: originale
 cree: 2026-10-31
 modifie: 2026-10-31
 ---

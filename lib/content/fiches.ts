@@ -69,6 +69,7 @@ export function getIndex(
     discipline: fiche.discipline,
     confusion: fiche.confusion,
     statut: fiche.statut,
+    preuve: fiche.preuve,
     resume: fiche.resume,
     suggestions: fiche.suggestions,
     chantier: fiche.chantier,

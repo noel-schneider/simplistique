@@ -3,6 +3,7 @@ terme: poids (au sens de masse)
 discipline: physique
 confusion: polysemie-externe
 statut: rejete
+preuve: documentee
 resume: >
   « Je pèse 70 kg » confond poids et masse au regard de la physique. Mais sur
   Terre l’erreur ne coûte rien, et changer l’usage coûterait beaucoup.

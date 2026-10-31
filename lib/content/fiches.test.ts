@@ -22,6 +22,7 @@ terme: groupe
 discipline: mathematiques
 confusion: faux-ami-courant
 statut: pointe
+preuve: intuition
 resume: Un mot courant dont le sens technique n'a aucun rapport.
 suggestions: []
 cree: 2026-10-03
@@ -171,6 +172,7 @@ function lireFicheDeTest(champs: Record<string, unknown>, chantiers: ChantierMet
       discipline: 'comptabilite',
       confusion: 'faux-ami-courant',
       statut: 'pointe',
+      preuve: 'intuition',
       resume: 'court',
       suggestions: [],
       cree: '2026-10-04',

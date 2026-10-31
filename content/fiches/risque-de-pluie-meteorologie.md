@@ -3,12 +3,19 @@ terme: 30 % de risque de pluie
 discipline: meteorologie
 confusion: jargon-opaque
 statut: propose
+preuve: mesuree
 resume: >
   Pour la plupart des gens, « 30 % de pluie » veut dire 30 % du temps ou 30 %
   de la zone. Les météorologues veulent dire : il pleut 3 jours sur 10 comme
   celui-ci.
 suggestions:
   - il pleut 3 jours sur 10 comme celui-ci
+sources:
+  - auteur: "Gerd Gigerenzer et coll."
+    annee: 2005
+    titre: "A 30% chance of rain tomorrow (Risk Analysis)"
+    url: https://econpapers.repec.org/RePEc:wly:riskan:v:25:y:2005:i:3:p:623-629
+    lecture: seconde-main
 cree: 2026-10-31
 modifie: 2026-10-31
 ---

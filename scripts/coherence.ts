@@ -48,6 +48,24 @@ export function verifierCoherence(fiche: Fiche): Avertissement[] {
     )
   }
 
+  // Une preuve « documentée » ou « mesurée » qui ne cite rien est une
+  // affirmation sans appui : le niveau annoncé doit pouvoir se vérifier.
+  if (fiche.preuve !== 'intuition' && fiche.sources.length === 0) {
+    avertissements.push(
+      `preuve « ${fiche.preuve} » sans aucune source : citer les références, ou ramener la preuve à « intuition »`,
+    )
+  }
+
+  // Un avertissement par source, pour qu’aucune ne reste lue de seconde main
+  // sans que quelqu’un l’ait décidé : la liste est la file de relecture.
+  for (const source of fiche.sources) {
+    if (source.lecture === 'seconde-main') {
+      avertissements.push(
+        `source de seconde main à relire : ${source.auteur} (${source.annee}), « ${source.titre} »`,
+      )
+    }
+  }
+
   if (fiche.resume.length >= SEUIL_RESUME) {
     avertissements.push(
       `resume de ${fiche.resume.length} caractères, proche de la limite de ${LONGUEUR_MAX_RESUME}`,

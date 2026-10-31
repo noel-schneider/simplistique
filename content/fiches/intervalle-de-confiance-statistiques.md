@@ -3,12 +3,19 @@ terme: intervalle de confiance
 discipline: statistiques
 confusion: faux-ami-courant
 statut: propose
+preuve: documentee
 resume: >
   Le mot « confiance » promet une certitude que l’intervalle ne donne pas : il
   mesure l’incertitude, et ne dit pas où se trouve la vraie valeur.
 suggestions:
   - intervalle de compatibilité
   - intervalle d’incertitude
+sources:
+  - auteur: "Andrew Gelman et Sander Greenland"
+    annee: 2019
+    titre: "Are confidence intervals better termed “uncertainty intervals”? (BMJ)"
+    url: https://sites.stat.columbia.edu/gelman/research/published/uncertainty_intervals.pdf
+    lecture: originale
 cree: 2026-10-31
 modifie: 2026-10-31
 ---

@@ -31,12 +31,14 @@ export function Corpus({
   disciplines,
   confusions,
   statuts,
+  preuves,
   chantiers,
 }: {
   index: FicheIndex[]
   disciplines: Discipline[]
   confusions: EntreeTaxonomie[]
   statuts: EntreeTaxonomie[]
+  preuves: EntreeTaxonomie[]
   chantiers: { slug: string; nom: string }[]
 }) {
   const router = useRouter()
@@ -48,9 +50,10 @@ export function Corpus({
       disciplines: disciplines.map((d) => d.slug),
       confusions: confusions.map((c) => c.slug),
       statuts: statuts.map((s) => s.slug),
+      preuves: preuves.map((p) => p.slug),
       chantiers: chantiers.map((c) => c.slug),
     }),
-    [disciplines, confusions, statuts, chantiers],
+    [disciplines, confusions, statuts, preuves, chantiers],
   )
 
   const vueDemandee = params.get('vue')
@@ -91,8 +94,9 @@ export function Corpus({
       disciplines: new Map(disciplines.map((d) => [d.slug, d.nom])),
       confusions: new Map(confusions.map((c) => [c.slug, c.nom])),
       statuts: new Map(statuts.map((s) => [s.slug, s.nom])),
+      preuves: new Map(preuves.map((p) => [p.slug, p.nom])),
     }),
-    [disciplines, confusions, statuts],
+    [disciplines, confusions, statuts, preuves],
   )
 
   const fiches = filtrerFiches(index, criteres, libellesParSlug)
@@ -101,6 +105,7 @@ export function Corpus({
     () => ({
       disciplines: libellesParSlug.disciplines,
       statuts: libellesParSlug.statuts,
+      preuves: libellesParSlug.preuves,
     }),
     [libellesParSlug],
   )
@@ -189,6 +194,7 @@ export function Corpus({
           { cle: 'disciplines', libelle: 'Discipline', entrees: disciplines },
           { cle: 'confusions', libelle: 'Confusion', entrees: confusions },
           { cle: 'statuts', libelle: 'Statut', entrees: statuts },
+          { cle: 'preuves', libelle: 'Preuve', entrees: preuves },
           { cle: 'chantiers', libelle: 'Chantier', entrees: chantiers },
         ]}
       />

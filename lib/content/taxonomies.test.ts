@@ -18,6 +18,11 @@ const STATUTS_VALIDES = `
 - { slug: propose, nom: Proposé, description: b }
 - { slug: rejete, nom: Rejeté, description: c }
 `
+const PREUVES_VALIDES = `
+- { slug: intuition, nom: Intuition, description: a }
+- { slug: documentee, nom: Documentée, description: b }
+- { slug: mesuree, nom: Mesurée, description: c }
+`
 const CONFUSIONS_VALIDES = `
 - { slug: faux-ami-courant, nom: Faux ami, description: d }
 `
@@ -29,6 +34,7 @@ describe('chargerTaxonomies', () => {
   it('charge les trois taxonomies réelles du dépôt', () => {
     const t = chargerTaxonomies(DOSSIER_CONTENU)
     expect(t.statuts.map((s) => s.slug)).toEqual(['pointe', 'propose', 'rejete'])
+    expect(t.preuves.map((p) => p.slug)).toEqual(['intuition', 'documentee', 'mesuree'])
     expect(t.disciplines.map((d) => d.slug)).toContain('theorie-musicale')
     // confusions.yml est volontairement extensible (spec §3.4, README) :
     // une borne inférieure plutôt qu'une égalité, pour qu'un sixième type
@@ -46,6 +52,7 @@ describe('chargerTaxonomies', () => {
   it('refuse un slug dupliqué en nommant le fautif', () => {
     const racine = dossierFactice({
       'statuts.yml': STATUTS_VALIDES,
+      'preuves.yml': PREUVES_VALIDES,
       'confusions.yml': CONFUSIONS_VALIDES,
       'disciplines.yml': `
 - { slug: escalade, nom: Escalade, couleur: '#3fa08a', description: a }
@@ -58,6 +65,7 @@ describe('chargerTaxonomies', () => {
   it('refuse une entrée sans description', () => {
     const racine = dossierFactice({
       'statuts.yml': STATUTS_VALIDES,
+      'preuves.yml': PREUVES_VALIDES,
       'confusions.yml': CONFUSIONS_VALIDES,
       'disciplines.yml': `- { slug: escalade, nom: Escalade, couleur: '#3fa08a' }`,
     })
@@ -67,6 +75,7 @@ describe('chargerTaxonomies', () => {
   it('refuse une couleur qui n\'est pas hexadécimale', () => {
     const racine = dossierFactice({
       'statuts.yml': STATUTS_VALIDES,
+      'preuves.yml': PREUVES_VALIDES,
       'confusions.yml': CONFUSIONS_VALIDES,
       'disciplines.yml': `- { slug: escalade, nom: Escalade, couleur: turquoise, description: a }`,
     })
@@ -76,6 +85,7 @@ describe('chargerTaxonomies', () => {
   it('cite le slug fautif dans le message, même quand un autre champ est invalide', () => {
     const racine = dossierFactice({
       'statuts.yml': STATUTS_VALIDES,
+      'preuves.yml': PREUVES_VALIDES,
       'confusions.yml': CONFUSIONS_VALIDES,
       'disciplines.yml': `- { slug: escalade, nom: Escalade, couleur: turquoise, description: a }`,
     })
@@ -89,5 +99,15 @@ describe('chargerTaxonomies', () => {
       'disciplines.yml': DISCIPLINES_VALIDES,
     })
     expect(() => chargerTaxonomies(racine)).toThrow(/statuts/)
+  })
+
+  it('refuse une taxonomie de preuves qui ne contient pas exactement intuition, documentee, mesuree', () => {
+    const racine = dossierFactice({
+      'statuts.yml': STATUTS_VALIDES,
+      'preuves.yml': `- { slug: intuition, nom: Intuition, description: a }`,
+      'confusions.yml': CONFUSIONS_VALIDES,
+      'disciplines.yml': DISCIPLINES_VALIDES,
+    })
+    expect(() => chargerTaxonomies(racine)).toThrow(/preuves\.yml doit contenir exactement/)
   })
 })

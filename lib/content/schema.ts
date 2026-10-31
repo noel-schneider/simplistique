@@ -3,6 +3,22 @@ import { z, type ZodType } from 'zod'
 export type Statut = 'pointe' | 'propose' | 'rejete'
 export const STATUTS = ['pointe', 'propose', 'rejete'] as const satisfies readonly Statut[]
 
+export type Preuve = 'intuition' | 'documentee' | 'mesuree'
+export const PREUVES = ['intuition', 'documentee', 'mesuree'] as const satisfies readonly Preuve[]
+
+// Ce que l’auteur a réellement lu : la source elle-même, ou un texte qui la
+// rapporte. La distinction est affichée au lecteur et signalée à la relecture.
+export type Lecture = 'originale' | 'seconde-main'
+export const LECTURES = ['originale', 'seconde-main'] as const satisfies readonly Lecture[]
+
+export type Source = {
+  auteur: string
+  annee: number
+  titre: string
+  url?: string
+  lecture: Lecture
+}
+
 // Réutilisée telle quelle pour valider le nom de fichier d'une fiche (voir
 // `lireFiche` dans lib/content/fiches.ts), dont le slug n'est pas un champ de
 // schéma mais le nom de fichier brut.
@@ -27,6 +43,7 @@ export type Taxonomies = {
   disciplines: Discipline[]
   confusions: EntreeTaxonomie[]
   statuts: EntreeTaxonomie[]
+  preuves: EntreeTaxonomie[]
 }
 
 export type FicheMeta = {
@@ -35,6 +52,9 @@ export type FicheMeta = {
   discipline: string
   confusion: string
   statut: Statut
+  preuve: Preuve
+  /** Absent du front-matter = aucune source. */
+  sources: Source[]
   resume: string
   suggestions: string[]
   /** Le slug d’un chantier de la même discipline, ou rien. */
@@ -102,6 +122,35 @@ export function creerSchemaChantier(taxonomies: Taxonomies): ZodType<Omit<Chanti
   })
 }
 
+// Seules les URL http(s) sont acceptées : l’adresse devient un lien dans la
+// page, et un schéma comme `javascript:` y serait exécuté au clic.
+const urlWeb = z
+  .string()
+  .refine((valeur) => {
+    try {
+      const { protocol } = new URL(valeur)
+      return protocol === 'http:' || protocol === 'https:'
+    } catch {
+      return false
+    }
+  }, 'url invalide : une adresse http(s) complète est attendue')
+
+const ANNEE_MIN_SOURCE = 1500
+
+function creerSchemaSource() {
+  // Calculée à l’appel et non à l’import : la borne haute suit l’année courante
+  // (+ 1 pour un ouvrage annoncé), sans valeur figée dans le code.
+  const anneeMax = new Date().getFullYear() + 1
+
+  return z.strictObject({
+    auteur: z.string().min(1),
+    annee: z.number().int().min(ANNEE_MIN_SOURCE).max(anneeMax),
+    titre: z.string().min(1),
+    url: urlWeb.optional(),
+    lecture: z.enum(LECTURES),
+  })
+}
+
 export function creerSchemaFiche(
   taxonomies: Taxonomies,
   chantiers: ChantierMeta[] = [],
@@ -115,6 +164,8 @@ export function creerSchemaFiche(
       discipline: z.enum(disciplines),
       confusion: z.enum(confusions),
       statut: z.enum(STATUTS),
+      preuve: z.enum(PREUVES),
+      sources: z.array(creerSchemaSource()).default([]),
       // Les scalaires `>` du YAML gardent un saut de ligne final, qui partirait
       // tel quel dans <meta name="description"> et consommerait un caractère
       // du budget de 240 pour rien.
@@ -155,4 +206,6 @@ export function creerSchemaFiche(
     })
 }
 
-export type FicheIndex = Omit<FicheMeta, 'cree' | 'modifie'>
+// Sans `sources` : l’index part au navigateur avec la page des fiches, et les
+// références ne servent que sur la page de la fiche.
+export type FicheIndex = Omit<FicheMeta, 'cree' | 'modifie' | 'sources'>

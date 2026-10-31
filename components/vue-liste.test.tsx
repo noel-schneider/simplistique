@@ -22,6 +22,11 @@ const libelles: Libelles = {
     ['propose', 'Proposé'],
     ['rejete', 'Rejeté'],
   ]),
+  preuves: new Map([
+    ['intuition', 'Intuition d’auteur'],
+    ['documentee', 'Documentée'],
+    ['mesuree', 'Mesurée'],
+  ]),
 }
 
 // Libellés dont l’ordre alphabétique DIFFÈRE de celui des slugs. C’est la seule
@@ -39,6 +44,11 @@ const LIBELLES_DIVERGENTS: Libelles = {
     ['propose', 'Avancé'], // slug second, libellé premier
     ['rejete', 'Écarté'], // slug troisième, libellé second
   ]),
+  preuves: new Map([
+    ['intuition', 'Intuition d’auteur'],
+    ['documentee', 'Documentée'],
+    ['mesuree', 'Mesurée'],
+  ]),
 }
 
 function fiche(p: Partial<FicheIndex>): FicheIndex {
@@ -48,6 +58,7 @@ function fiche(p: Partial<FicheIndex>): FicheIndex {
     discipline: 'mathematiques',
     confusion: 'faux-ami-courant',
     statut: 'pointe',
+    preuve: 'documentee',
     resume: '',
     suggestions: [],
     ...p,
@@ -124,6 +135,12 @@ describe('VueListe', () => {
   it('affiche un tiret quand il n’y a aucune suggestion', () => {
     render(<VueListe fiches={[fiches[0]]} libelles={libelles} />)
     expect(screen.getByText('—')).toBeInTheDocument()
+  })
+
+  it('affiche la colonne Preuve avec le libellé du niveau', () => {
+    render(<VueListe fiches={[fiches[0]]} libelles={libelles} />)
+    expect(screen.getByRole('button', { name: 'Preuve' })).toBeInTheDocument()
+    expect(screen.getByText('Documentée')).toBeInTheDocument()
   })
 
   it('trie par statut au clic sur l’en-tête', async () => {

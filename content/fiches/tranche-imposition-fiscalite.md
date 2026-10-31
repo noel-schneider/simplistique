@@ -3,11 +3,18 @@ terme: tranche d’imposition
 discipline: fiscalite
 confusion: faux-ami-courant
 statut: propose
+preuve: mesuree
 resume: >
   « Passer dans la tranche supérieure » ne fait pas payer plus d’impôt sur tout
   le revenu : seuls les euros au-dessus du seuil sont taxés au taux supérieur.
 suggestions:
   - part du revenu taxée à X %
+sources:
+  - auteur: "Tax Policy Associates"
+    annee: 2024
+    titre: "Half the British public doesn’t understand income tax: new data"
+    url: https://taxpolicy.org.uk/2024/07/05/half-the-british-public-doesnt-understand-income-tax-new-data/
+    lecture: seconde-main
 cree: 2026-10-31
 modifie: 2026-10-31
 ---

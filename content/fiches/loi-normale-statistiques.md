@@ -3,11 +3,17 @@ terme: loi normale
 discipline: statistiques
 confusion: faux-ami-courant
 statut: propose
+preuve: documentee
 resume: >
   Appeler « normale » une loi de probabilité suggère que les autres sont
   anormales. Karl Pearson, qui a imposé le nom, l’a lui-même regretté.
 suggestions:
   - loi de Laplace-Gauss
+sources:
+  - auteur: "Karl Pearson"
+    annee: 1920
+    titre: "Notes on the History of Correlation (Biometrika)"
+    lecture: seconde-main
 cree: 2026-10-31
 modifie: 2026-10-31
 ---
