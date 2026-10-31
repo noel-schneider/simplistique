@@ -41,7 +41,7 @@ describe('getFiches sur le corpus réel', () => {
     // indépendamment du chargeur, donc le seul filet contre un sur-comptage —
     // `app/sitemap.test.ts` calcule désormais son attendu avec `getFiches()`
     // lui-même, et ne peut donc pas jouer ce rôle.
-    expect(fiches).toHaveLength(24)
+    expect(fiches).toHaveLength(40)
     expect(new Set(fiches.map((f) => f.slug)).size).toBe(fiches.length)
   })
 
