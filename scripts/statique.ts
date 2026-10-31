@@ -4,6 +4,9 @@
  * chaque tâche. Une régression s’y glisserait sans bruit, et le site deviendrait une
  * application rendue à la demande sans que rien ne le dise.
  *
+ * Seules les routes d’API qui écrivent en base (votes, propositions) sont rendues à la
+ * demande ; elles sont énumérées ici.
+ *
  * Ce module analyse les manifestes du build et ne touche à rien : il suit le partage
  * de `scripts/coherence.ts`, pur et testé, face à `scripts/lint-content.ts`, qui lit
  * le disque et affiche. Un module pur est indispensable ici : un test qui importerait
@@ -15,7 +18,7 @@
  * n’écrit ici aucune liste de routes : ajouter une fiche ou une page ne demande donc
  * aucune mise à jour de ce fichier.
  */
-export const SEULE_ROUTE_DYNAMIQUE = '/api/votes'
+export const ROUTES_DYNAMIQUES = ['/api/votes', '/api/propositions']
 
 /** Une entrée de `prerender-manifest.routes` : une page réellement pré-générée. */
 export type RoutePreGeneree = {
@@ -51,7 +54,7 @@ export type Manifestes = {
  * correspond à une dérive observée sur un vrai build :
  *
  * 1. une route de l’application qui n’est ni pré-générée ni paramétrée — une page qui
- *    lit une donnée de requête, ou une seconde route d’API ;
+ *    lit une donnée de requête, ou une route d’API hors de `ROUTES_DYNAMIQUES` ;
  * 2. une page pré-générée qui se revalide, ce que produit `export const revalidate` :
  *    elle est alors rendue côté serveur à intervalle, et `next build` l’affiche encore
  *    comme statique ;
@@ -70,7 +73,7 @@ export function anomaliesDuBuild({
   const connues = new Set([...Object.keys(preGenerees), ...Object.keys(parametrees)])
 
   for (const route of Object.values(routesDeLApplication).sort()) {
-    if (route === SEULE_ROUTE_DYNAMIQUE || connues.has(route)) continue
+    if (ROUTES_DYNAMIQUES.includes(route) || connues.has(route)) continue
     anomalies.push(`${route} n’est ni pré-générée ni énumérée au build`)
   }
 

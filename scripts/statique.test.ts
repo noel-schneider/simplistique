@@ -12,6 +12,7 @@ const SAIN: Manifestes = {
     '/fiches/[slug]/page': '/fiches/[slug]',
     '/sitemap.xml/route': '/sitemap.xml',
     '/api/votes/route': '/api/votes',
+    '/api/propositions/route': '/api/propositions',
   },
   preGenerees: {
     '/': { initialRevalidateSeconds: false, compute: 'static', srcRoute: '/' },

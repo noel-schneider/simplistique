@@ -1,6 +1,6 @@
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { anomaliesDuBuild, SEULE_ROUTE_DYNAMIQUE, type Manifestes } from './statique'
+import { anomaliesDuBuild, ROUTES_DYNAMIQUES, type Manifestes } from './statique'
 
 function lireManifeste(nom: string): Record<string, unknown> {
   return JSON.parse(readFileSync(join(process.cwd(), '.next', nom), 'utf8')) as Record<
@@ -25,7 +25,7 @@ function principal(): void {
 
   if (anomalies.length === 0) {
     console.log(
-      `Le site reste statique : ${SEULE_ROUTE_DYNAMIQUE} est la seule route rendue à la demande.`,
+      `Le site reste statique : ${ROUTES_DYNAMIQUES.join(' et ')} sont les seules routes rendues à la demande.`,
     )
     return
   }
