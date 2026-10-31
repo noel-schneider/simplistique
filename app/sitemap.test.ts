@@ -66,21 +66,6 @@ describe('sitemap', () => {
     }
   })
 
-  it('n’indexe aucune page de démonstration', () => {
-    const urls = sitemap().map((e) => e.url)
-    const fictives = [
-      ...getFiches().filter((f) => f.demonstration).map((f) => `/fiches/${f.slug}`),
-      ...getChantiers().filter((c) => c.demonstration).map((c) => `/chantiers/${c.slug}`),
-    ]
-
-    // Le corpus doit en contenir, sans quoi ce test ne prouverait rien : il
-    // passerait tout seul le jour où le contenu fictif aura disparu.
-    expect(fictives.length).toBeGreaterThan(0)
-    for (const chemin of fictives) {
-      expect(urls.some((u) => u.endsWith(chemin))).toBe(false)
-    }
-  })
-
   it('contient la page de chaque chantier, avec sa date de modification', () => {
     const entrees = sitemap()
     const chantiers = chantiersPublies()

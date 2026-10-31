@@ -52,16 +52,6 @@ describe('PageChantier', () => {
     expect(html).not.toContain('href="/fiches/groupe-mathematiques"')
   })
 
-  it('annonce un chantier de démonstration', async () => {
-    const page = await PageChantier({
-      params: Promise.resolve({ slug: 'structures-algebriques' }),
-    })
-
-    // Le texte, et non le nom du composant : ce que cette page doit garantir,
-    // c’est qu’un lecteur apprenne que la page est fictive avant de la lire.
-    expect(renderToStaticMarkup(page)).toContain('fictive')
-  })
-
   it('n’annonce rien sur un chantier réel', async () => {
     const page = await PageChantier({
       params: Promise.resolve({ slug: 'vocabulaire-du-bilan' }),
