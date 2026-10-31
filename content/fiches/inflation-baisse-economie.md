@@ -16,7 +16,7 @@ sources:
     titre: "Public Understanding of Economics and Economic Statistics After the COVID-19 Pandemic"
     objet: "ESCoE Discussion Paper 2023-13, enquête YouGov d’août 2022"
     url: https://www.escoe.ac.uk/publications/public-understanding-of-economics-and-economic-statistics-after-the-covid-19-pandemic/
-    lecture: seconde-main
+    lecture: originale
 motifs:
   - taux-et-niveau
 cree: 2026-10-31

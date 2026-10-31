@@ -21,7 +21,7 @@ sources:
     annee: 1831
     objet: "compte rendu par Gauss de sa Theoria residuorum biquadraticorum, commentatio secunda, Göttingische gelehrte Anzeigen, 23 avril 1831 (Werke II, p. 177-178)"
     url: https://archive.org/details/bub_gb_qg9_iiEO0mQC
-    lecture: seconde-main
+    lecture: originale
 cree: 2026-10-31
 modifie: 2026-10-31
 ---

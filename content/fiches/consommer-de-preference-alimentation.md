@@ -27,7 +27,7 @@ sources:
     annee: 2018
     titre: "Market study on date marking and other information provided on food labels and food waste prevention"
     url: https://food.ec.europa.eu/document/download/40858365-e85c-4dcb-90c9-2b79dbcd49f5_en?filename=fw_lib_srp_date-marking.pdf
-    lecture: seconde-main
+    lecture: originale
 precedents:
   - lieu: France
     annee: 2022
