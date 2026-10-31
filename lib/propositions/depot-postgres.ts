@@ -10,7 +10,7 @@ export function depotPostgres(executer: Executeur): DepotDePropositions {
     async ajouter(p, auteur) {
       await executer(
         `INSERT INTO propositions (terme, discipline, pourquoi, suggestion, auteur)
-         VALUES ($1, $2, $3, $4, $5, $6)`,
+         VALUES ($1, $2, $3, $4, $5)`,
         [p.terme, p.discipline, p.pourquoi, p.suggestion, auteur],
       )
     },
