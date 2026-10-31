@@ -2,9 +2,9 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal :** rendre la simplistique crédible (preuve et sources visibles) et ouverte au grand public (proposer un terme sans GitHub, quiz, accueil qui accroche), et garder le corpus lisible à 40+ fiches (familles de disciplines, motifs transversaux).
+**Goal :** rendre la simplistique crédible (preuve et sources visibles) et ouverte au grand public (proposer un terme sans GitHub, accueil qui accroche), et garder le corpus lisible à 40+ fiches (familles de disciplines, motifs transversaux).
 
-**Architecture :** tout le contenu reste en fichiers versionnés validés par Zod au build ; seules les données d'interaction (propositions, réponses de quiz) vont dans la base Neon déjà utilisée par les votes, avec le même découpage `service` / `depot` (interface + implémentation en mémoire pour les tests + implémentation Postgres) que `lib/votes`.
+**Architecture :** tout le contenu reste en fichiers versionnés validés par Zod au build ; seules les données d'interaction (propositions) vont dans la base Neon déjà utilisée par les votes, avec le même découpage `service` / `depot` (interface + implémentation en mémoire pour les tests + implémentation Postgres) que `lib/votes`.
 
 **Tech Stack :** Next.js 16.3 (App Router, rendu statique), React 19, Zod 4, gray-matter, Tailwind, Vitest + Testing Library, `@neondatabase/serverless`, `next/og` pour les images de partage.
 
@@ -20,7 +20,8 @@
 6. **Motifs** — un motif est un piège de vocabulaire qui revient dans plusieurs disciplines. Fichier `content/motifs/<slug>.md` (`nom, resume, cree, modifie` + corps libre) ; une fiche le rejoint par un champ facultatif `motifs: [slug, …]`. Routes `/motifs` et `/motifs/<slug>`, lien « Motifs » dans la navigation. Différence avec un chantier : un chantier réunit des fiches d'**une** discipline qui doivent bouger ensemble ; un motif relie des fiches de disciplines **différentes** qui partagent un piège.
 7. **Accueil et partage** — champ facultatif `accroche` (140 caractères max), une phrase-choc. L'accueil garde son intro et ajoute une section « Le saviez-vous ? » avec jusqu'à 3 fiches ayant une accroche, choisies de façon déterministe (preuve `mesuree` d'abord, puis `documentee`, puis ordre alphabétique du terme) *(choix)*, et un lien vers les motifs. Chaque fiche a une image de partage générée au build (`opengraph-image.tsx`) : terme, accroche ou résumé, discipline.
 8. **Proposer un terme** — page `/proposer`, formulaire sans compte : `terme` (requis, ≤ 120), `discipline` (texte libre, ≤ 80), `pourquoi` (requis, 20 à 2000), `suggestion` (≤ 200), `contact` (≤ 200, facultatif). Champ piège invisible `site` : rempli → réponse 200 sans enregistrement. Stockage table `propositions`. Limite 5 propositions par heure et par empreinte. Modération : script `npm run propositions` (liste les non traitées) et `npm run propositions -- --traiter <id>`. `/contribuer` renvoie vers `/proposer` pour le grand public et garde GitHub pour les fiches complètes.
-9. **Quiz** — champ facultatif `quiz: { question, reponses: [{ texte, juste }], explication }` : 2 à 5 réponses, exactement une `juste: true`. Le lecteur choisit une réponse, puis voit la bonne, l'explication et la répartition des réponses des autres. Une réponse par fiche et par empreinte, non modifiable *(choix : sinon on vote pour la bonne réponse après l'avoir vue)*. Réponse identifiée par empreinte de son texte (`empreinteAlternative`), jamais par sa position. Table `reponses_quiz`. Limite 30 réponses par heure.
+
+Le quiz « tu comprends quoi ? » est reporté à plus tard, à la demande de l'auteur (2026-10-31).
 
 ## Global Constraints
 
@@ -36,10 +37,9 @@
 ## Review Focus
 
 - Fiche existante sans `preuve` après la tâche 2 : le build doit échouer avec un message qui nomme le fichier et le champ, pas une erreur Zod brute. → test dans la tâche 2.
-- Quiz dont le texte d'une réponse change après publication : les anciennes réponses ne doivent pas être comptées pour la nouvelle formulation, ni planter la lecture. → test dans la tâche 11 (`ignore les empreintes inconnues`).
 - Proposition avec champ piège rempli ou corps non JSON : jamais d'erreur 500, jamais d'écriture. → tests dans la tâche 9.
 - Motif désigné par une fiche mais absent de `content/motifs/` : erreur de build explicite (comme `chantier`). → test dans la tâche 6.
-- Base indisponible ou variables absentes : le formulaire et le quiz affichent un message lisible et la fiche reste lisible (le quiz montre quand même la bonne réponse). → tests dans les tâches 10 et 12.
+- Base indisponible ou variables absentes : le formulaire affiche un message lisible sans perdre la saisie. → test dans la tâche 10.
 
 ---
 
@@ -167,7 +167,7 @@
 
 **Files :**
 - Create : `migrations/002-propositions.sql`, `lib/propositions/validation.ts`, `lib/propositions/depot.ts`, `lib/propositions/depot-postgres.ts`, `lib/propositions/service.ts`, `app/api/propositions/route.ts`, tests `.test.ts` à côté de chacun
-- Modify : `lib/votes/migration.ts` et `scripts/migrer.ts` (appliquer tous les `migrations/*.sql` dans l'ordre alphabétique, puis vérifier `vote_unique` et l'existence des tables `propositions` et `reponses_quiz`), `lib/votes/migration.test.ts`
+- Modify : `lib/votes/migration.ts` et `scripts/migrer.ts` (appliquer tous les `migrations/*.sql` dans l'ordre alphabétique, puis vérifier `vote_unique` et l'existence de la table `propositions`), `lib/votes/migration.test.ts`
 
 **Interfaces :**
 - Produces :
@@ -181,7 +181,7 @@
 - [ ] **Step 1 : tests de validation** — `exige terme et pourquoi`, `refuse pourquoi de moins de 20 caractères`, `refuse chaque champ au-delà de sa limite (120/80/2000/200/200)`, `ignore les clés inconnues sans échouer`, `champ site rempli → piege`, `corps non objet → invalide`.
 - [ ] **Step 2 : tests du service** — `enregistre une proposition valide`, `n’écrit rien pour un piège mais répond ok`, `refuse la 6e proposition dans l’heure`, `la limite est par auteur`.
 - [ ] **Step 3 : tests de la route** (dépôt en mémoire injecté comme le fait `app/api/votes/route.test.ts`) — 403 si `sec-fetch-site: cross-site`, 400 corps non JSON, 503 sans configuration, 201 nominal, en-tête `cache-control: private, no-store`.
-- [ ] **Step 4 :** migration `002-propositions.sql` : table `propositions (id bigint identity pk, terme, discipline, pourquoi, suggestion, contact text not null default '', auteur text not null, cree_le timestamptz default now(), traitee_le timestamptz)` + index `(auteur, cree_le)` ; `003-reponses-quiz.sql` est créé par la tâche 11 mais le runner doit déjà gérer plusieurs fichiers — test `instructionsDeToutesLesMigrations lit les fichiers dans l’ordre`.
+- [ ] **Step 4 :** migration `002-propositions.sql` : table `propositions (id bigint identity pk, terme, discipline, pourquoi, suggestion, contact text not null default '', auteur text not null, cree_le timestamptz default now(), traitee_le timestamptz)` + index `(auteur, cree_le)` ; le runner gère désormais plusieurs fichiers — test `instructionsDeToutesLesMigrations lit les fichiers dans l’ordre`.
 - [ ] **Step 5 :** implémenter ; tests verts ; build ; commit `Recevoir des propositions de termes sans compte GitHub`.
 
 ### Task 10 : Page `/proposer` et modération
@@ -194,36 +194,8 @@
 - [ ] **Step 4 :** `contribuer.md` : section « Proposer un terme en deux minutes » en tête (lien `/proposer`), GitHub restant la voie pour une fiche complète ; mettre à jour « Ce que ce site enregistre » (propositions : texte saisi, empreinte non réversible, date ; contact seulement si fourni).
 - [ ] **Step 5 :** lint, tests, build ; commit `Ajouter la page Proposer un terme`.
 
-### Task 11 : Quiz — schéma, domaine, API
-
-**Files :** Create : `migrations/003-reponses-quiz.sql`, `lib/quiz/depot.ts`, `lib/quiz/depot-postgres.ts`, `lib/quiz/service.ts`, `app/api/quiz/route.ts`, tests ; Modify : `lib/content/schema.ts`
-
-**Interfaces :**
-- Produces :
-  - `FicheMeta.quiz?: { question: string; reponses: { texte: string; juste: boolean }[]; explication: string }` — 2 à 5 réponses, exactement une juste, textes distincts après `normaliser`.
-  - `interface DepotDeQuiz { repartition(fiche: string): Promise<Record<string, number>>; reponseDe(fiche: string, votant: string): Promise<string | null>; ajouter(fiche: string, reponse: string, votant: string): Promise<'ajoute' | 'deja'>; nombreDepuis(votant: string, depuis: Date): Promise<number> }`
-  - `export const LIMITE_QUIZ_PAR_HEURE = 30`
-  - `lireQuiz(depot, fiche, votant)` et `repondre(depot, fiche, empreinte, votant)` → `{ type: 'ok'; repartition: Record<string, number>; mienne: string | null } | { type: 'inconnu' } | { type: 'deja' } | { type: 'trop' }` ; `repartition` ne contient que les empreintes des réponses actuelles de la fiche.
-  - `GET /api/quiz?fiche=<slug>`, `POST /api/quiz { fiche, reponse: <empreinte> }`.
-
-- [ ] **Step 1 : tests de schéma** — `refuse un quiz sans réponse juste`, `refuse deux réponses justes`, `refuse une seule réponse`, `refuse six réponses`, `refuse deux réponses au même texte normalisé`, `refuse une clé inconnue`.
-- [ ] **Step 2 : tests du service** — `refuse une fiche sans quiz` (inconnu), `refuse une empreinte qui n’est pas une réponse de la fiche`, `une seule réponse par votant` (deja), `limite par heure`, `ignore les empreintes inconnues dans la répartition` (réponse dont le texte a changé).
-- [ ] **Step 3 : tests de route** — mêmes cas d'origine, de corps et de configuration que les votes.
-- [ ] **Step 4 :** migration : `reponses_quiz (id, fiche, reponse, votant, cree_le, CONSTRAINT reponse_quiz_unique UNIQUE (fiche, votant))` + index `(votant, cree_le)` ; le runner vérifie aussi `reponse_quiz_unique`.
-- [ ] **Step 5 :** implémenter ; tests verts ; commit `Enregistrer les réponses aux quiz`.
-
-### Task 12 : Quiz — composant et contenu
-
-**Files :** Create : `components/quiz.tsx`, `components/quiz.test.tsx` ; Modify : `app/fiches/[slug]/page.tsx` (quiz rendu **avant** la prose, pour qu'on réponde sans avoir lu l'explication *(choix)*), 6 fiches, `content/contribuer.md`
-
-- [ ] **Step 1 : tests du composant** — `affiche la question et les réponses avant tout choix, sans dire laquelle est juste` ; `après un choix : marque la bonne réponse, la mienne, l’explication et le pourcentage de chaque réponse` ; `si GET dit que j’ai déjà répondu, affiche directement le résultat` ; `si l’API est indisponible, révèle quand même la bonne réponse et l’explication, sans pourcentages` ; `pourcentages arrondis à l’entier et absents tant que personne n’a répondu`.
-- [ ] **Step 2 :** implémenter (modèle : `components/votes.tsx` pour la récupération et la garde de type des réponses).
-- [ ] **Step 3 : contenu** — quiz de 3 ou 4 réponses, fidèles au texte de la fiche, pour : risque-de-pluie-meteorologie, inflation-baisse-economie, tranche-imposition-fiscalite, consommer-de-preference-alimentation, intervalle-de-confiance-statistiques, decouvert-autorise-banque. Les mauvaises réponses reprennent les interprétations fausses décrites dans la fiche.
-- [ ] **Step 4 :** `contribuer.md` : documenter `quiz` et `accroche`, et compléter « Ce que ce site enregistre » (réponse choisie, empreinte, date).
-- [ ] **Step 5 :** lint, tests, build ; commit `Ajouter des quiz « tu comprends quoi ? » sur les fiches du quotidien`.
-
-### Task 13 : Vérification d'ensemble
+### Task 11 : Vérification d'ensemble
 
 - [ ] `npm run lint`, `npm run lint:content`, `npm run test:once`, `npm run build`, `npm run verifier:statique` passent.
-- [ ] Lancer `npm run dev`, ouvrir `/`, `/fiches` (carte et liste), une fiche avec quiz, `/motifs`, `/proposer` : aucun message d'erreur en console ; sans `DATABASE_URL`, quiz et formulaire affichent leur message d'indisponibilité.
+- [ ] Lancer `npm run dev`, ouvrir `/`, `/fiches` (carte et liste), une fiche avec sources et précédents, `/motifs`, `/proposer` : aucun message d'erreur en console ; sans `DATABASE_URL`, le formulaire affiche son message d'indisponibilité.
 - [ ] Mettre à jour `README.md` si la liste des scripts y figure (`propositions`, migrations multiples).
