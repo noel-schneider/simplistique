@@ -11,13 +11,23 @@ suggestions:
   - assouplissement du crédit
 sources:
   - auteur: "Ben Bernanke"
+    annee: 2009
+    titre: "The Crisis and the Policy Response"
+    objet: "discours, Stamp Lecture, London School of Economics, 13 janvier 2009"
+    url: https://www.federalreserve.gov/newsevents/speech/bernanke20090113a.htm
+    lecture: originale
+  - auteur: "Ben Bernanke"
     annee: 2010
-    objet: "propos sur l’emploi de l’expression « quantitative easing » pour la politique de la Fed"
-    lecture: seconde-main
+    titre: "Rebalancing the Global Recovery"
+    objet: "discours, Francfort, 19 novembre 2010"
+    url: https://www.federalreserve.gov/newsevents/speech/bernanke20101119a.htm
+    lecture: originale
   - auteur: "Silvana Tenreyro"
     annee: 2023
-    objet: "propos sur l’image de la planche à billets et l’échange d’actifs"
-    lecture: seconde-main
+    titre: "Quantitative easing and quantitative tightening"
+    objet: "discours, Glasgow, 4 avril 2023"
+    url: https://www.bankofengland.co.uk/speech/2023/april/quantitative-easing-quantitative-tightening-speech-silvana-tenreyro
+    lecture: originale
 cree: 2026-10-31
 modifie: 2026-10-31
 ---
@@ -51,9 +61,14 @@ la politique, dont certaines visent bien la quantité de réserves.
 ## D’où ça vient
 
 L’expression vient de la politique de la Banque du Japon au début des années
-2000, qui ciblait justement la quantité de réserves. En 2010, Ben Bernanke,
-alors président de la Réserve fédérale américaine, juge inapproprié de
-l’appliquer à la politique de la Fed, qui visait les rendements. En 2023,
-Silvana Tenreyro, membre du comité de politique monétaire de la Banque
-d’Angleterre, relève que l’image de la planche à billets persiste. Elle
-recommande de voir l’opération comme un échange d’actifs.
+2000, qui ciblait justement la quantité de réserves. En janvier 2009, dans un
+discours à Londres, Ben Bernanke, alors président de la Réserve fédérale
+américaine, présente l’approche de la Fed comme distincte de celle de la
+Banque du Japon de 2001 à 2006 et la nomme *credit easing*. En 2010, il juge
+inapproprié d’appeler *quantitative easing* la politique de la Fed, dont les
+achats de titres agissent surtout en faisant baisser les taux à long terme.
+En 2023, Silvana Tenreyro, membre du comité de politique monétaire de la
+Banque d’Angleterre, juge que décrire le QE comme de la planche à billets
+« manque la cible ». Elle décrit l’opération comme l’échange d’une dette
+publique contre une autre, et recommande de la présenter comme un changement
+de taux d’intérêt plutôt que comme une création de monnaie.

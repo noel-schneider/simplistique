@@ -14,15 +14,17 @@ sources:
   - auteur: "G. E. Moore"
     annee: 1903
     titre: "Principia Ethica"
-    lecture: seconde-main
+    url: https://www.gutenberg.org/ebooks/53430
+    lecture: originale
   - auteur: "William Frankena"
     annee: 1939
     titre: "The Naturalistic Fallacy"
+    url: https://doi.org/10.1093/mind/XLVIII.192.464
     lecture: seconde-main
   - auteur: "Bernard Williams"
     annee: 1985
     titre: "Ethics and the Limits of Philosophy"
-    lecture: seconde-main
+    lecture: originale
 motifs:
   - normal-et-naturel
 cree: 2026-10-31
@@ -59,7 +61,7 @@ l’appel à la nature, qui demande seulement d’employer ce dernier nom.
 ## D’où ça vient
 
 Moore introduit l’expression dans *Principia Ethica* (1903). Dès 1939, William
-Frankena la qualifie de « complete misnomer » (« nom entièrement erroné »),
-dans « The Naturalistic Fallacy » (*Mind*), et propose *definist fallacy*.
-Bernard Williams parle à son tour d’un nom spectaculairement mal choisi, dans
-*Ethics and the Limits of Philosophy* (1985).
+Frankena juge que le nom est un contresens (*misnomer*), dans « The
+Naturalistic Fallacy » (*Mind*), et propose *definist fallacy*. Bernard
+Williams parle à son tour d’un nom spectaculairement mal choisi (« such a
+spectacular misnomer »), dans *Ethics and the Limits of Philosophy* (1985).

@@ -5,13 +5,14 @@ confusion: jargon-opaque
 statut: pointe
 preuve: documentee
 resume: >
-  Nom choisi par son inventeur pour impressionner les financeurs, pas pour
-  décrire : il ne s’agit ni de programmer au sens du code, ni de dynamisme.
+  Nom choisi par son inventeur pour abriter ses travaux d’un ministre hostile
+  au mot « recherche », pas pour décrire : il ne s’agit ni de programmer au
+  sens du code, ni de dynamisme.
 suggestions: []
 sources:
   - auteur: "Richard Bellman"
     annee: 1984
-    titre: "Eye of the Hurricane"
+    titre: "Eye of the Hurricane: An Autobiography"
     lecture: seconde-main
 cree: 2026-10-31
 modifie: 2026-10-31
@@ -46,7 +47,10 @@ la lecture fautive, pas pour changer le nom.
 
 Richard Bellman a forgé le terme au début des années 1950, à la RAND
 Corporation. Dans son autobiographie (*Eye of the Hurricane*, 1984), il
-raconte avoir choisi « dynamique » parce qu’on ne peut pas l’employer de
-façon péjorative : c’était un nom auquel même un parlementaire ne pourrait
-rien objecter. La chronologie de l’anecdote est contestée, mais l’aveu
-demeure : le nom a été choisi pour son effet, pas pour sa clarté.
+raconte que Wilson, alors secrétaire à la Défense, était hostile aux mots
+« recherche » et « mathématique » : il fallait un nom qui mette ses travaux à
+l’abri. Il dit aussi avoir voulu évoquer un processus à étapes multiples qui
+varie dans le temps, mais le critère décisif reste que « dynamique » ne peut
+pas être employé de façon péjorative : c’était un nom auquel même un membre du
+Congrès américain ne pourrait rien objecter. Le nom a été choisi pour ne pas
+prêter le flanc, pas pour sa clarté.

@@ -13,6 +13,7 @@ sources:
   - auteur: "Karl Pearson"
     annee: 1920
     titre: "Notes on the History of Correlation"
+    url: https://doi.org/10.1093/biomet/13.1.25
     lecture: seconde-main
 motifs:
   - normal-et-naturel

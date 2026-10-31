@@ -9,10 +9,10 @@ resume: >
   Terre l’erreur ne coûte rien, et changer l’usage coûterait beaucoup.
 suggestions: []
 sources:
-  - auteur: "Ministère de l’Éducation nationale"
+  - auteur: "Ministère de l’Éducation nationale, de la Jeunesse et des Sports"
     annee: 2020
-    titre: "Programme de physique-chimie du cycle 4"
-    objet: "Bulletin officiel n° 31 du 30 juillet 2020"
+    objet: "programmes d’enseignement du cycle 4, physique-chimie, Bulletin officiel n° 31 du 30 juillet 2020"
+    url: https://www.education.gouv.fr/bo/20/Hebdo31/MENE2018714A.htm
     lecture: seconde-main
 cree: 2026-10-31
 modifie: 2026-10-31
@@ -51,8 +51,8 @@ nouveau.
 
 L’usage courant précède de loin la distinction physique, qui s’établit avec
 la mécanique de Newton. Le programme français de physique-chimie du collège
-(cycle 4, 2020) demande de distinguer poids et masse et de modéliser le poids comme
-une force. La métrologie légale tolère l’usage courant : le guide du NIST
+(cycle 4, 2020) demande de distinguer poids et masse, et de traiter le poids
+comme la force de pesanteur, P = mg. La métrologie légale tolère l’usage courant : le guide du NIST
 américain sur les poids et mesures (Handbook 130) note que, dans le commerce
 et la vie quotidienne, « weight » est souvent employé comme synonyme de
 « mass ».

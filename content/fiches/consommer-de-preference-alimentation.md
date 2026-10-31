@@ -15,16 +15,19 @@ suggestions:
 sources:
   - auteur: "Parlement européen et Conseil"
     annee: 2011
-    objet: "règlement INCO (n° 1169/2011)"
+    objet: "règlement (UE) n° 1169/2011 du 25 octobre 2011 concernant l’information des consommateurs sur les denrées alimentaires (règlement INCO)"
+    url: https://eur-lex.europa.eu/legal-content/FR/TXT/?uri=CELEX:32011R1169
     lecture: seconde-main
   - auteur: "Commission européenne"
     annee: 2015
-    objet: "Eurobaromètre sur la compréhension de la mention « à consommer de préférence avant »"
+    titre: "Flash Eurobarometer 425: Food waste and date marking"
+    url: https://data.europa.eu/euodp/en/data/dataset/S2095_425_ENG
     lecture: seconde-main
-  - auteur: "Commission européenne"
+  - auteur: "ICF et coll., pour la Commission européenne"
     annee: 2018
-    objet: "estimation de la part du gaspillage alimentaire liée au marquage des dates"
-    lecture: seconde-main
+    titre: "Market study on date marking and other information provided on food labels and food waste prevention"
+    url: https://food.ec.europa.eu/document/download/40858365-e85c-4dcb-90c9-2b79dbcd49f5_en?filename=fw_lib_srp_date-marking.pdf
+    lecture: originale
 precedents:
   - lieu: France
     annee: 2022
@@ -71,6 +74,6 @@ optimale » (DLUO). Le règlement européen INCO (n° 1169/2011) l’a renommée
 « date de durabilité minimale » (DDM), sans toucher à la formule de
 l’étiquette. Selon un Eurobaromètre de 2015, 47 % des Européens comprennent la
 mention « à consommer de préférence avant » et 40 % la mention « à consommer
-jusqu’au ». En 2018, la Commission européenne estimait qu’environ 10 % des
-88 millions de tonnes d’aliments gaspillés chaque année dans l’Union étaient
-liés au marquage des dates.
+jusqu’au ». En 2018, une étude commandée par la Commission européenne estimait
+que jusqu’à 10 % des 88 millions de tonnes d’aliments gaspillés chaque année
+dans l’Union étaient liés au marquage des dates.

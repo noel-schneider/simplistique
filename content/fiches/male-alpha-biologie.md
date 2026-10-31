@@ -11,15 +11,15 @@ accroche: "Dans la nature, une meute de loups est une famille : ses « alphas »
 suggestions:
   - mâle reproducteur / femelle reproductrice
 sources:
-  - auteur: "David Mech"
+  - auteur: "L. David Mech"
     annee: 1970
-    titre: "The Wolf"
+    titre: "The Wolf: The Ecology and Behavior of an Endangered Species"
     lecture: seconde-main
-  - auteur: "David Mech"
+  - auteur: "L. David Mech"
     annee: 1999
     titre: "Alpha status, dominance, and division of labor in wolf packs"
-    url: https://pubs.usgs.gov/publication/1001725
-    lecture: seconde-main
+    url: https://doi.org/10.1139/z99-099
+    lecture: originale
 cree: 2026-10-31
 modifie: 2026-10-31
 ---
@@ -46,8 +46,7 @@ David Mech. Le nom décrit le rôle réel des individus dans la meute.
 
 « Alpha » est entré dans la langue courante, et la fiche n’a aucune prise sur
 ses usages métaphoriques. L’alternative décrit les loups, pas les autres
-espèces, où des hiérarchies de dominance existent bel et bien. Le terme
-« alpha » reste donc légitime chez certains primates, par exemple.
+espèces, où des hiérarchies de dominance existent bel et bien.
 
 ## D’où ça vient
 

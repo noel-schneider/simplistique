@@ -13,8 +13,9 @@ suggestions:
 sources:
   - auteur: "Mathias Couturier"
     annee: 2009
-    titre: "Croissance négative ou décroissance"
-    lecture: seconde-main
+    titre: "Croissance négative ou décroissance…"
+    url: https://reporterre.net/Croissance-negative-ou
+    lecture: originale
 motifs:
   - positif-et-negatif
   - taux-et-niveau
@@ -50,8 +51,7 @@ décroissance, ce qui peut la faire paraître militante.
 
 ## D’où ça vient
 
-L’expression est un calque de l’anglais *negative growth*, courant dans le
-jargon économique. En 2009, le juriste Mathias Couturier (université de Caen)
-la juge incorrecte sur le plan sémantique, dans une tribune publiée par
-*Reporterre*. Il y voit une manière de faire de la croissance l’état normal.
+En 2009, le juriste Mathias Couturier (université de Caen) juge l’expression
+incorrecte sur le plan sémantique, dans une tribune publiée par *Reporterre*.
+Il y voit une manière de faire de la croissance l’état normal.
 Aucune autre critique de spécialiste n’a été trouvée.

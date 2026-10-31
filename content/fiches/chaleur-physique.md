@@ -13,6 +13,7 @@ sources:
   - auteur: "Robert Romer"
     annee: 2001
     titre: "Heat is not a noun"
+    url: https://doi.org/10.1119/1.1341254
     lecture: seconde-main
 cree: 2026-10-31
 modifie: 2026-10-31

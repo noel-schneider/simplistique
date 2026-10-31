@@ -11,12 +11,19 @@ suggestions: []
 sources:
   - auteur: "Paul Rozin"
     annee: 2005
-    titre: "The Meaning of “Natural”"
+    titre: "The Meaning of “Natural”: Process More Important Than Content"
+    url: https://doi.org/10.1111/j.1467-9280.2005.01589.x
+    lecture: seconde-main
+  - auteur: "Paul Rozin, Claude Fischler et Christy Shields-Argelès"
+    annee: 2009
+    objet: "article « Additivity dominance », Judgment and Decision Making, 4(6), p. 475-478"
+    url: https://doi.org/10.1017/S1930297500004010
     lecture: seconde-main
   - auteur: "G. E. Moore"
     annee: 1903
     titre: "Principia Ethica"
-    lecture: seconde-main
+    url: https://www.gutenberg.org/ebooks/53430
+    lecture: originale
 motifs:
   - normal-et-naturel
 cree: 2026-10-31
@@ -51,8 +58,11 @@ fautif, alors que le contexte suffit souvent à lever l’ambiguïté.
 ## D’où ça vient
 
 Paul Rozin a étudié ce que les gens entendent par *natural* (« The Meaning of
-“Natural” », *Psychological Science*, 2005). Ses travaux montrent qu’un
-ajout, même minime, fait perdre plus de naturalité qu’un retrait. En
+“Natural” », *Psychological Science*, 2005). Ses travaux montrent que
+l’historique de transformation pèse plus que le contenu : l’insertion d’un
+gène d’une autre espèce fait chuter la naturalité bien plus que la
+domestication. Une étude ultérieure (Rozin, Fischler et Shields-Argelès, 2009)
+montre qu’un ajout fait perdre plus de naturalité qu’un retrait équivalent. En
 étiquetage alimentaire, la FDA américaine n’a jamais adopté de définition
 formelle du mot.
 
