@@ -64,3 +64,21 @@
   description: >
     Termes techniques que chacun manipule au quotidien sans toujours savoir
     ce qu'ils découpent.
+- slug: informatique
+  nom: Informatique
+  couleur: '#5b6ee1'
+  description: >
+    Discipline jeune, dont les noms ont parfois été choisis pour séduire un
+    financeur plutôt que pour décrire.
+- slug: physique
+  nom: Physique
+  couleur: '#1f6f8b'
+  description: >
+    Vocabulaire hérité de théories abandonnées, comme le calorique, que
+    les découvertes suivantes n'ont pas pris la peine de renommer.
+- slug: medecine
+  nom: Médecine
+  couleur: '#b5485d'
+  description: >
+    Les noms de maladies sont lus par les patients autant que par les
+    soignants, et un mauvais nom peut aggraver la stigmatisation.
