@@ -7,7 +7,6 @@ type Champs = {
   discipline: string
   pourquoi: string
   suggestion: string
-  contact: string
   site: string
 }
 
@@ -27,10 +26,9 @@ const LIBELLES: Record<Nom, string> = {
   discipline: 'Discipline',
   pourquoi: 'Pourquoi il induit en erreur',
   suggestion: 'Une suggestion',
-  contact: 'Contact',
 }
 
-const VIDE: Champs = { terme: '', discipline: '', pourquoi: '', suggestion: '', contact: '', site: '' }
+const VIDE: Champs = { terme: '', discipline: '', pourquoi: '', suggestion: '', site: '' }
 
 function estNom(valeur: unknown): valeur is Nom {
   return typeof valeur === 'string' && Object.prototype.hasOwnProperty.call(LIBELLES, valeur)
@@ -135,10 +133,6 @@ export function FormulaireProposition() {
         aide: 'Le malentendu : ce que le mot laisse comprendre, et ce qu’il veut dire en réalité (20 caractères minimum)',
       })}
       {champ('suggestion', { max: 200 })}
-      {champ('contact', {
-        max: 200,
-        aide: 'Une adresse e-mail ou un pseudo, pour recevoir une réponse. Facultatif.',
-      })}
 
       {/* Champ piège : un robot remplit tout ce qu’il trouve, une personne ne le voit pas.
           Hors écran plutôt que `display: none`, que certains robots savent ignorer ;
@@ -186,7 +180,7 @@ export function FormulaireProposition() {
 
       <p className="text-sm text-stone-600">
         Ce qui est enregistré : le texte saisi, une empreinte non réversible de la connexion (pour
-        limiter les envois à cinq par heure) et la date. Le contact n’est gardé que s’il est donné.
+        limiter les envois à cinq par heure) et la date.
       </p>
     </form>
   )

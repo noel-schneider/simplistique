@@ -44,14 +44,13 @@ export function depotEnMemoire(): DepotDePropositions {
     async nonTraitees() {
       return lignes
         .filter((l) => l.traiteeLe === null)
-        .map(({ id, creeLe, terme, discipline, pourquoi, suggestion, contact }) => ({
+        .map(({ id, creeLe, terme, discipline, pourquoi, suggestion }) => ({
           id,
           creeLe,
           terme,
           discipline,
           pourquoi,
           suggestion,
-          contact,
         }))
     },
 

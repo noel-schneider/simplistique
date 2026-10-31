@@ -11,7 +11,6 @@ describe('validerProposition', () => {
         discipline: ' Comptabilité ',
         pourquoi: `  ${POURQUOI}  `,
         suggestion: ' Avoirs ',
-        contact: ' moi@exemple.org ',
       }),
     ).toEqual({
       ok: true,
@@ -20,7 +19,6 @@ describe('validerProposition', () => {
         discipline: 'Comptabilité',
         pourquoi: POURQUOI,
         suggestion: 'Avoirs',
-        contact: 'moi@exemple.org',
       },
     })
   })
@@ -28,7 +26,7 @@ describe('validerProposition', () => {
   it('rend les champs facultatifs absents comme des chaînes vides', () => {
     expect(validerProposition({ terme: 'Actif', pourquoi: POURQUOI })).toEqual({
       ok: true,
-      proposition: { terme: 'Actif', discipline: '', pourquoi: POURQUOI, suggestion: '', contact: '' },
+      proposition: { terme: 'Actif', discipline: '', pourquoi: POURQUOI, suggestion: '' },
     })
   })
 
@@ -53,8 +51,8 @@ describe('validerProposition', () => {
     expect(validerProposition({ terme: 'Actif', pourquoi: `  ${'a'.repeat(19)}  ` })).toMatchObject({ ok: false })
   })
 
-  it('refuse chaque champ au-delà de sa limite (120/80/2000/200/200)', () => {
-    const limites = { terme: 120, discipline: 80, pourquoi: 2000, suggestion: 200, contact: 200 }
+  it('refuse chaque champ au-delà de sa limite (120/80/2000/200)', () => {
+    const limites = { terme: 120, discipline: 80, pourquoi: 2000, suggestion: 200 }
     const base = { terme: 'Actif', pourquoi: POURQUOI }
     for (const [champ, limite] of Object.entries(limites)) {
       const pile = 'a'.repeat(limite)
@@ -74,10 +72,10 @@ describe('validerProposition', () => {
   })
 
   it('refuse un champ qui n’est pas une chaîne', () => {
-    expect(validerProposition({ terme: 42, pourquoi: POURQUOI, contact: ['x'] })).toEqual({
+    expect(validerProposition({ terme: 42, pourquoi: ['x'] })).toEqual({
       ok: false,
       erreur: 'invalide',
-      champs: ['terme', 'contact'],
+      champs: ['terme', 'pourquoi'],
     })
   })
 
@@ -85,8 +83,19 @@ describe('validerProposition', () => {
     const issue = validerProposition({ terme: 'Actif', pourquoi: POURQUOI, auteur: 'pirate', id: 3 })
     expect(issue).toMatchObject({ ok: true })
     expect(Object.keys((issue as { proposition: object }).proposition).sort()).toEqual(
-      ['contact', 'discipline', 'pourquoi', 'suggestion', 'terme'],
+      ['discipline', 'pourquoi', 'suggestion', 'terme'],
     )
+  })
+
+  it('ignore un `contact` envoyé par un ancien client : il n’est jamais conservé', () => {
+    const issue = validerProposition({ terme: 'Actif', pourquoi: POURQUOI, contact: 'moi@exemple.org' })
+    expect(issue).toEqual({
+      ok: true,
+      proposition: { terme: 'Actif', discipline: '', pourquoi: POURQUOI, suggestion: '' },
+    })
+    expect(JSON.stringify(issue)).not.toContain('moi@exemple.org')
+    // Même une valeur invalide pour l’ancien champ ne fait pas échouer l’envoi.
+    expect(validerProposition({ terme: 'Actif', pourquoi: POURQUOI, contact: ['x'] })).toMatchObject({ ok: true })
   })
 
   it('champ site rempli → piege', () => {
@@ -115,10 +124,10 @@ describe('validerProposition', () => {
       })
     }
     // Un champ facultatif n’y échappe pas.
-    expect(validerProposition({ terme: 'Actif', pourquoi: POURQUOI, contact: 'moi\u0000' })).toEqual({
+    expect(validerProposition({ terme: 'Actif', pourquoi: POURQUOI, suggestion: 'Avo\u0000irs' })).toEqual({
       ok: false,
       erreur: 'invalide',
-      champs: ['contact'],
+      champs: ['suggestion'],
     })
   })
 

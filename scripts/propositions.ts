@@ -48,8 +48,6 @@ async function principal(): Promise<void> {
     console.log(`  Discipline : ${n(p.discipline) || '(non précisée)'}`)
     console.log(`  Pourquoi : ${n(p.pourquoi)}`)
     console.log(`  Suggestion : ${n(p.suggestion) || '(aucune)'}`)
-    // Le contact n’apparaît qu’ici : il est destiné au modérateur, nulle part ailleurs.
-    console.log(`  Contact : ${n(p.contact) || '(aucun)'}`)
   }
   console.log('\nPour clore une proposition : npm run propositions -- --traiter <id>')
 }

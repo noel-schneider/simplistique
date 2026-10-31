@@ -20,7 +20,7 @@ describe('soumettre', () => {
   it('enregistre une proposition valide', async () => {
     expect(await soumettre(depot, CORPS, ALICE)).toEqual({ type: 'ok' })
     expect(await depot.nonTraitees()).toMatchObject([
-      { terme: 'Actif', discipline: '', pourquoi: CORPS.pourquoi, suggestion: '', contact: '' },
+      { terme: 'Actif', discipline: '', pourquoi: CORPS.pourquoi, suggestion: '' },
     ])
   })
 

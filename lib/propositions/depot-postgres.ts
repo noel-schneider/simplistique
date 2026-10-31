@@ -9,9 +9,9 @@ export function depotPostgres(executer: Executeur): DepotDePropositions {
   return {
     async ajouter(p, auteur) {
       await executer(
-        `INSERT INTO propositions (terme, discipline, pourquoi, suggestion, contact, auteur)
+        `INSERT INTO propositions (terme, discipline, pourquoi, suggestion, auteur)
          VALUES ($1, $2, $3, $4, $5, $6)`,
-        [p.terme, p.discipline, p.pourquoi, p.suggestion, p.contact, auteur],
+        [p.terme, p.discipline, p.pourquoi, p.suggestion, auteur],
       )
     },
 
@@ -35,7 +35,7 @@ export function depotPostgres(executer: Executeur): DepotDePropositions {
     async nonTraitees() {
       // `auteur` n’est volontairement pas lu : la modération n’en a pas l’usage.
       const lignes = await executer(
-        `SELECT id, cree_le, terme, discipline, pourquoi, suggestion, contact
+        `SELECT id, cree_le, terme, discipline, pourquoi, suggestion
          FROM propositions WHERE traitee_le IS NULL ORDER BY id`,
         [],
       )
@@ -51,7 +51,6 @@ export function depotPostgres(executer: Executeur): DepotDePropositions {
           discipline: String(l.discipline),
           pourquoi: String(l.pourquoi),
           suggestion: String(l.suggestion),
-          contact: String(l.contact),
         }),
       )
     },

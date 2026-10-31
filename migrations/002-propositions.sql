@@ -4,8 +4,6 @@ CREATE TABLE IF NOT EXISTS propositions (
   discipline  text        NOT NULL DEFAULT '',
   pourquoi    text        NOT NULL DEFAULT '',
   suggestion  text        NOT NULL DEFAULT '',
-  -- Donnee personnelle facultative : jamais journalisee, jamais rendue par l'API.
-  contact     text        NOT NULL DEFAULT '',
   -- Empreinte salee (empreinteVotant), pour la limite de debit uniquement.
   auteur      text        NOT NULL,
   cree_le     timestamptz NOT NULL DEFAULT now(),

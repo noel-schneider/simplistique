@@ -17,8 +17,8 @@ function json(corps: unknown, status: number): Response {
 }
 
 /**
- * Aucune réponse ne renvoie la proposition : le `contact` est une donnée
- * personnelle, et rien dans la réponse ne doit pouvoir le refléter. Le piège
+ * Aucune réponse ne renvoie la proposition : rien de ce qui a été saisi ne
+ * doit pouvoir être reflété par la réponse. Le piège
  * arrive ici en `ok`, comme un vrai envoi — un code distinct trahirait le champ.
  */
 function reponse(issue: IssueDeProposition): Response {
@@ -39,7 +39,7 @@ function indisponible(cause: 'configuration' | 'base'): Response {
 function journaliser(erreur: unknown): void {
   // Jamais `erreur.message` : il peut porter un nom d’hôte, donc la chaîne de
   // connexion — et ici, en plus, une valeur du corps reprise par le pilote dans son
-  // message, `contact` compris. Nom de classe et SQLSTATE sont des constantes.
+  // message. Nom de classe et SQLSTATE sont des constantes.
   console.error(
     'propositions:',
     erreur instanceof Error ? erreur.constructor.name : 'inconnu',

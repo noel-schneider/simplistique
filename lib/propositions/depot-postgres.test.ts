@@ -10,8 +10,8 @@ const URL_TEST = process.env.DATABASE_URL_TEST
 const ALICE = 'a'.repeat(64)
 const BOB = 'b'.repeat(64)
 
-function proposition(terme: string, contact = ''): Proposition {
-  return { terme, discipline: 'Comptabilité', pourquoi: 'x'.repeat(20), suggestion: 'Avoirs', contact }
+function proposition(terme: string): Proposition {
+  return { terme, discipline: 'Comptabilité', pourquoi: 'x'.repeat(20), suggestion: 'Avoirs' }
 }
 
 // Contre un vrai PostgreSQL : prouve que la migration 002 crée bien les colonnes
@@ -39,11 +39,11 @@ describe.skipIf(!URL_TEST)('depotPostgres (propositions) contre un vrai PostgreS
   })
 
   it('enregistre puis liste les non traitées dans l’ordre, sans l’auteur', async () => {
-    await depot.ajouter(proposition('Actif', 'moi@exemple.org'), ALICE)
+    await depot.ajouter(proposition('Actif'), ALICE)
     await depot.ajouter(proposition('Groupe'), BOB)
     const liste = await depot.nonTraitees()
     expect(liste.map((p) => p.terme)).toEqual(['Actif', 'Groupe'])
-    expect(liste[0]).toMatchObject({ discipline: 'Comptabilité', suggestion: 'Avoirs', contact: 'moi@exemple.org' })
+    expect(liste[0]).toMatchObject({ discipline: 'Comptabilité', suggestion: 'Avoirs' })
     expect(typeof liste[0].id).toBe('number')
     expect(liste[0].creeLe).toBeInstanceOf(Date)
     expect(liste[0]).not.toHaveProperty('auteur')

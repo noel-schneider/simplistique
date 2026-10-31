@@ -5,7 +5,7 @@ const ALICE = 'a'.repeat(64)
 const BOB = 'b'.repeat(64)
 
 function proposition(terme: string): Proposition {
-  return { terme, discipline: '', pourquoi: 'x'.repeat(20), suggestion: '', contact: '' }
+  return { terme, discipline: '', pourquoi: 'x'.repeat(20), suggestion: '' }
 }
 
 describe('depotEnMemoire (propositions)', () => {

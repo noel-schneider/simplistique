@@ -44,7 +44,6 @@ describe('FormulaireProposition', () => {
       discipline: 'Physique',
       pourquoi: POURQUOI,
       suggestion: '',
-      contact: '',
       site: '',
     })
   })

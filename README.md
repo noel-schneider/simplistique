@@ -62,7 +62,7 @@ l’hébergement, pas dans le code.
 | `npm run lint:content` | Avertissements de cohérence des fiches |
 | `npm run migrer` | Crée les tables des votes et des propositions, et leurs index ; sans effet si elles existent déjà |
 | `npm run votes:orphelins` | Signale les votes dont la fiche ou l’alternative a disparu du corpus |
-| `npm run propositions` | Liste les propositions de termes non traitées (contact compris) ; `-- --traiter <id>` en marque une comme traitée |
+| `npm run propositions` | Liste les propositions de termes non traitées ; `-- --traiter <id>` en marque une comme traitée |
 
 ## Variables d’environnement
 

@@ -9,8 +9,8 @@ plus bas).
 ## Proposer un terme en deux minutes
 
 Tout se passe sur [la page Proposer](/proposer) : le terme, une phrase ou deux sur le
-malentendu, et c’est tout. La suggestion de remplacement, la discipline et un contact
-sont facultatifs. Pas de compte, pas de GitHub. Une proposition n’est pas une
+malentendu, et c’est tout. La suggestion de remplacement et la discipline
+sont facultatives. Pas de compte, pas de GitHub. Une proposition n’est pas une
 fiche : elle est lue, puis éventuellement instruite pour en devenir une.
 
 ## Proposer une analyse complète
@@ -159,6 +159,5 @@ le calcul, pas son nom.
 
 Une proposition envoyée depuis [la page Proposer](/proposer) enregistre le texte
 saisi, la date, et la même sorte d’empreinte non réversible, qui ne sert qu’à limiter
-les envois à cinq par heure. L’adresse réseau n’est pas enregistrée. Le contact
-n’est conservé que s’il est donné ; il n’est lu que par la personne qui modère, et
-affiché nulle part ailleurs.
+les envois à cinq par heure. L’adresse réseau n’est pas enregistrée. Aucune autre
+donnée personnelle n’est demandée.

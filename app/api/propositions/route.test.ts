@@ -15,7 +15,6 @@ const { POST } = await import('./route')
 const CORPS = {
   terme: 'Actif',
   pourquoi: 'Le mot dit le contraire de ce qu’il désigne.',
-  contact: 'moi@exemple.org',
 }
 
 function requete(corps: unknown, entetes: Record<string, string> = {}): Request {
@@ -37,9 +36,9 @@ describe('POST /api/propositions', () => {
     const r = await POST(requete(CORPS))
     expect(r.status).toBe(201)
     const texte = await r.text()
-    // Le contact est une donnée personnelle : il ne repart jamais vers le client.
-    expect(texte).not.toContain(CORPS.contact)
-    expect(await depotCourant.nonTraitees()).toMatchObject([{ terme: 'Actif', contact: CORPS.contact }])
+    // Rien de ce qui a été saisi ne repart vers le client.
+    expect(texte).not.toContain(CORPS.pourquoi)
+    expect(await depotCourant.nonTraitees()).toMatchObject([{ terme: 'Actif', pourquoi: CORPS.pourquoi }])
   })
 
   it('accepte un POST de même origine', async () => {
@@ -113,14 +112,14 @@ describe('POST /api/propositions', () => {
 
   it('répond 503 sans détail quand la base échoue', async () => {
     const espion = vi.spyOn(console, 'error').mockImplementation(() => {})
-    const panne = Object.assign(new Error(`relation absente sur ${CORPS.contact}`), { code: '42P01' })
+    const panne = Object.assign(new Error(`relation absente sur ${CORPS.pourquoi}`), { code: '42P01' })
     depotCourant = { ...depotEnMemoire(), nombreDepuis: async () => Promise.reject(panne) }
     const r = await POST(requete(CORPS))
     expect(r.status).toBe(503)
     expect(await r.json()).toEqual({ erreur: 'indisponible', cause: 'base' })
     // Seuls le nom de classe et le SQLSTATE sont journalisés, jamais le message.
     expect(espion).toHaveBeenCalledWith('propositions:', 'Error', '42P01')
-    expect(JSON.stringify(espion.mock.calls)).not.toContain(CORPS.contact)
+    expect(JSON.stringify(espion.mock.calls)).not.toContain(CORPS.pourquoi)
     espion.mockRestore()
   })
 

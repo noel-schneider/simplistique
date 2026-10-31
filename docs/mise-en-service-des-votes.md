@@ -117,8 +117,7 @@ DATABASE_URL='...' npm run propositions                # liste les non traitées
 DATABASE_URL='...' npm run propositions -- --traiter 3 # marque la n° 3 comme traitée
 ```
 
-Le moyen de contact laissé par la personne n’apparaît qu’ici. Marquer une proposition
-déjà traitée est sans effet (la première date est gardée) ; un numéro inexistant est signalé.
+Marquer une proposition déjà traitée est sans effet (la première date est gardée) ; un numéro inexistant est signalé.
 
 ## Ce que tu ne pourras pas faire
 

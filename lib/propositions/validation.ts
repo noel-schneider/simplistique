@@ -3,7 +3,6 @@ export type Proposition = {
   discipline: string
   pourquoi: string
   suggestion: string
-  contact: string
 }
 
 type Champ = keyof Proposition
@@ -19,7 +18,6 @@ const BORNES: Record<Champ, { requis: boolean; min: number; max: number }> = {
   discipline: { requis: false, min: 0, max: 80 },
   pourquoi: { requis: true, min: 20, max: 2000 },
   suggestion: { requis: false, min: 0, max: 200 },
-  contact: { requis: false, min: 0, max: 200 },
 }
 
 const CHAMPS = Object.keys(BORNES) as Champ[]
