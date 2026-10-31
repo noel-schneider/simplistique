@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import type { Chantier, Fiche, Source } from '../lib/content/schema'
-import { verifierChantiers, verifierCoherence, verifierCorpus, verifierDocuments } from './coherence'
+import type { Chantier, Fiche, Motif, Source } from '../lib/content/schema'
+import { verifierChantiers, verifierCoherence, verifierMotifs, verifierCorpus, verifierDocuments } from './coherence'
 import { getFiches } from '../lib/content/fiches'
+import { getMotifs } from '../lib/content/motifs'
 import { DOSSIER_CONTENU } from '../lib/content/taxonomies'
 
 function fiche(p: Partial<Fiche> = {}): Fiche {
@@ -14,6 +15,7 @@ function fiche(p: Partial<Fiche> = {}): Fiche {
     preuve: 'intuition',
     sources: [],
     precedents: [],
+    motifs: [],
     resume: 'court',
     suggestions: [],
     cree: new Date('2026-10-03'),
@@ -238,5 +240,56 @@ describe('verifierChantiers', () => {
     const slugs = new Set(avertissements.map((a) => a.slug))
     expect(slugs).toContain('vocabulaire-du-bilan')
     expect(slugs).toContain('structures-algebriques')
+  })
+})
+
+describe('verifierMotifs', () => {
+  function motif(p: Partial<Motif> = {}): Motif {
+    return {
+      slug: 'positif-et-negatif',
+      nom: 'Positif et négatif',
+      resume: 'court',
+      cree: new Date('2026-10-31'),
+      modifie: new Date('2026-10-31'),
+      corps: '## Le piège\n\ntexte\n',
+      ...p,
+    }
+  }
+
+  const rattachee = (slug: string, discipline: string) =>
+    fiche({ slug, discipline, motifs: ['positif-et-negatif'] })
+
+  it('ne signale rien pour un motif sain', () => {
+    expect(
+      verifierMotifs(
+        [motif()],
+        [rattachee('a-droit', 'droit'), rattachee('b-economie', 'economie')],
+      ),
+    ).toEqual([])
+  })
+
+  it('avertit un motif relié à moins de deux fiches', () => {
+    const zero = verifierMotifs([motif()], [fiche()])
+    expect(zero).toHaveLength(1)
+    expect(zero[0].message).toMatch(/aucune fiche/)
+
+    const une = verifierMotifs([motif()], [rattachee('a-droit', 'droit')])
+    expect(une).toHaveLength(1)
+    expect(une[0].message).toMatch(/une seule fiche/)
+  })
+
+  it('avertit un motif dont toutes les fiches sont d’une seule discipline', () => {
+    const a = verifierMotifs(
+      [motif()],
+      [rattachee('a-droit', 'droit'), rattachee('b-droit', 'droit')],
+    )
+    expect(a).toHaveLength(1)
+    expect(a[0].message).toMatch(/une seule discipline.*chantier/)
+  })
+
+  it('n’avertit pas le motif réel normal-et-naturel', () => {
+    const fiches = getFiches(DOSSIER_CONTENU)
+    const motifs = getMotifs(DOSSIER_CONTENU)
+    expect(verifierMotifs(motifs, fiches)).toEqual([])
   })
 })

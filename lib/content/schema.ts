@@ -75,6 +75,8 @@ export type FicheMeta = {
   suggestions: string[]
   /** Le slug d’un chantier de la même discipline, ou rien. */
   chantier?: string
+  /** Slugs des motifs transversaux que la fiche illustre. Absent = aucun. */
+  motifs: string[]
   /** Contenu fictif, écrit pour développer le site. Absent = contenu réel. */
   demonstration?: boolean
   cree: Date
@@ -97,6 +99,18 @@ export type ChantierMeta = {
 }
 
 export type Chantier = ChantierMeta & { corps: string }
+
+// Un motif est un piège de vocabulaire qui revient dans plusieurs disciplines.
+// Pas de champ `discipline` : c’est précisément ce qui le distingue d’un chantier.
+export type MotifMeta = {
+  slug: string
+  nom: string
+  resume: string
+  cree: Date
+  modifie: Date
+}
+
+export type Motif = MotifMeta & { corps: string }
 
 /**
  * Message lisible pour un échec de schéma, partagé par les fiches et les chantiers.
@@ -133,6 +147,16 @@ export function creerSchemaChantier(taxonomies: Taxonomies): ZodType<Omit<Chanti
     // que `true`, pour qu’un `demonstration: false` oublié dans un fichier soit
     // refusé plutôt que de laisser croire à un marquage qui ne marque rien.
     demonstration: z.literal(true).optional(),
+    cree: z.coerce.date(),
+    modifie: z.coerce.date(),
+  })
+}
+
+export function creerSchemaMotif(): ZodType<Omit<MotifMeta, 'slug'>> {
+  return z.strictObject({
+    nom: z.string().min(1),
+    // Même traitement que le résumé d’une fiche (saut de ligne final des `>`).
+    resume: z.string().trim().min(1).max(LONGUEUR_MAX_RESUME),
     cree: z.coerce.date(),
     modifie: z.coerce.date(),
   })
@@ -189,6 +213,7 @@ function creerSchemaSource() {
 export function creerSchemaFiche(
   taxonomies: Taxonomies,
   chantiers: ChantierMeta[] = [],
+  motifs: MotifMeta[] = [],
 ): ZodType<Omit<FicheMeta, 'slug'>> {
   const disciplines = taxonomies.disciplines.map((d) => d.slug) as [string, ...string[]]
   const confusions = taxonomies.confusions.map((c) => c.slug) as [string, ...string[]]
@@ -216,10 +241,29 @@ export function creerSchemaFiche(
       // que `true`, pour qu’un `demonstration: false` oublié dans un fichier soit
       // refusé plutôt que de laisser croire à un marquage qui ne marque rien.
       demonstration: z.literal(true).optional(),
+      // Liste de slugs vérifiée dans le superRefine plus bas, pour la même
+      // raison que `chantier` : l’enum serait impossible avec zéro motif au corpus.
+      motifs: z.array(z.string().min(1, 'motif vide : retirer l’entrée plutôt que la laisser vide')).default([]),
       cree: z.coerce.date(),
       modifie: z.coerce.date(),
     })
     .superRefine((fiche, ctx) => {
+      fiche.motifs.forEach((slugMotif, index) => {
+        if (!motifs.some((m) => m.slug === slugMotif)) {
+          ctx.addIssue({
+            code: 'custom',
+            path: ['motifs', index],
+            message: `motif inconnu « ${slugMotif} » — aucun fichier content/motifs/${slugMotif}.md`,
+          })
+        } else if (fiche.motifs.indexOf(slugMotif) !== index) {
+          ctx.addIssue({
+            code: 'custom',
+            path: ['motifs', index],
+            message: `motif répété « ${slugMotif} » — une fiche ne rejoint un motif qu’une fois`,
+          })
+        }
+      })
+
       if (fiche.chantier === undefined) return
 
       const chantier = chantiers.find((c) => c.slug === fiche.chantier)
@@ -242,6 +286,6 @@ export function creerSchemaFiche(
     })
 }
 
-// Sans `sources` ni `precedents` : l’index part au navigateur avec la page des
-// fiches, et ces champs ne servent que sur la page de la fiche.
-export type FicheIndex = Omit<FicheMeta, 'cree' | 'modifie' | 'sources' | 'precedents'>
+// Sans `sources`, `precedents` ni `motifs` : l’index part au navigateur avec la
+// page des fiches, et ces champs ne servent que sur la page de la fiche.
+export type FicheIndex = Omit<FicheMeta, 'cree' | 'modifie' | 'sources' | 'precedents' | 'motifs'>

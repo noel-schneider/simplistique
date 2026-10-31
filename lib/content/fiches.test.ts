@@ -4,7 +4,7 @@ import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { chargerTaxonomies, DOSSIER_CONTENU } from './taxonomies'
 import { getFiche, getFiches, getDocument, getIndex } from './fiches'
-import type { Fiche, ChantierMeta } from './schema'
+import type { Fiche, ChantierMeta, MotifMeta } from './schema'
 
 const taxonomies = chargerTaxonomies(DOSSIER_CONTENU)
 
@@ -163,7 +163,11 @@ describe('getDocument', () => {
   })
 })
 
-function lireFicheDeTest(champs: Record<string, unknown>, chantiers: ChantierMeta[]): Fiche {
+function lireFicheDeTest(
+  champs: Record<string, unknown>,
+  chantiers: ChantierMeta[],
+  motifs: MotifMeta[] = [],
+): Fiche {
   const dossier = mkdtempSync(join(tmpdir(), 'simplistique-fiche-'))
   try {
     mkdirSync(join(dossier, 'fiches'), { recursive: true })
@@ -186,7 +190,7 @@ function lireFicheDeTest(champs: Record<string, unknown>, chantiers: ChantierMet
       `---\n${entete}\n---\n\n## Risques\n\ntexte\n`,
       'utf8',
     )
-    const fiche = getFiche('essai-comptabilite', dossier, chargerTaxonomies(DOSSIER_CONTENU), chantiers)
+    const fiche = getFiche('essai-comptabilite', dossier, chargerTaxonomies(DOSSIER_CONTENU), chantiers, motifs)
     if (!fiche) throw new Error('fiche de test introuvable')
     return fiche
   } finally {
@@ -252,5 +256,39 @@ describe('le champ chantier d’une fiche', () => {
       'vocabulaire-du-bilan',
     )
     expect(index.find((e) => e.slug === 'groupe-mathematiques')?.chantier).toBeUndefined()
+  })
+})
+
+describe('le champ motifs d’une fiche', () => {
+  const MOTIFS: MotifMeta[] = [
+    {
+      slug: 'positif-et-negatif',
+      nom: 'Positif et négatif',
+      resume: 'court',
+      cree: new Date('2026-10-31'),
+      modifie: new Date('2026-10-31'),
+    },
+  ]
+
+  it('vaut une liste vide quand le champ est absent', () => {
+    expect(lireFicheDeTest({}, [], MOTIFS).motifs).toEqual([])
+  })
+
+  it('accepte un motif qui existe', () => {
+    expect(lireFicheDeTest({ motifs: ['positif-et-negatif'] }, [], MOTIFS).motifs).toEqual([
+      'positif-et-negatif',
+    ])
+  })
+
+  it('refuse un motif inconnu', () => {
+    expect(() => lireFicheDeTest({ motifs: ['x'] }, [], MOTIFS)).toThrow(
+      /motif inconnu « x » — aucun fichier content\/motifs\/x\.md/,
+    )
+  })
+
+  it('refuse un motif répété dans la même fiche', () => {
+    expect(() =>
+      lireFicheDeTest({ motifs: ['positif-et-negatif', 'positif-et-negatif'] }, [], MOTIFS),
+    ).toThrow(/motif répété « positif-et-negatif »/)
   })
 })

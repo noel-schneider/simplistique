@@ -15,6 +15,8 @@ sources:
     objet: "sondage sur la compréhension des tranches d’impôt"
     url: https://taxpolicy.org.uk/2024/07/05/half-the-british-public-doesnt-understand-income-tax-new-data/
     lecture: seconde-main
+motifs:
+  - taux-et-niveau
 cree: 2026-10-31
 modifie: 2026-10-31
 ---

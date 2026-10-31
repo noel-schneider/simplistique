@@ -23,6 +23,8 @@ sources:
     annee: 1985
     titre: "Ethics and the Limits of Philosophy"
     lecture: seconde-main
+motifs:
+  - normal-et-naturel
 cree: 2026-10-31
 modifie: 2026-10-31
 ---

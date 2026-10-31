@@ -38,7 +38,7 @@ continue qui vérifie, sans discussion possible :
   sans accent.
 - Les champs du front-matter. Requis : `terme`, `discipline`, `confusion`,
   `statut`, `preuve`, `resume`, `suggestions`, `cree`, `modifie`. Facultatifs :
-  `chantier`, `sources` et `precedents`.
+  `chantier`, `motifs`, `sources` et `precedents`.
 - `preuve` : le niveau d’appui de l’analyse, parmi trois valeurs.
   `intuition` : l’analyse vient de l’auteur de la fiche. `documentee` : un
   spécialiste de la discipline a écrit que ce nom pose problème. `mesuree` :
@@ -58,6 +58,9 @@ continue qui vérifie, sans discussion possible :
 - `chantier`, s’il est présent : doit désigner un fichier existant de
   `content/chantiers/`, et ce chantier doit relever de la même discipline que
   la fiche. Les deux manquements font échouer la construction du site.
+- `motifs`, s’il est présent : une liste de slugs, chacun désignant un fichier
+  existant de `content/motifs/`, sans répétition. Un slug inconnu ou répété fait
+  échouer la construction du site.
 - Aucun champ inconnu : une clé mal orthographiée fait échouer la construction
   plutôt que d’être ignorée en silence.
 
@@ -83,6 +86,25 @@ Son corps suit le même plan qu’une fiche, section « Risques » comprise.
 `npm run lint:content` signale un chantier que plus aucune fiche ne désigne, un chantier
 qui n’en a qu’une — le mot suppose un corpus — et un chantier dont le texte n’identifie
 aucun risque.
+
+## Proposer un motif
+
+Certains pièges reviennent d’une discipline à l’autre : « positif » et « négatif » qui
+comptent au lieu de juger, « normal » qui glisse de fréquent à souhaitable. Un
+**motif** est le document qui nomme ce piège commun, et que chaque fiche concernée
+désigne par son champ `motifs`.
+
+La différence avec un chantier : un chantier réunit des fiches d’**une** discipline qui
+doivent bouger ensemble ; un motif relie des fiches de disciplines **différentes** qui
+partagent un piège, sans que leurs renommages dépendent les uns des autres.
+
+Un motif est un fichier `content/motifs/<slug>.md`, dont le nom de fichier fait le slug.
+Son front-matter porte `nom`, `resume` (240 caractères maximum), `cree` et `modifie`.
+Son corps suit trois sections : « Le piège », « Où on le retrouve », « Ce qu’on peut en
+tirer ». Il ne dit que ce que les fiches reliées disent déjà.
+
+`npm run lint:content` signale un motif relié à moins de deux fiches, et un motif dont
+toutes les fiches relèvent d’une seule discipline — c’est alors un chantier.
 
 ## Ce qui sera probablement refusé
 

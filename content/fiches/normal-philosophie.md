@@ -17,6 +17,8 @@ sources:
     annee: 1990
     titre: "The Taming of Chance"
     lecture: seconde-main
+motifs:
+  - normal-et-naturel
 cree: 2026-10-31
 modifie: 2026-10-31
 ---

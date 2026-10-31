@@ -14,6 +14,8 @@ sources:
     annee: 2022
     objet: "enquête YouGov réalisée pour le NIESR sur un titre annonçant une baisse de l’inflation"
     lecture: seconde-main
+motifs:
+  - taux-et-niveau
 cree: 2026-10-31
 modifie: 2026-10-31
 ---

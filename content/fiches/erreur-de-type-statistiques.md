@@ -15,6 +15,8 @@ sources:
     annee: 2015
     objet: "propos sur les erreurs de type I et de type II"
     lecture: seconde-main
+motifs:
+  - positif-et-negatif
 cree: 2026-10-31
 modifie: 2026-10-31
 ---

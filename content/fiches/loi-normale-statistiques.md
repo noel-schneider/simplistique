@@ -14,6 +14,8 @@ sources:
     annee: 1920
     titre: "Notes on the History of Correlation"
     lecture: seconde-main
+motifs:
+  - normal-et-naturel
 cree: 2026-10-31
 modifie: 2026-10-31
 ---

@@ -17,6 +17,8 @@ sources:
     annee: 1903
     titre: "Principia Ethica"
     lecture: seconde-main
+motifs:
+  - normal-et-naturel
 cree: 2026-10-31
 modifie: 2026-10-31
 ---

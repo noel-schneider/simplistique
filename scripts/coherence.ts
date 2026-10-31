@@ -1,5 +1,5 @@
 import { listerTitres, retirerCrochets } from '../lib/content/markdown'
-import { LONGUEUR_MAX_RESUME, type Chantier, type Fiche } from '../lib/content/schema'
+import { LONGUEUR_MAX_RESUME, type Chantier, type Fiche, type Motif } from '../lib/content/schema'
 import { empreinteAlternative } from '../lib/votes/empreintes'
 
 export type Avertissement = { slug: string; message: string }
@@ -157,6 +157,47 @@ export function verifierChantier(chantier: Chantier, fiches: Fiche[]): Avertisse
 
 export function verifierChantiers(chantiers: Chantier[], fiches: Fiche[]): Avertissement[] {
   return chantiers.flatMap((chantier) => verifierChantier(chantier, fiches))
+}
+
+/**
+ * Deux avertissements éditoriaux. Un motif relie des fiches de disciplines
+ * différentes : avec moins de deux fiches il ne relie rien, et si toutes les
+ * fiches relèvent de la même discipline, c’est un chantier qu’il faut (une
+ * réforme qui bouge ensemble), pas un motif (un piège qui revient ailleurs).
+ */
+export function verifierMotif(motif: Motif, fiches: Fiche[]): Avertissement[] {
+  const siennes = fiches.filter((fiche) => fiche.motifs.includes(motif.slug))
+
+  if (siennes.length === 0) {
+    return [
+      {
+        slug: motif.slug,
+        message: 'aucune fiche ne désigne ce motif : un « motifs: » a probablement été oublié dans une fiche',
+      },
+    ]
+  }
+  if (siennes.length === 1) {
+    return [
+      {
+        slug: motif.slug,
+        message: 'une seule fiche désigne ce motif : un motif relie au moins deux fiches, sans quoi il ne relie rien',
+      },
+    ]
+  }
+  if (new Set(siennes.map((fiche) => fiche.discipline)).size === 1) {
+    return [
+      {
+        slug: motif.slug,
+        message:
+          'toutes les fiches de ce motif relèvent d’une seule discipline : c’est plutôt un chantier, un motif relie des disciplines différentes',
+      },
+    ]
+  }
+  return []
+}
+
+export function verifierMotifs(motifs: Motif[], fiches: Fiche[]): Avertissement[] {
+  return motifs.flatMap((motif) => verifierMotif(motif, fiches))
 }
 
 export function verifierDocuments(documents: { nom: string; texte: string }[]): Avertissement[] {

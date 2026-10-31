@@ -1,6 +1,7 @@
 import type { MetadataRoute } from 'next'
 import { getChantiers } from '@/lib/content/chantiers'
 import { getFiches } from '@/lib/content/fiches'
+import { getMotifs } from '@/lib/content/motifs'
 import { urlSite } from '@/lib/site'
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -24,10 +25,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
     url: `${base}${chemin}`,
   }))
 
-  // `/` et `/fiches` affichent le corpus (l'accueil en donne les compteurs,
-  // `/fiches` le catalogue) : la date la plus récente du corpus veut
+  // `/`, `/fiches` et `/motifs` affichent le corpus (l'accueil en donne les
+  // compteurs, `/fiches` le catalogue, `/motifs` la liste des pièges) : la date la plus récente du corpus veut
   // réellement dire quelque chose pour elles.
-  const pagesCorpus: MetadataRoute.Sitemap = ['/', '/fiches'].map((chemin) => ({
+  const pagesCorpus: MetadataRoute.Sitemap = ['/', '/fiches', '/motifs'].map((chemin) => ({
     url: `${base}${chemin}`,
     lastModified: derniereModifDuCorpus,
   }))
@@ -49,5 +50,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: chantier.modifie,
     }))
 
-  return [...pagesCorpus, ...pagesDocuments, ...pagesFiches, ...pagesChantiers]
+  const pagesMotifs: MetadataRoute.Sitemap = getMotifs().map((motif) => ({
+    url: `${base}/motifs/${motif.slug}`,
+    lastModified: motif.modifie,
+  }))
+
+  return [...pagesCorpus, ...pagesDocuments, ...pagesFiches, ...pagesChantiers, ...pagesMotifs]
 }

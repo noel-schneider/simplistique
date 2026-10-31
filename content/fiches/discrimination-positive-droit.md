@@ -15,6 +15,8 @@ sources:
     titre: "La discrimination positive"
     objet: "coll. Que sais-je ?, PUF"
     lecture: seconde-main
+motifs:
+  - positif-et-negatif
 cree: 2026-10-31
 modifie: 2026-10-31
 ---

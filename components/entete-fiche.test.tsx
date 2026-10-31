@@ -21,6 +21,7 @@ function meta(p: Partial<FicheMeta> = {}): FicheMeta {
     preuve: 'documentee',
     sources: [],
     precedents: [],
+    motifs: [],
     resume: 'Un mot courant au sens technique étranger.',
     suggestions: [],
     cree: new Date('2026-10-03'),

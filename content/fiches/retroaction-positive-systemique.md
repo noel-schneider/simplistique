@@ -16,6 +16,8 @@ sources:
     titre: "Confusing Science Vocabulary: When Negative Is Positive!"
     url: https://www.nsta.org/journal-college-science-teaching/journal-college-science-teaching-januaryfebruary-2020/confusing
     lecture: originale
+motifs:
+  - positif-et-negatif
 cree: 2026-10-31
 modifie: 2026-10-31
 ---

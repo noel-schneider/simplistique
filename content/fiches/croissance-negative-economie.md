@@ -15,6 +15,9 @@ sources:
     annee: 2009
     titre: "Croissance négative ou décroissance"
     lecture: seconde-main
+motifs:
+  - positif-et-negatif
+  - taux-et-niveau
 cree: 2026-10-31
 modifie: 2026-10-31
 ---
