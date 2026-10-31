@@ -7,6 +7,10 @@ export const alt = 'Image de partage de la fiche'
 export const size = { width: 1200, height: 630 }
 export const contentType = 'image/png'
 
+// Comme la page de fiche (voir page.tsx) : un slug inconnu répond 404 sans
+// invoquer le gestionnaire, qui lirait le disque puis lèverait une erreur 500.
+export const dynamicParams = false
+
 // Même liste que la page de fiche : une image par fiche, produite au build.
 export function generateStaticParams() {
   return getFiches().map((fiche) => ({ slug: fiche.slug }))
