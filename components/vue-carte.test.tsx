@@ -1,12 +1,18 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import type { FicheIndex } from '../lib/content/schema'
 import { styleStatut, VueCarte } from './vue-carte'
 
+const familles = [
+  { slug: 'sciences', nom: 'Sciences', description: 'a' },
+  { slug: 'societe', nom: 'Société', description: 'b' },
+  { slug: 'pratiques', nom: 'Arts et pratiques', description: 'c' },
+]
+
 const disciplines = [
-  { slug: 'mathematiques', nom: 'Mathématiques', couleur: '#e8703a', description: 'a' },
-  { slug: 'escalade', nom: 'Escalade', couleur: '#3fa08a', description: 'b' },
-  { slug: 'comptabilite', nom: 'Comptabilité', couleur: '#3b82c4', description: 'c' },
+  { slug: 'mathematiques', nom: 'Mathématiques', famille: 'sciences', couleur: '#e8703a', description: 'a' },
+  { slug: 'escalade', nom: 'Escalade', famille: 'pratiques', couleur: '#3fa08a', description: 'b' },
+  { slug: 'comptabilite', nom: 'Comptabilité', famille: 'societe', couleur: '#3b82c4', description: 'c' },
 ]
 
 const libellesStatuts = new Map([
@@ -53,7 +59,7 @@ describe('styleStatut', () => {
 
 describe('VueCarte', () => {
   it('fait de chaque fiche un lien réel, atteignable au clavier', () => {
-    render(<VueCarte fiches={fiches} disciplines={disciplines} libellesStatuts={libellesStatuts} />)
+    render(<VueCarte fiches={fiches} familles={familles} disciplines={disciplines} libellesStatuts={libellesStatuts} />)
     expect(screen.getByRole('link', { name: /groupe/ })).toHaveAttribute(
       'href',
       '/fiches/groupe-mathematiques',
@@ -62,26 +68,26 @@ describe('VueCarte', () => {
   })
 
   it('nomme chaque zone de discipline avec son compte de fiches', () => {
-    render(<VueCarte fiches={fiches} disciplines={disciplines} libellesStatuts={libellesStatuts} />)
+    render(<VueCarte fiches={fiches} familles={familles} disciplines={disciplines} libellesStatuts={libellesStatuts} />)
     expect(screen.getByText(/Mathématiques/)).toBeInTheDocument()
     expect(screen.getByText(/Mathématiques/).textContent).toMatch(/2/)
     expect(screen.getByText(/Escalade/).textContent).toMatch(/1/)
   })
 
-  it('dessine une discipline sans aucune fiche avec un compte de zéro', () => {
-    render(<VueCarte fiches={fiches} disciplines={disciplines} libellesStatuts={libellesStatuts} />)
-    expect(screen.getByText(/Comptabilité/).textContent).toMatch(/0/)
+  it('masque une discipline sans fiche', () => {
+    render(<VueCarte fiches={fiches} familles={familles} disciplines={disciplines} libellesStatuts={libellesStatuts} />)
+    expect(screen.queryByText(/Comptabilité/)).not.toBeInTheDocument()
   })
 
   it('ne plante pas sur un corpus entièrement vide', () => {
-    render(<VueCarte fiches={[]} disciplines={disciplines} libellesStatuts={libellesStatuts} />)
+    render(<VueCarte fiches={[]} familles={familles} disciplines={disciplines} libellesStatuts={libellesStatuts} />)
     expect(screen.queryAllByRole('link')).toHaveLength(0)
-    expect(screen.getByText(/Mathématiques/).textContent).toMatch(/0/)
+    expect(screen.queryByText(/Mathématiques/)).not.toBeInTheDocument()
   })
 
   it('colore chaque point selon sa discipline', () => {
     const { container } = render(
-      <VueCarte fiches={fiches} disciplines={disciplines} libellesStatuts={libellesStatuts} />,
+      <VueCarte fiches={fiches} familles={familles} disciplines={disciplines} libellesStatuts={libellesStatuts} />,
     )
     const cercles = Array.from(container.querySelectorAll('circle'))
     const mathematiques = cercles.filter((c) => c.getAttribute('stroke') === '#e8703a')
@@ -92,7 +98,7 @@ describe('VueCarte', () => {
 
   it('donne le même rayon à tous les points', () => {
     const { container } = render(
-      <VueCarte fiches={fiches} disciplines={disciplines} libellesStatuts={libellesStatuts} />,
+      <VueCarte fiches={fiches} familles={familles} disciplines={disciplines} libellesStatuts={libellesStatuts} />,
     )
     const rayons = new Set(
       Array.from(container.querySelectorAll('circle')).map((c) => c.getAttribute('r')),
@@ -101,33 +107,45 @@ describe('VueCarte', () => {
   })
 
   it('affiche une légende des trois statuts', () => {
-    render(<VueCarte fiches={fiches} disciplines={disciplines} libellesStatuts={libellesStatuts} />)
+    render(<VueCarte fiches={fiches} familles={familles} disciplines={disciplines} libellesStatuts={libellesStatuts} />)
     for (const nom of ['Pointé', 'Proposé', 'Rejeté']) {
       expect(screen.getByText(nom)).toBeInTheDocument()
     }
   })
 
   it('décrit chaque point par son terme et son statut', () => {
-    render(<VueCarte fiches={fiches} disciplines={disciplines} libellesStatuts={libellesStatuts} />)
+    render(<VueCarte fiches={fiches} familles={familles} disciplines={disciplines} libellesStatuts={libellesStatuts} />)
     expect(screen.getByRole('link', { name: 'groupe — Pointé' })).toBeInTheDocument()
   })
 
   it('marque chaque point d’une classe qui porte le style de focus', () => {
-    render(<VueCarte fiches={fiches} disciplines={disciplines} libellesStatuts={libellesStatuts} />)
+    render(<VueCarte fiches={fiches} familles={familles} disciplines={disciplines} libellesStatuts={libellesStatuts} />)
     for (const lien of screen.getAllByRole('link')) {
       expect(lien).toHaveClass('point-fiche')
     }
   })
 
   it('dit en clair ce que la couleur et le remplissage encodent', () => {
-    render(<VueCarte fiches={fiches} disciplines={disciplines} libellesStatuts={libellesStatuts} />)
+    render(<VueCarte fiches={fiches} familles={familles} disciplines={disciplines} libellesStatuts={libellesStatuts} />)
     expect(screen.getByText(/Chaque couleur désigne une discipline/)).toBeInTheDocument()
   })
 
-  it('utilise des titres de niveau 2 pour chaque zone de discipline', () => {
-    render(<VueCarte fiches={fiches} disciplines={disciplines} libellesStatuts={libellesStatuts} />)
-    const titresNiveau2 = screen.getAllByRole('heading', { level: 2 })
-    // Une zone par discipline, même celles sans fiche (Mathématiques, Escalade, Comptabilité)
-    expect(titresNiveau2).toHaveLength(3)
+  it('regroupe les zones sous le titre de leur famille, dans l’ordre de familles.yml', () => {
+    render(<VueCarte fiches={fiches} familles={familles} disciplines={disciplines} libellesStatuts={libellesStatuts} />)
+    const titresFamilles = screen.getAllByRole('heading', { level: 2 })
+    expect(titresFamilles.map((t) => t.textContent)).toEqual(['Sciences', 'Arts et pratiques'])
+    const sciences = titresFamilles[0].closest('section')!
+    expect(within(sciences).getByText(/Mathématiques/)).toBeInTheDocument()
+    expect(within(sciences).queryByText(/Escalade/)).not.toBeInTheDocument()
+  })
+
+  it('n’affiche pas une famille sans discipline', () => {
+    render(<VueCarte fiches={fiches} familles={familles} disciplines={disciplines} libellesStatuts={libellesStatuts} />)
+    expect(screen.queryByRole('heading', { name: 'Société' })).not.toBeInTheDocument()
+  })
+
+  it('place les titres de zone au niveau 3, sous le titre de famille', () => {
+    render(<VueCarte fiches={fiches} familles={familles} disciplines={disciplines} libellesStatuts={libellesStatuts} />)
+    expect(screen.getAllByRole('heading', { level: 3 })).toHaveLength(2)
   })
 })

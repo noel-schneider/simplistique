@@ -43,6 +43,9 @@ export const schemaEntreeTaxonomie = z.object({
 })
 
 export const schemaDiscipline = schemaEntreeTaxonomie.extend({
+  // Slug d'une entrée de familles.yml ; l'existence est vérifiée au chargement
+  // des taxonomies, qui voit les deux fichiers à la fois.
+  famille: z.string().min(1),
   couleur: z.string().regex(/^#[0-9a-fA-F]{6}$/, 'couleur invalide : hexadécimal sur 6 chiffres'),
 })
 
@@ -50,6 +53,7 @@ export type EntreeTaxonomie = z.infer<typeof schemaEntreeTaxonomie>
 export type Discipline = z.infer<typeof schemaDiscipline>
 
 export type Taxonomies = {
+  familles: EntreeTaxonomie[]
   disciplines: Discipline[]
   confusions: EntreeTaxonomie[]
   statuts: EntreeTaxonomie[]

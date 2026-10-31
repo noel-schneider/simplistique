@@ -1,0 +1,19 @@
+- slug: sciences
+  nom: Sciences
+  description: >
+    Disciplines scientifiques et formelles, au vocabulaire souvent hérité de
+    plusieurs siècles de pratique.
+- slug: societe
+  nom: Société
+  description: >
+    Disciplines qui décrivent ou organisent la vie en commun : échanges, règles,
+    pensée.
+- slug: quotidien
+  nom: Vie quotidienne
+  description: >
+    Domaines dont chacun manie les mots sans être spécialiste : argent,
+    assiette, météo, santé, travail.
+- slug: pratiques
+  nom: Arts et pratiques
+  description: >
+    Pratiques apprises par le geste autant que par le livre.

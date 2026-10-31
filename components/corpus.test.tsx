@@ -21,9 +21,11 @@ vi.mock('next/link', () => ({
   ),
 }))
 
+const familles = [{ slug: 'sciences', nom: 'Sciences', description: 'f' }]
+
 const disciplines = [
-  { slug: 'mathematiques', nom: 'Mathématiques', couleur: '#e8703a', description: 'a' },
-  { slug: 'escalade', nom: 'Escalade', couleur: '#3fa08a', description: 'b' },
+  { slug: 'mathematiques', nom: 'Mathématiques', famille: 'sciences', couleur: '#e8703a', description: 'a' },
+  { slug: 'escalade', nom: 'Escalade', famille: 'sciences', couleur: '#3fa08a', description: 'b' },
 ]
 const confusions = [{ slug: 'faux-ami-courant', nom: 'Faux ami courant', description: 'c' }]
 const preuves = [
@@ -63,6 +65,7 @@ function elementCorpus() {
   return (
     <Corpus
       index={index}
+      familles={familles}
       disciplines={disciplines}
       confusions={confusions}
       statuts={statuts}
@@ -117,7 +120,8 @@ describe('Corpus — filtres et URL', () => {
     render(
       <Corpus
         index={index}
-        disciplines={disciplines}
+        familles={familles}
+      disciplines={disciplines}
         confusions={confusions}
         statuts={statuts}
         preuves={preuves}
@@ -142,7 +146,8 @@ describe('Corpus — filtres et URL', () => {
     render(
       <Corpus
         index={index}
-        disciplines={disciplines}
+        familles={familles}
+      disciplines={disciplines}
         confusions={confusions}
         statuts={statuts}
         preuves={preuves}

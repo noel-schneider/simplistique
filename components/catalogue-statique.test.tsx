@@ -16,6 +16,7 @@ const disciplines: Discipline[] = [
     slug: 'mathematiques',
     nom: 'Mathématiques',
     description: 'La discipline des mathématiques.',
+    famille: 'sciences',
     couleur: '#1d4ed8',
   },
 ]

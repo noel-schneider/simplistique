@@ -10,7 +10,7 @@ export const metadata: Metadata = { title: 'Fiches' }
 
 export default function PageFiches() {
   const index = getIndex()
-  const { disciplines, confusions, statuts, preuves } = chargerTaxonomies()
+  const { familles, disciplines, confusions, statuts, preuves } = chargerTaxonomies()
   const chantiers = getChantiers().map((c) => ({ slug: c.slug, nom: c.nom }))
 
   return (
@@ -28,6 +28,7 @@ export default function PageFiches() {
       >
         <Corpus
           index={index}
+          familles={familles}
           disciplines={disciplines}
           confusions={confusions}
           statuts={statuts}

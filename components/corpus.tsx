@@ -28,6 +28,7 @@ export function vueParDefaut(): Vue {
 
 export function Corpus({
   index,
+  familles,
   disciplines,
   confusions,
   statuts,
@@ -35,6 +36,7 @@ export function Corpus({
   chantiers,
 }: {
   index: FicheIndex[]
+  familles: EntreeTaxonomie[]
   disciplines: Discipline[]
   confusions: EntreeTaxonomie[]
   statuts: EntreeTaxonomie[]
@@ -204,7 +206,12 @@ export function Corpus({
           Aucune fiche ne correspond à ces critères.
         </p>
       ) : vue === 'carte' ? (
-        <VueCarte fiches={fiches} disciplines={disciplines} libellesStatuts={libelles.statuts} />
+        <VueCarte
+          fiches={fiches}
+          familles={familles}
+          disciplines={disciplines}
+          libellesStatuts={libelles.statuts}
+        />
       ) : (
         <VueListe fiches={fiches} libelles={libelles} />
       )}

@@ -1,4 +1,4 @@
-import { STATUTS, type Discipline, type FicheIndex, type Statut } from '@/lib/content/schema'
+import { STATUTS, type Discipline, type EntreeTaxonomie, type FicheIndex, type Statut } from '@/lib/content/schema'
 
 const RAYON = 7
 const PAS = 26
@@ -39,9 +39,9 @@ function Zone({
           className="inline-block size-2.5 rounded-sm"
           style={{ backgroundColor: discipline.couleur }}
         />
-        <h2 className="text-xs uppercase tracking-wide text-stone-500">
+        <h3 className="text-xs uppercase tracking-wide text-stone-500">
           {`${discipline.nom} · ${fiches.length} fiche${fiches.length > 1 ? 's' : ''}`}
-        </h2>
+        </h3>
       </div>
       <svg
         role="presentation"
@@ -77,25 +77,47 @@ function Zone({
 
 export function VueCarte({
   fiches,
+  familles,
   disciplines,
   libellesStatuts,
 }: {
   fiches: FicheIndex[]
+  familles: EntreeTaxonomie[]
   disciplines: Discipline[]
   libellesStatuts: Map<string, string>
 }) {
+  // Une discipline sans fiche (après filtrage) n'a pas de zone : vingt zones dont
+  // beaucoup de vides noieraient la carte. Une famille sans zone disparaît avec elles.
+  const groupes = familles
+    .map((famille) => ({
+      famille,
+      zones: disciplines
+        .filter((d) => d.famille === famille.slug)
+        .map((discipline) => ({
+          discipline,
+          fiches: fiches.filter((f) => f.discipline === discipline.slug),
+        }))
+        .filter((zone) => zone.fiches.length > 0),
+    }))
+    .filter((groupe) => groupe.zones.length > 0)
+
   return (
     <div className="space-y-8">
-      <div className="grid gap-8 sm:grid-cols-2">
-        {disciplines.map((discipline) => (
-          <Zone
-            key={discipline.slug}
-            discipline={discipline}
-            fiches={fiches.filter((f) => f.discipline === discipline.slug)}
-            libellesStatuts={libellesStatuts}
-          />
-        ))}
-      </div>
+      {groupes.map(({ famille, zones }) => (
+        <section key={famille.slug} className="space-y-4">
+          <h2 className="text-sm font-semibold text-stone-700">{famille.nom}</h2>
+          <div className="grid gap-8 sm:grid-cols-2">
+            {zones.map(({ discipline, fiches: fichesZone }) => (
+              <Zone
+                key={discipline.slug}
+                discipline={discipline}
+                fiches={fichesZone}
+                libellesStatuts={libellesStatuts}
+              />
+            ))}
+          </div>
+        </section>
+      ))}
 
       <p className="border-t border-stone-200 pt-4 text-xs text-stone-500">
         Chaque couleur désigne une discipline ; le remplissage du point dit le statut de
