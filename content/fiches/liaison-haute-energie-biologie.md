@@ -3,11 +3,22 @@ terme: liaison à haute énergie
 discipline: biologie
 confusion: faux-ami-courant
 statut: propose
+preuve: documentee
 resume: >
   L’énergie de l’ATP n’est pas « stockée dans une liaison » : rompre une liaison
   coûte toujours de l’énergie. Elle vient du bilan de la réaction entière.
 suggestions:
   - groupe phosphoryle transférable
+sources:
+  - auteur: "Hill et Morales"
+    annee: 1951
+    titre: "On “High Energy Phosphate Bonds” of Biochemical Interest"
+    lecture: seconde-main
+  - auteur: "Dreyfus et coll."
+    annee: 2012
+    titre: "Students’ Interdisciplinary Reasoning about “High-Energy Bonds” and ATP"
+    url: https://arxiv.org/abs/1209.0994
+    lecture: originale
 cree: 2026-10-31
 modifie: 2026-10-31
 ---

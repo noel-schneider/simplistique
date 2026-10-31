@@ -71,9 +71,11 @@ La commande lit `.env.local` s’il existe, ou prend la variable sur la même li
 **Ne colle pas la chaîne de connexion avec ses guillemets** : elle ne serait pas
 analysable comme URL. La commande échouerait proprement, mais c’est une minute perdue.
 
-Elle est sans danger à relancer : les trois instructions sont des `IF NOT EXISTS` dans
-une transaction. Elle vérifie en plus que la contrainte `vote_unique` existe bien, parce
-qu’une table antérieure sans cette contrainte laisserait voter mille fois sur une fiche.
+Elle crée deux tables : `votes` et `propositions` (les termes proposés depuis `/proposer`).
+Elle est sans danger à relancer : les instructions sont des `IF NOT EXISTS` dans une
+transaction. Elle vérifie en plus que la contrainte `vote_unique` existe bien, parce
+qu’une table antérieure sans cette contrainte laisserait voter mille fois sur une fiche,
+et que la table `propositions` existe.
 
 ## 4. Déployer
 
@@ -107,6 +109,15 @@ DATABASE_URL='...' npm run votes:orphelins
 
 Il répond « Aucun vote orphelin » si et seulement si la base répond et la table existe.
 C’est le seul test de bout en bout disponible, et il ne touche à rien.
+
+## 7. Lire les propositions
+
+```bash
+DATABASE_URL='...' npm run propositions                # liste les non traitées
+DATABASE_URL='...' npm run propositions -- --traiter 3 # marque la n° 3 comme traitée
+```
+
+Marquer une proposition déjà traitée est sans effet (la première date est gardée) ; un numéro inexistant est signalé.
 
 ## Ce que tu ne pourras pas faire
 

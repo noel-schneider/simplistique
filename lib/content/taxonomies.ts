@@ -5,6 +5,7 @@ import type { ZodType } from 'zod'
 import {
   schemaDiscipline,
   schemaEntreeTaxonomie,
+  PREUVES,
   STATUTS,
   type Discipline,
   type EntreeTaxonomie,
@@ -55,6 +56,7 @@ function chargerListe<T extends { slug: string }>(
 
 export function chargerTaxonomies(dossier: string = DOSSIER_CONTENU): Taxonomies {
   const disciplines = chargerListe<Discipline>(dossier, 'disciplines.yml', schemaDiscipline)
+  const familles = chargerListe<EntreeTaxonomie>(dossier, 'familles.yml', schemaEntreeTaxonomie)
   const confusions = chargerListe<EntreeTaxonomie>(dossier, 'confusions.yml', schemaEntreeTaxonomie)
   const statuts = chargerListe<EntreeTaxonomie>(dossier, 'statuts.yml', schemaEntreeTaxonomie)
 
@@ -64,8 +66,28 @@ export function chargerTaxonomies(dossier: string = DOSSIER_CONTENU): Taxonomies
     throw new Error(`statuts.yml : doit contenir exactement ${attendus}, trouvé ${trouves || '(rien)'}`)
   }
 
+  const preuves = chargerListe<EntreeTaxonomie>(dossier, 'preuves.yml', schemaEntreeTaxonomie)
+  const preuvesAttendues = [...PREUVES].sort().join(',')
+  const preuvesTrouvees = preuves.map((p) => p.slug).sort().join(',')
+  if (preuvesAttendues !== preuvesTrouvees) {
+    throw new Error(
+      `preuves.yml doit contenir exactement ${preuvesAttendues}, trouvé ${preuvesTrouvees || '(rien)'}`,
+    )
+  }
+
   if (disciplines.length === 0) throw new Error('disciplines.yml : au moins une discipline est requise')
+  if (familles.length === 0) throw new Error('familles.yml : au moins une famille est requise')
+
+  // Une famille inconnue ferait disparaître la discipline de la carte sans
+  // erreur : on échoue ici, au build, en nommant les deux.
+  const slugsFamilles = new Set(familles.map((f) => f.slug))
+  for (const d of disciplines) {
+    if (!slugsFamilles.has(d.famille)) {
+      throw new Error(`disciplines.yml : la discipline « ${d.slug} » cite la famille inconnue « ${d.famille} »`)
+    }
+  }
+
   if (confusions.length === 0) throw new Error('confusions.yml : au moins un type de confusion est requis')
 
-  return { disciplines, confusions, statuts }
+  return { familles, disciplines, confusions, statuts, preuves }
 }

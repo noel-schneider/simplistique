@@ -1,5 +1,7 @@
 import Link from 'next/link'
 import type { FicheMeta } from '@/lib/content/schema'
+import { typographier } from '@/lib/typographie'
+import { BadgePreuve } from './badge-preuve'
 import { BadgeStatut } from './badge-statut'
 
 function enFrancais(date: Date): string {
@@ -20,16 +22,18 @@ export function EnteteFiche({
   nomDiscipline,
   nomConfusion,
   nomStatut,
+  nomPreuve,
 }: {
   fiche: FicheMeta
   nomDiscipline: string
   nomConfusion: string
   nomStatut: string
+  nomPreuve: string
 }) {
   return (
     <header className="mb-8 space-y-4 border-b border-stone-200 pb-6">
-      <h1 className="text-3xl font-semibold tracking-tight">{fiche.terme}</h1>
-      <p className="text-lg leading-relaxed text-stone-700">{fiche.resume}</p>
+      <h1 className="text-3xl font-semibold tracking-tight">{typographier(fiche.terme)}</h1>
+      <p className="text-lg leading-relaxed text-stone-700">{typographier(fiche.resume)}</p>
 
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-sm">
         <Link
@@ -45,6 +49,7 @@ export function EnteteFiche({
           {nomConfusion}
         </Link>
         <BadgeStatut statut={fiche.statut} nom={nomStatut} />
+        <BadgePreuve preuve={fiche.preuve} nom={nomPreuve} />
       </div>
 
       <div className="text-sm">

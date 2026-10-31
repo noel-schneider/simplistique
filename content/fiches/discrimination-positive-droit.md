@@ -3,11 +3,20 @@ terme: discrimination positive
 discipline: droit
 confusion: faux-ami-courant
 statut: propose
+preuve: documentee
 resume: >
   « Discrimination » a pris dans l’usage le sens de traitement injuste :
   l’expression désigne donc son correctif par le nom du tort qu’il corrige.
 suggestions:
   - action positive
+sources:
+  - auteur: "Gwénaële Calvès"
+    annee: 2004
+    titre: "La discrimination positive"
+    objet: "coll. Que sais-je ?, PUF"
+    lecture: seconde-main
+motifs:
+  - positif-et-negatif
 cree: 2026-10-31
 modifie: 2026-10-31
 ---
@@ -49,5 +58,5 @@ des « mesures prévoyant des avantages spécifiques », et les directives
 d’égalité de traitement parlent d’« action positive ». Au Québec, le terme
 officiel est « programme d’accès à l’égalité ». En France, la juriste
 Gwénaële Calvès a analysé l’expression et ses usages (*La discrimination
-positive*, PUF, coll. « Que sais-je ? »). L’Observatoire des inégalités
+positive*, 2004, PUF, coll. « Que sais-je ? »). L’Observatoire des inégalités
 qualifie le débat français d’« extrême confusion ».

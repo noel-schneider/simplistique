@@ -3,6 +3,32 @@ import { z, type ZodType } from 'zod'
 export type Statut = 'pointe' | 'propose' | 'rejete'
 export const STATUTS = ['pointe', 'propose', 'rejete'] as const satisfies readonly Statut[]
 
+export type Preuve = 'intuition' | 'documentee' | 'mesuree'
+export const PREUVES = ['intuition', 'documentee', 'mesuree'] as const satisfies readonly Preuve[]
+
+// Ce que l’auteur a réellement lu : la source elle-même, ou un texte qui la
+// rapporte. La distinction est affichée au lecteur et signalée à la relecture.
+export type Lecture = 'originale' | 'seconde-main'
+export const LECTURES = ['originale', 'seconde-main'] as const satisfies readonly Lecture[]
+
+export type Source = {
+  auteur: string
+  annee: number
+  /** Titre réel de l’œuvre. Ne jamais y mettre une description ni un nom de revue. */
+  titre?: string
+  /** Description de la référence, quand on n’en connaît pas le titre exact. */
+  objet?: string
+  url?: string
+  lecture: Lecture
+}
+
+// Un renommage déjà adopté quelque part : un lieu, une année, ce qui a changé.
+export type Precedent = {
+  lieu: string
+  annee: number
+  description: string
+}
+
 // Réutilisée telle quelle pour valider le nom de fichier d'une fiche (voir
 // `lireFiche` dans lib/content/fiches.ts), dont le slug n'est pas un champ de
 // schéma mais le nom de fichier brut.
@@ -17,6 +43,9 @@ export const schemaEntreeTaxonomie = z.object({
 })
 
 export const schemaDiscipline = schemaEntreeTaxonomie.extend({
+  // Slug d'une entrée de familles.yml ; l'existence est vérifiée au chargement
+  // des taxonomies, qui voit les deux fichiers à la fois.
+  famille: z.string().min(1),
   couleur: z.string().regex(/^#[0-9a-fA-F]{6}$/, 'couleur invalide : hexadécimal sur 6 chiffres'),
 })
 
@@ -24,9 +53,11 @@ export type EntreeTaxonomie = z.infer<typeof schemaEntreeTaxonomie>
 export type Discipline = z.infer<typeof schemaDiscipline>
 
 export type Taxonomies = {
+  familles: EntreeTaxonomie[]
   disciplines: Discipline[]
   confusions: EntreeTaxonomie[]
   statuts: EntreeTaxonomie[]
+  preuves: EntreeTaxonomie[]
 }
 
 export type FicheMeta = {
@@ -35,10 +66,19 @@ export type FicheMeta = {
   discipline: string
   confusion: string
   statut: Statut
+  preuve: Preuve
+  /** Absent du front-matter = aucune source. */
+  sources: Source[]
+  /** Absent du front-matter = aucun précédent. */
+  precedents: Precedent[]
   resume: string
   suggestions: string[]
+  /** Une phrase-choc factuelle pour l’accueil et le partage. Absent = fiche jamais mise à la une. */
+  accroche?: string
   /** Le slug d’un chantier de la même discipline, ou rien. */
   chantier?: string
+  /** Slugs des motifs transversaux que la fiche illustre. Absent = aucun. */
+  motifs: string[]
   /** Contenu fictif, écrit pour développer le site. Absent = contenu réel. */
   demonstration?: boolean
   cree: Date
@@ -48,6 +88,7 @@ export type FicheMeta = {
 export type Fiche = FicheMeta & { corps: string }
 
 export const LONGUEUR_MAX_RESUME = 240
+export const LONGUEUR_MAX_ACCROCHE = 140
 
 export type ChantierMeta = {
   slug: string
@@ -61,6 +102,18 @@ export type ChantierMeta = {
 }
 
 export type Chantier = ChantierMeta & { corps: string }
+
+// Un motif est un piège de vocabulaire qui revient dans plusieurs disciplines.
+// Pas de champ `discipline` : c’est précisément ce qui le distingue d’un chantier.
+export type MotifMeta = {
+  slug: string
+  nom: string
+  resume: string
+  cree: Date
+  modifie: Date
+}
+
+export type Motif = MotifMeta & { corps: string }
 
 /**
  * Message lisible pour un échec de schéma, partagé par les fiches et les chantiers.
@@ -102,9 +155,68 @@ export function creerSchemaChantier(taxonomies: Taxonomies): ZodType<Omit<Chanti
   })
 }
 
+export function creerSchemaMotif(): ZodType<Omit<MotifMeta, 'slug'>> {
+  return z.strictObject({
+    nom: z.string().min(1),
+    // Même traitement que le résumé d’une fiche (saut de ligne final des `>`).
+    resume: z.string().trim().min(1).max(LONGUEUR_MAX_RESUME),
+    cree: z.coerce.date(),
+    modifie: z.coerce.date(),
+  })
+}
+
+// Seules les URL http(s) sont acceptées : l’adresse devient un lien dans la
+// page, et un schéma comme `javascript:` y serait exécuté au clic.
+const urlWeb = z
+  .string()
+  .refine((valeur) => {
+    try {
+      const { protocol } = new URL(valeur)
+      return protocol === 'http:' || protocol === 'https:'
+    } catch {
+      return false
+    }
+  }, 'url invalide : une adresse http(s) complète est attendue')
+
+const ANNEE_MIN_SOURCE = 1500
+
+// Partagée par les sources et les précédents. Calculée à l’appel et non à
+// l’import : la borne haute suit l’année courante (+ 1 pour un ouvrage
+// annoncé), sans valeur figée dans le code.
+function creerSchemaAnnee() {
+  const anneeMax = new Date().getFullYear() + 1
+  return z.number().int().min(ANNEE_MIN_SOURCE).max(anneeMax)
+}
+
+function creerSchemaPrecedent() {
+  return z.strictObject({
+    lieu: z.string().min(1),
+    annee: creerSchemaAnnee(),
+    description: z.string().min(1),
+  })
+}
+
+function creerSchemaSource() {
+  return z
+    .strictObject({
+      auteur: z.string().min(1),
+      annee: creerSchemaAnnee(),
+      titre: z.string().min(1).optional(),
+      objet: z.string().min(1).optional(),
+      url: urlWeb.optional(),
+      lecture: z.enum(LECTURES),
+    })
+    // Un titre inventé serait affiché comme un titre réel : sans titre exact,
+    // on décrit la référence dans `objet`. L’un des deux au moins est requis.
+    .refine((source) => source.titre !== undefined || source.objet !== undefined, {
+      message: 'source sans titre ni objet : donner le titre réel, ou à défaut une description dans « objet »',
+    })
+}
+
 export function creerSchemaFiche(
   taxonomies: Taxonomies,
   chantiers: ChantierMeta[] = [],
+  motifs: MotifMeta[] = [],
 ): ZodType<Omit<FicheMeta, 'slug'>> {
   const disciplines = taxonomies.disciplines.map((d) => d.slug) as [string, ...string[]]
   const confusions = taxonomies.confusions.map((c) => c.slug) as [string, ...string[]]
@@ -115,11 +227,15 @@ export function creerSchemaFiche(
       discipline: z.enum(disciplines),
       confusion: z.enum(confusions),
       statut: z.enum(STATUTS),
+      preuve: z.enum(PREUVES),
+      sources: z.array(creerSchemaSource()).default([]),
+      precedents: z.array(creerSchemaPrecedent()).default([]),
       // Les scalaires `>` du YAML gardent un saut de ligne final, qui partirait
       // tel quel dans <meta name="description"> et consommerait un caractère
       // du budget de 240 pour rien.
       resume: z.string().trim().min(1).max(LONGUEUR_MAX_RESUME),
       suggestions: z.array(z.string().min(1)),
+      accroche: z.string().trim().min(1).max(LONGUEUR_MAX_ACCROCHE).optional(),
       // Pas un `z.enum` : l'appariement à vérifier porte sur deux champs à la
       // fois — le chantier doit exister ET relever de la même discipline — ce
       // qu'un enum sur le seul champ ne sait pas dire. Et `z.enum` exige une
@@ -129,10 +245,29 @@ export function creerSchemaFiche(
       // que `true`, pour qu’un `demonstration: false` oublié dans un fichier soit
       // refusé plutôt que de laisser croire à un marquage qui ne marque rien.
       demonstration: z.literal(true).optional(),
+      // Liste de slugs vérifiée dans le superRefine plus bas, pour la même
+      // raison que `chantier` : l’enum serait impossible avec zéro motif au corpus.
+      motifs: z.array(z.string().min(1, 'motif vide : retirer l’entrée plutôt que la laisser vide')).default([]),
       cree: z.coerce.date(),
       modifie: z.coerce.date(),
     })
     .superRefine((fiche, ctx) => {
+      fiche.motifs.forEach((slugMotif, index) => {
+        if (!motifs.some((m) => m.slug === slugMotif)) {
+          ctx.addIssue({
+            code: 'custom',
+            path: ['motifs', index],
+            message: `motif inconnu « ${slugMotif} » — aucun fichier content/motifs/${slugMotif}.md`,
+          })
+        } else if (fiche.motifs.indexOf(slugMotif) !== index) {
+          ctx.addIssue({
+            code: 'custom',
+            path: ['motifs', index],
+            message: `motif répété « ${slugMotif} » — une fiche ne rejoint un motif qu’une fois`,
+          })
+        }
+      })
+
       if (fiche.chantier === undefined) return
 
       const chantier = chantiers.find((c) => c.slug === fiche.chantier)
@@ -155,4 +290,6 @@ export function creerSchemaFiche(
     })
 }
 
-export type FicheIndex = Omit<FicheMeta, 'cree' | 'modifie'>
+// Sans `sources`, `precedents` ni `motifs` : l’index part au navigateur avec la
+// page des fiches, et ces champs ne servent que sur la page de la fiche.
+export type FicheIndex = Omit<FicheMeta, 'cree' | 'modifie' | 'sources' | 'precedents' | 'motifs'>

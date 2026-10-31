@@ -3,6 +3,7 @@ terme: mesure
 discipline: theorie-musicale
 confusion: polysemie-externe
 statut: rejete
+preuve: intuition
 resume: >
   Le même mot désigne l’unité de découpage temporel, l’action de mesurer et
   une disposition règlementaire — parfois dans la même phrase.

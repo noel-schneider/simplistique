@@ -3,11 +3,17 @@ terme: chaleur
 discipline: physique
 confusion: faux-ami-courant
 statut: propose
+preuve: documentee
 resume: >
   Le mot fait de la chaleur une substance qu’un corps contiendrait. En
   physique, c’est de l’énergie qui passe d’un corps à un autre, pas un stock.
 suggestions:
   - transfert thermique
+sources:
+  - auteur: "Robert Romer"
+    annee: 2001
+    titre: "Heat is not a noun"
+    lecture: seconde-main
 cree: 2026-10-31
 modifie: 2026-10-31
 ---

@@ -3,10 +3,17 @@ terme: héritabilité
 discipline: biologie
 confusion: faux-ami-courant
 statut: pointe
+preuve: documentee
 resume: >
   Le mot sonne comme « héréditaire », mais il ne dit pas dans quelle mesure un
   trait se transmet : c’est une statistique propre à une population donnée.
 suggestions: []
+sources:
+  - auteur: "David S. Moore et David Shenk"
+    annee: 2016
+    titre: "The Heritability Fallacy"
+    url: https://scholarship.claremont.edu/pitzer_fac_pub/193
+    lecture: seconde-main
 cree: 2026-10-31
 modifie: 2026-10-31
 ---

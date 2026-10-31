@@ -3,6 +3,7 @@ terme: groupe
 discipline: mathematiques
 confusion: faux-ami-courant
 statut: pointe
+preuve: intuition
 resume: >
   Mot du langage courant dont le sens technique n’a aucun rapport avec l’idée
   de collection d’objets.

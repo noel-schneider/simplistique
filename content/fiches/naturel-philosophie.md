@@ -3,10 +3,22 @@ terme: naturel
 discipline: philosophie
 confusion: polysemie-externe
 statut: pointe
+preuve: documentee
 resume: >
   « Naturel » signifie tour à tour non transformé, d’origine vivante, habituel,
   sain ou moralement bon, et l’argument glisse d’un sens à l’autre.
 suggestions: []
+sources:
+  - auteur: "Paul Rozin"
+    annee: 2005
+    titre: "The Meaning of “Natural”"
+    lecture: seconde-main
+  - auteur: "G. E. Moore"
+    annee: 1903
+    titre: "Principia Ethica"
+    lecture: seconde-main
+motifs:
+  - normal-et-naturel
 cree: 2026-10-31
 modifie: 2026-10-31
 ---

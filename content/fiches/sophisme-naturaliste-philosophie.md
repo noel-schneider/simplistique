@@ -3,12 +3,28 @@ terme: sophisme naturaliste
 discipline: philosophie
 confusion: faux-ami-courant
 statut: propose
+preuve: documentee
 resume: >
   Doublement mal nommé selon les philosophes eux-mêmes : l’erreur ne concerne
   pas que la nature, et ce n’est pas un raisonnement fautif mais une
   définition.
 suggestions:
   - erreur définitionniste
+sources:
+  - auteur: "G. E. Moore"
+    annee: 1903
+    titre: "Principia Ethica"
+    lecture: seconde-main
+  - auteur: "William Frankena"
+    annee: 1939
+    titre: "The Naturalistic Fallacy"
+    lecture: seconde-main
+  - auteur: "Bernard Williams"
+    annee: 1985
+    titre: "Ethics and the Limits of Philosophy"
+    lecture: seconde-main
+motifs:
+  - normal-et-naturel
 cree: 2026-10-31
 modifie: 2026-10-31
 ---

@@ -28,7 +28,7 @@ describe('Votes', () => {
     render(<Votes fiche="f" alternatives={ALTERNATIVES} />)
     // La question est du texte ordinaire, et le contrôle de vote porte son propre nom
     // accessible : le libellé seul ne dirait pas à un lecteur d’écran ce que le bouton fait.
-    expect(await screen.findByText('Ce terme vous a-t-il gêné ?')).toBeInTheDocument()
+    expect(await screen.findByText('Ce terme gêne-t-il ?')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Ce terme m’a gêné' })).toBeInTheDocument()
   })
 
@@ -140,7 +140,7 @@ describe('Votes', () => {
     await waitFor(() => expect(bouton).toHaveTextContent('0'))
     expect(
       await screen.findByText(
-        'Vous avez voté beaucoup de fois cette heure-ci. Réessayez plus tard.',
+        'Beaucoup de votes depuis cette connexion cette heure-ci. Nouvel essai possible plus tard.',
       ),
     ).toBeInTheDocument()
   })
@@ -157,7 +157,7 @@ describe('Votes', () => {
     render(<Votes fiche="f" alternatives={ALTERNATIVES} />)
     await userEvent.click(await screen.findByRole('button', { name: /gêné/i }))
     expect(
-      await screen.findByText('Cette fiche a changé depuis l’ouverture de la page. Rechargez-la.'),
+      await screen.findByText('Cette fiche a changé depuis l’ouverture de la page : il faut la recharger.'),
     ).toBeInTheDocument()
   })
 
@@ -191,7 +191,7 @@ describe('Votes', () => {
   it('n’affiche aucune question d’alternative quand la fiche n’en a pas', async () => {
     render(<Votes fiche="f" alternatives={[]} />)
     expect(await screen.findByRole('button', { name: /gêné/i })).toBeInTheDocument()
-    expect(screen.queryByText('Quelle alternative préférez-vous ?')).not.toBeInTheDocument()
+    expect(screen.queryByText('Alternative préférée')).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /préfère/i })).not.toBeInTheDocument()
   })
 

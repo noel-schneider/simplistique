@@ -3,11 +3,18 @@ terme: énergie noire
 discipline: physique
 confusion: jargon-opaque
 statut: propose
+preuve: documentee
 resume: >
   Nom calqué sur « matière noire », qui ne dit rien de la chose : beaucoup de
   choses sont noires, et tout a de l’énergie.
 suggestions:
   - tension lisse
+sources:
+  - auteur: "Sean Carroll"
+    annee: 2003
+    titre: "Why is the Universe Accelerating?"
+    url: https://arxiv.org/abs/astro-ph/0310342
+    lecture: originale
 cree: 2026-10-31
 modifie: 2026-10-31
 ---

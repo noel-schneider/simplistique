@@ -3,6 +3,7 @@ terme: agios
 discipline: banque
 confusion: jargon-opaque
 statut: propose
+preuve: intuition
 resume: >
   Mot d’origine italienne que presque personne ne sait définir, pour désigner
   ce que coûte un compte à découvert. Le terme réglementaire est plus clair.

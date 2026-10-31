@@ -3,6 +3,7 @@ terme: névrosisme
 discipline: psychologie
 confusion: nom-historique
 statut: propose
+preuve: intuition
 resume: >
   Trait de personnalité ordinaire du modèle Big Five, nommé d’après la
   « névrose », catégorie clinique que la psychiatrie a abandonnée.

@@ -16,6 +16,7 @@ const disciplines: Discipline[] = [
     slug: 'mathematiques',
     nom: 'Mathématiques',
     description: 'La discipline des mathématiques.',
+    famille: 'sciences',
     couleur: '#1d4ed8',
   },
 ]
@@ -31,6 +32,7 @@ function fiche(p: Partial<FicheIndex>): FicheIndex {
     discipline: 'mathematiques',
     confusion: 'faux-ami-courant',
     statut: 'pointe',
+    preuve: 'documentee',
     resume: '',
     suggestions: [],
     ...p,

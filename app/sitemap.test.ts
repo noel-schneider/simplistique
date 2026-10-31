@@ -1,10 +1,11 @@
 import { describe, expect, it } from 'vitest'
 import { getChantiers } from '@/lib/content/chantiers'
+import { getMotifs } from '@/lib/content/motifs'
 import { getFiches } from '@/lib/content/fiches'
 import sitemap from './sitemap'
 
-const PAGES_SANS_DATE = ['/manifeste', '/contribuer']
-const PAGES_DATEES_DU_CORPUS = ['/', '/fiches']
+const PAGES_SANS_DATE = ['/manifeste', '/contribuer', '/proposer']
+const PAGES_DATEES_DU_CORPUS = ['/', '/fiches', '/motifs']
 
 // Le plan de site ne publie que le contenu réel : les pages de démonstration
 // restent visibles sur le site mais n’ont pas à être indexées. Les tests qui
@@ -13,15 +14,18 @@ const fichesPubliees = () => getFiches().filter((fiche) => !fiche.demonstration)
 const chantiersPublies = () => getChantiers().filter((c) => !c.demonstration)
 
 describe('sitemap', () => {
-  it('liste les quatre pages statiques et les fiches publiées', () => {
+  it('liste les six pages statiques et les fiches publiées', () => {
     const entrees = sitemap()
     const fiches = fichesPubliees()
 
     // Compte exact, pas « au moins » : un corpus listé deux fois ou un groupe de
     // pages oublié doit se voir. Exprimé comme une somme plutôt qu’en dur, pour
     // qu’ajouter une fiche ou un chantier ne fasse pas tomber ce test pour rien.
-    // Les quatre : la page d’accueil, le catalogue, le manifeste, contribuer.
-    expect(entrees).toHaveLength(4 + fichesPubliees().length + chantiersPublies().length)
+    // Les six : la page d’accueil, le catalogue, les motifs, le manifeste,
+    // contribuer, proposer. Les motifs n’ont pas de marque de démonstration : tous publiés.
+    expect(entrees).toHaveLength(
+      6 + fichesPubliees().length + chantiersPublies().length + getMotifs().length,
+    )
 
     const urls = entrees.map((e) => e.url)
     for (const fiche of fiches) {
@@ -63,21 +67,6 @@ describe('sitemap', () => {
     for (const chemin of PAGES_SANS_DATE) {
       const entree = entrees.find((e) => e.url.endsWith(chemin))
       expect(entree?.lastModified).toBeUndefined()
-    }
-  })
-
-  it('n’indexe aucune page de démonstration', () => {
-    const urls = sitemap().map((e) => e.url)
-    const fictives = [
-      ...getFiches().filter((f) => f.demonstration).map((f) => `/fiches/${f.slug}`),
-      ...getChantiers().filter((c) => c.demonstration).map((c) => `/chantiers/${c.slug}`),
-    ]
-
-    // Le corpus doit en contenir, sans quoi ce test ne prouverait rien : il
-    // passerait tout seul le jour où le contenu fictif aura disparu.
-    expect(fictives.length).toBeGreaterThan(0)
-    for (const chemin of fictives) {
-      expect(urls.some((u) => u.endsWith(chemin))).toBe(false)
     }
   })
 

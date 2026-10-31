@@ -2,17 +2,23 @@
 
 import Link from 'next/link'
 import { useState } from 'react'
+import { BadgePreuve } from './badge-preuve'
 import { BadgeStatut } from './badge-statut'
 import { PastilleDemonstration } from './pastille-demonstration'
-import type { FicheIndex } from '@/lib/content/schema'
+import { PREUVES, type FicheIndex } from '@/lib/content/schema'
 
-export type Libelles = { disciplines: Map<string, string>; statuts: Map<string, string> }
-export type Colonne = 'terme' | 'discipline' | 'statut'
+export type Libelles = {
+  disciplines: Map<string, string>
+  statuts: Map<string, string>
+  preuves: Map<string, string>
+}
+export type Colonne = 'terme' | 'discipline' | 'statut' | 'preuve'
 
 const TRIABLES: { cle: Colonne; libelle: string }[] = [
   { cle: 'terme', libelle: 'Terme' },
   { cle: 'discipline', libelle: 'Discipline' },
   { cle: 'statut', libelle: 'Statut' },
+  { cle: 'preuve', libelle: 'Preuve' },
 ]
 
 export function trierFiches(
@@ -27,7 +33,15 @@ export function trierFiches(
     return fiche.terme
   }
 
-  const triees = [...fiches].sort((a, b) => valeur(a).localeCompare(valeur(b), 'fr'))
+  // La preuve est une échelle, pas un nom : trier ses libellés par ordre
+  // alphabétique mettrait « Documentée » avant « Intuition ». Le rang dans
+  // `PREUVES` est l’ordre de la plus faible à la plus forte.
+  const comparer =
+    colonne === 'preuve'
+      ? (a: FicheIndex, b: FicheIndex) => PREUVES.indexOf(a.preuve) - PREUVES.indexOf(b.preuve)
+      : (a: FicheIndex, b: FicheIndex) => valeur(a).localeCompare(valeur(b), 'fr')
+
+  const triees = [...fiches].sort(comparer)
   return croissant ? triees : triees.reverse()
 }
 
@@ -91,6 +105,12 @@ export function VueListe({ fiches, libelles }: { fiches: FicheIndex[]; libelles:
                 <BadgeStatut
                   statut={fiche.statut}
                   nom={libelles.statuts.get(fiche.statut) ?? fiche.statut}
+                />
+              </td>
+              <td className="px-4 py-2">
+                <BadgePreuve
+                  preuve={fiche.preuve}
+                  nom={libelles.preuves.get(fiche.preuve) ?? fiche.preuve}
                 />
               </td>
               <td className="py-2 text-stone-600">

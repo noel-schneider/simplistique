@@ -1,12 +1,14 @@
 import { getChantiers } from '../lib/content/chantiers'
 import { getDocument, getFiches } from '../lib/content/fiches'
+import { getMotifs } from '../lib/content/motifs'
 import { chargerTaxonomies, DOSSIER_CONTENU } from '../lib/content/taxonomies'
-import { verifierChantiers, verifierCorpus, verifierDocuments } from './coherence'
+import { verifierChantiers, verifierCorpus, verifierMotifs, verifierDocuments } from './coherence'
 
 function principal(): void {
   const taxonomies = chargerTaxonomies(DOSSIER_CONTENU)
   const chantiers = getChantiers(DOSSIER_CONTENU, taxonomies)
-  const fiches = getFiches(DOSSIER_CONTENU, taxonomies, chantiers)
+  const motifs = getMotifs(DOSSIER_CONTENU, taxonomies)
+  const fiches = getFiches(DOSSIER_CONTENU, taxonomies, chantiers, motifs)
   const documents = (['manifeste', 'contribuer'] as const).map((nom) => ({
     nom,
     texte: getDocument(nom, DOSSIER_CONTENU),
@@ -14,6 +16,7 @@ function principal(): void {
   const avertissements = [
     ...verifierCorpus(fiches),
     ...verifierChantiers(chantiers, fiches),
+    ...verifierMotifs(motifs, fiches),
     ...verifierDocuments(documents),
   ]
 
@@ -25,7 +28,7 @@ function principal(): void {
     chantiers.filter((chantier) => chantier.demonstration).length
 
   console.log(
-    `${fiches.length} fiche(s), ${chantiers.length} chantier(s), ${taxonomies.disciplines.length} discipline(s) — validation du schéma réussie.`,
+    `${fiches.length} fiche(s), ${chantiers.length} chantier(s), ${motifs.length} motif(s), ${taxonomies.disciplines.length} discipline(s) — validation du schéma réussie.`,
   )
   console.log(
     demonstrations === 0

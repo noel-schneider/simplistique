@@ -3,10 +3,16 @@ terme: programmation dynamique
 discipline: informatique
 confusion: jargon-opaque
 statut: pointe
+preuve: documentee
 resume: >
   Nom choisi par son inventeur pour impressionner les financeurs, pas pour
   décrire : il ne s’agit ni de programmer au sens du code, ni de dynamisme.
 suggestions: []
+sources:
+  - auteur: "Richard Bellman"
+    annee: 1984
+    titre: "Eye of the Hurricane"
+    lecture: seconde-main
 cree: 2026-10-31
 modifie: 2026-10-31
 ---

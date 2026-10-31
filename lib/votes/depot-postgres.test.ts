@@ -1,10 +1,8 @@
 import { Client } from 'pg'
-import { readFileSync } from 'node:fs'
-import { join } from 'node:path'
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import { depotPostgres, type Executeur } from './depot-postgres'
 import type { DepotDeVotes } from './depot'
-import { CHEMIN_MIGRATION, instructionsSql } from './migration'
+import { appliquerLesMigrations } from './migration-test'
 
 const URL_TEST = process.env.DATABASE_URL_TEST
 
@@ -20,13 +18,7 @@ describe.skipIf(!URL_TEST)('depotPostgres contre un vrai PostgreSQL', () => {
   beforeAll(async () => {
     client = new Client({ connectionString: URL_TEST })
     await client.connect()
-    // On applique la migration par le même chemin que la production (une
-    // instruction à la fois), pour prouver que le découpage produit des
-    // instructions valides contre un vrai PostgreSQL.
-    const instructions = instructionsSql(readFileSync(join(process.cwd(), CHEMIN_MIGRATION), 'utf8'))
-    for (const instruction of instructions) {
-      await client.query(instruction)
-    }
+    await appliquerLesMigrations(client)
 
     const executer: Executeur = async (sql, parametres) =>
       (await client.query(sql, parametres)).rows as Record<string, unknown>[]

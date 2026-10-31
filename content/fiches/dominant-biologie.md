@@ -3,11 +3,26 @@ terme: dominant / récessif
 discipline: biologie
 confusion: faux-ami-courant
 statut: propose
+preuve: documentee
 resume: >
   Un allèle « dominant » n’est ni plus fort, ni meilleur, ni plus fréquent : il
   s’exprime, c’est tout. Le Japon a déjà renommé la paire en 2017.
+accroche: "Un allèle « dominant » n’est ni plus fort ni plus fréquent : en 2017, le Japon a déjà renommé la paire."
 suggestions:
   - manifeste / latent
+sources:
+  - auteur: "Société japonaise de génétique"
+    annee: 2017
+    objet: "remplacement des termes japonais pour « dominant » et « récessif »"
+    lecture: seconde-main
+  - auteur: "Rosemary Redfield"
+    annee: 2012
+    titre: "“Why Do We Have to Learn This Stuff?” — A New Genetics for 21st Century Students"
+    lecture: seconde-main
+precedents:
+  - lieu: Japon
+    annee: 2017
+    description: "la Société japonaise de génétique remplace les mots signifiant « supérieur » et « inférieur » par des termes signifiant « apparent » et « latent »"
 cree: 2026-10-31
 modifie: 2026-10-31
 ---

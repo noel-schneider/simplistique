@@ -22,6 +22,11 @@ const libelles: Libelles = {
     ['propose', 'Proposé'],
     ['rejete', 'Rejeté'],
   ]),
+  preuves: new Map([
+    ['intuition', 'Intuition d’auteur'],
+    ['documentee', 'Documentée'],
+    ['mesuree', 'Mesurée'],
+  ]),
 }
 
 // Libellés dont l’ordre alphabétique DIFFÈRE de celui des slugs. C’est la seule
@@ -39,6 +44,11 @@ const LIBELLES_DIVERGENTS: Libelles = {
     ['propose', 'Avancé'], // slug second, libellé premier
     ['rejete', 'Écarté'], // slug troisième, libellé second
   ]),
+  preuves: new Map([
+    ['intuition', 'Intuition d’auteur'],
+    ['documentee', 'Documentée'],
+    ['mesuree', 'Mesurée'],
+  ]),
 }
 
 function fiche(p: Partial<FicheIndex>): FicheIndex {
@@ -48,6 +58,7 @@ function fiche(p: Partial<FicheIndex>): FicheIndex {
     discipline: 'mathematiques',
     confusion: 'faux-ami-courant',
     statut: 'pointe',
+    preuve: 'documentee',
     resume: '',
     suggestions: [],
     ...p,
@@ -92,6 +103,25 @@ describe('trierFiches', () => {
     ])
   })
 
+  it('trie la preuve par rang (intuition < documentée < mesurée), pas par libellé', () => {
+    // Par libellé, « Documentée » passerait avant « Intuition d’auteur ».
+    const parPreuve = [
+      fiche({ slug: 'a', terme: 'a', preuve: 'mesuree' }),
+      fiche({ slug: 'b', terme: 'b', preuve: 'documentee' }),
+      fiche({ slug: 'c', terme: 'c', preuve: 'intuition' }),
+    ]
+    expect(trierFiches(parPreuve, 'preuve', true, libelles).map((f) => f.preuve)).toEqual([
+      'intuition',
+      'documentee',
+      'mesuree',
+    ])
+    expect(trierFiches(parPreuve, 'preuve', false, libelles).map((f) => f.preuve)).toEqual([
+      'mesuree',
+      'documentee',
+      'intuition',
+    ])
+  })
+
   it('trie par libellé de statut, pas par slug', () => {
     expect(trierFiches(fiches, 'statut', true, LIBELLES_DIVERGENTS).map((f) => f.statut)).toEqual([
       'propose',
@@ -124,6 +154,12 @@ describe('VueListe', () => {
   it('affiche un tiret quand il n’y a aucune suggestion', () => {
     render(<VueListe fiches={[fiches[0]]} libelles={libelles} />)
     expect(screen.getByText('—')).toBeInTheDocument()
+  })
+
+  it('affiche la colonne Preuve avec le libellé du niveau', () => {
+    render(<VueListe fiches={[fiches[0]]} libelles={libelles} />)
+    expect(screen.getByRole('button', { name: 'Preuve' })).toBeInTheDocument()
+    expect(screen.getByText('Documentée')).toBeInTheDocument()
   })
 
   it('trie par statut au clic sur l’en-tête', async () => {

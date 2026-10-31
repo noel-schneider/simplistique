@@ -3,13 +3,32 @@ terme: à consommer de préférence avant
 discipline: alimentation
 confusion: paire-bancale
 statut: propose
+preuve: mesuree
 resume: >
   Deux dates presque identiques sur les étiquettes, l’une de sécurité, l’autre
   de qualité. Moins d’un Européen sur deux sait les distinguer, et des tonnes
   d’aliments partent à la poubelle.
+accroche: "Selon un Eurobaromètre de 2015, 47 % des Européens comprennent la mention « à consommer de préférence avant »."
 suggestions:
   - pour une dégustation optimale, avant… / peut être consommé après cette date
   - meilleur avant… / souvent bon après
+sources:
+  - auteur: "Parlement européen et Conseil"
+    annee: 2011
+    objet: "règlement INCO (n° 1169/2011)"
+    lecture: seconde-main
+  - auteur: "Commission européenne"
+    annee: 2015
+    objet: "Eurobaromètre sur la compréhension de la mention « à consommer de préférence avant »"
+    lecture: seconde-main
+  - auteur: "Commission européenne"
+    annee: 2018
+    objet: "estimation de la part du gaspillage alimentaire liée au marquage des dates"
+    lecture: seconde-main
+precedents:
+  - lieu: France
+    annee: 2022
+    description: "mention autorisée « Pour une dégustation optimale, à consommer de préférence avant… », complétée par « Ce produit peut être consommé après cette date »"
 cree: 2026-10-31
 modifie: 2026-10-31
 ---

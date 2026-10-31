@@ -3,6 +3,7 @@ terme: découvert autorisé
 discipline: banque
 confusion: faux-ami-courant
 statut: propose
+preuve: intuition
 resume: >
   « Autorisé » sonne comme une permission gratuite. Juridiquement, c’est un
   crédit, avec des intérêts et souvent des frais, même quand on ne s’en sert

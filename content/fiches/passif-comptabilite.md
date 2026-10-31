@@ -4,6 +4,7 @@ discipline: comptabilite
 confusion: paire-bancale
 chantier: vocabulaire-du-bilan
 statut: propose
+preuve: intuition
 resume: >
   Fausse symétrie avec « actif » : la paire suggère une opposition entre agir
   et subir, là où il s’agit d’avoirs et de dettes.

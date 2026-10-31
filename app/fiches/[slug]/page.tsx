@@ -1,12 +1,16 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { cache } from 'react'
 import { BandeauChantier } from '@/components/bandeau-chantier'
 import { BandeauDemonstration } from '@/components/bandeau-demonstration'
 import { EnteteFiche } from '@/components/entete-fiche'
+import { Precedents } from '@/components/precedents'
 import { Prose } from '@/components/prose'
+import { Sources } from '@/components/sources'
 import { Votes } from '@/components/votes'
 import { getChantier } from '@/lib/content/chantiers'
+import { getMotifs } from '@/lib/content/motifs'
 import { getFiche, getFiches } from '@/lib/content/fiches'
 import { rendreMarkdown } from '@/lib/content/markdown'
 import { chargerTaxonomies } from '@/lib/content/taxonomies'
@@ -50,6 +54,7 @@ export default async function PageFiche({ params }: Params) {
   const taxonomies = taxonomiesDeLaRequete()
   const fiche = getFiche((await params).slug, undefined, taxonomies)
   if (!fiche) notFound()
+  const motifs = getMotifs().filter((m) => fiche.motifs.includes(m.slug))
   const chantier = fiche.chantier ? getChantier(fiche.chantier, undefined, taxonomies) : null
 
   return (
@@ -59,10 +64,29 @@ export default async function PageFiche({ params }: Params) {
         nomDiscipline={nomDe(taxonomies.disciplines, fiche.discipline)}
         nomConfusion={nomDe(taxonomies.confusions, fiche.confusion)}
         nomStatut={nomDe(taxonomies.statuts, fiche.statut)}
+        nomPreuve={nomDe(taxonomies.preuves, fiche.preuve)}
       />
       {fiche.demonstration && <BandeauDemonstration />}
       {chantier && <BandeauChantier slug={chantier.slug} nom={chantier.nom} />}
+      <Precedents precedents={fiche.precedents} />
       <Prose html={await rendreMarkdown(fiche.corps)} />
+      <Sources sources={fiche.sources} />
+      {motifs.length > 0 && (
+        <aside className="mt-8 border-t border-stone-200 pt-4 text-sm text-stone-700">
+          <p>
+            {motifs.length === 1 ? 'Ce terme illustre un piège qui revient ailleurs : ' : 'Ce terme illustre des pièges qui reviennent ailleurs : '}
+            {motifs.map((motif, i) => (
+              <span key={motif.slug}>
+                {i > 0 && ', '}
+                <Link href={`/motifs/${motif.slug}`} className="font-medium underline hover:text-stone-900">
+                  {motif.nom}
+                </Link>
+              </span>
+            ))}
+            .
+          </p>
+        </aside>
+      )}
       <Votes
         fiche={fiche.slug}
         alternatives={fiche.suggestions.map((texte) => ({

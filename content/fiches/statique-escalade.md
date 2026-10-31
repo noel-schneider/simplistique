@@ -3,6 +3,7 @@ terme: statique
 discipline: escalade
 confusion: paire-bancale
 statut: propose
+preuve: intuition
 resume: >
   Opposé à « dynamique » pour qualifier un mouvement, alors que les deux
   gestes sont en mouvement et que l’opposition réelle porte sur l’élan.

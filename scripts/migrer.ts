@@ -1,7 +1,5 @@
-import { readFileSync } from 'node:fs'
-import { join } from 'node:path'
 import { neon } from '@neondatabase/serverless'
-import { CHEMIN_MIGRATION, instructionsSql } from '../lib/votes/migration'
+import { fichiersDeMigration, instructionsDeToutesLesMigrations } from '../lib/votes/migration'
 
 async function principal(): Promise<void> {
   const url = process.env.DATABASE_URL
@@ -12,12 +10,15 @@ async function principal(): Promise<void> {
   }
 
   const sql = neon(url)
-  const instructions = instructionsSql(readFileSync(join(process.cwd(), CHEMIN_MIGRATION), 'utf8'))
+  const fichiers = fichiersDeMigration()
+  const instructions = instructionsDeToutesLesMigrations()
   if (instructions.length === 0) {
-    console.error('La migration est vide. Rien n’a été fait.')
+    console.error('Aucune instruction dans migrations/*.sql. Rien n’a été fait.')
     process.exitCode = 1
     return
   }
+  // Une seule transaction pour tous les fichiers : une instruction qui échoue dans
+  // `002` annule aussi `001`, et la base ne reste jamais à moitié migrée.
   await sql.transaction(instructions.map((instruction) => sql.query(instruction)))
 
   // `CREATE TABLE IF NOT EXISTS` ne fait rien contre une table `votes`
@@ -34,7 +35,20 @@ async function principal(): Promise<void> {
     return
   }
 
-  console.log(`Migration appliquée : ${instructions.length} instructions, la table votes et ses index existent.`)
+  // `to_regclass` rend NULL pour une table absente, sans lever d’erreur. Après une
+  // transaction réussie, elle ne peut manquer que si un fichier a disparu du dossier.
+  const propositions = await sql.query("SELECT to_regclass('public.propositions') IS NOT NULL AS existe")
+  if (propositions[0]?.existe !== true) {
+    console.error(
+      'La table propositions est absente : migrations/002-propositions.sql n’a pas été appliquée. Aucune proposition ne pourra être enregistrée.',
+    )
+    process.exitCode = 1
+    return
+  }
+
+  console.log(
+    `Migrations appliquées (${fichiers.join(', ')}) : ${instructions.length} instructions, les tables votes et propositions existent.`,
+  )
 }
 
 principal().catch((erreur: unknown) => {

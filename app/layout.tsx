@@ -28,7 +28,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Navigation />
         <main className="mx-auto max-w-3xl px-5 py-10">{children}</main>
         <footer className="mx-auto max-w-3xl px-5 pb-10 text-sm text-stone-500">
-          Un corpus ouvert. Les suggestions passent par le dépôt — voir{' '}
+          Un corpus ouvert : un terme se propose en deux minutes sur la page{' '}
+          <Link className="underline" href="/proposer">
+            Proposer
+          </Link>
+          , une fiche complète passe par{' '}
           <Link className="underline" href="/contribuer">
             Contribuer
           </Link>

@@ -3,11 +3,18 @@ terme: masse relativiste / masse au repos
 discipline: physique
 confusion: paire-bancale
 statut: propose
+preuve: documentee
 resume: >
   Deux « masses » pour une seule grandeur : la masse d’un corps ne change pas
   avec la vitesse, c’est son énergie qui augmente.
 suggestions:
   - masse (sans qualificatif) et énergie
+sources:
+  - auteur: "Lev Okun"
+    annee: 1989
+    titre: "The Concept of Mass"
+    url: https://faculty.washington.edu/seattle/physics544/Eismc2/1989%20Okun%20Physics%20Today.pdf
+    lecture: originale
 cree: 2026-10-31
 modifie: 2026-10-31
 ---

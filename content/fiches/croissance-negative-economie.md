@@ -3,12 +3,21 @@ terme: croissance négative
 discipline: economie
 confusion: jargon-opaque
 statut: propose
+preuve: documentee
 resume: >
   Une croissance qui décroît : l’expression se contredit, et elle présente la
   croissance comme l’état normal même quand l’économie recule.
 suggestions:
   - recul du PIB
   - baisse de l’activité
+sources:
+  - auteur: "Mathias Couturier"
+    annee: 2009
+    titre: "Croissance négative ou décroissance"
+    lecture: seconde-main
+motifs:
+  - positif-et-negatif
+  - taux-et-niveau
 cree: 2026-10-31
 modifie: 2026-10-31
 ---

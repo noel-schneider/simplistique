@@ -18,6 +18,10 @@ function meta(p: Partial<FicheMeta> = {}): FicheMeta {
     discipline: 'mathematiques',
     confusion: 'faux-ami-courant',
     statut: 'pointe',
+    preuve: 'documentee',
+    sources: [],
+    precedents: [],
+    motifs: [],
     resume: 'Un mot courant au sens technique étranger.',
     suggestions: [],
     cree: new Date('2026-10-03'),
@@ -30,6 +34,7 @@ const libelles = {
   nomDiscipline: 'Mathématiques',
   nomConfusion: 'Faux ami courant',
   nomStatut: 'Pointé',
+  nomPreuve: 'Documentée par des spécialistes',
 }
 
 describe('EnteteFiche', () => {

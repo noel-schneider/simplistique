@@ -2,8 +2,9 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import matter from 'gray-matter'
 import { chargerTaxonomies, DOSSIER_CONTENU } from './taxonomies'
-import { creerSchemaFiche, decrireErreursDeSchema, schemaSlug, type Fiche, type FicheIndex, type Taxonomies, type ChantierMeta } from './schema'
+import { creerSchemaFiche, decrireErreursDeSchema, schemaSlug, type Fiche, type FicheIndex, type Taxonomies, type ChantierMeta, type MotifMeta } from './schema'
 import { getChantiers } from './chantiers'
+import { getMotifs } from './motifs'
 
 export { DOSSIER_CONTENU }
 
@@ -12,6 +13,7 @@ function lireFiche(
   fichier: string,
   taxonomies: Taxonomies,
   chantiers: ChantierMeta[],
+  motifs: MotifMeta[],
 ): Fiche {
   const slug = fichier.replace(/\.md$/, '')
   if (!schemaSlug.test(slug)) {
@@ -22,7 +24,7 @@ function lireFiche(
 
   const chemin = join(dossier, 'fiches', fichier)
   const { data, content } = matter(readFileSync(chemin, 'utf8'))
-  const resultat = creerSchemaFiche(taxonomies, chantiers).safeParse(data)
+  const resultat = creerSchemaFiche(taxonomies, chantiers, motifs).safeParse(data)
 
   if (!resultat.success) {
     const details = decrireErreursDeSchema(resultat.error.issues, data as Record<string, unknown>)
@@ -36,13 +38,14 @@ export function getFiches(
   dossier: string = DOSSIER_CONTENU,
   taxonomies: Taxonomies = chargerTaxonomies(dossier),
   chantiers: ChantierMeta[] = getChantiers(dossier, taxonomies),
+  motifs: MotifMeta[] = getMotifs(dossier, taxonomies),
 ): Fiche[] {
   const dossierFiches = join(dossier, 'fiches')
   if (!existsSync(dossierFiches)) return []
 
   return readdirSync(dossierFiches)
     .filter((f) => f.endsWith('.md'))
-    .map((f) => lireFiche(dossier, f, taxonomies, chantiers))
+    .map((f) => lireFiche(dossier, f, taxonomies, chantiers, motifs))
     .sort((a, b) => a.terme.localeCompare(b.terme, 'fr'))
 }
 
@@ -51,26 +54,30 @@ export function getFiche(
   dossier: string = DOSSIER_CONTENU,
   taxonomies: Taxonomies = chargerTaxonomies(dossier),
   chantiers: ChantierMeta[] = getChantiers(dossier, taxonomies),
+  motifs: MotifMeta[] = getMotifs(dossier, taxonomies),
 ): Fiche | null {
   const fichier = `${slug}.md`
   const chemin = join(dossier, 'fiches', fichier)
   if (!existsSync(chemin)) return null
-  return lireFiche(dossier, fichier, taxonomies, chantiers)
+  return lireFiche(dossier, fichier, taxonomies, chantiers, motifs)
 }
 
 export function getIndex(
   dossier: string = DOSSIER_CONTENU,
   taxonomies: Taxonomies = chargerTaxonomies(dossier),
   chantiers: ChantierMeta[] = getChantiers(dossier, taxonomies),
+  motifs: MotifMeta[] = getMotifs(dossier, taxonomies),
 ): FicheIndex[] {
-  return getFiches(dossier, taxonomies, chantiers).map((fiche) => ({
+  return getFiches(dossier, taxonomies, chantiers, motifs).map((fiche) => ({
     slug: fiche.slug,
     terme: fiche.terme,
     discipline: fiche.discipline,
     confusion: fiche.confusion,
     statut: fiche.statut,
+    preuve: fiche.preuve,
     resume: fiche.resume,
     suggestions: fiche.suggestions,
+    accroche: fiche.accroche,
     chantier: fiche.chantier,
     demonstration: fiche.demonstration,
   }))

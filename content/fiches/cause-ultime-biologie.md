@@ -3,12 +3,26 @@ terme: cause ultime / cause proximale
 discipline: biologie
 confusion: jargon-opaque
 statut: propose
+preuve: documentee
 resume: >
   Ni « ultime » ni « proximale » ne disent qu’on oppose le pourquoi évolutif
   d’un comportement au comment de son mécanisme.
 suggestions:
   - explication évolutive / explication mécaniste
   - pourquoi / comment
+sources:
+  - auteur: "Ernst Mayr"
+    annee: 1961
+    titre: "Cause and Effect in Biology"
+    lecture: seconde-main
+  - auteur: "Laland et coll."
+    annee: 2011
+    titre: "Cause and Effect in Biology Revisited: Is Mayr’s Proximate–Ultimate Dichotomy Still Useful?"
+    lecture: seconde-main
+  - auteur: "Scott-Phillips, Dickins et West"
+    annee: 2011
+    titre: "Evolutionary Theory and the Ultimate–Proximate Distinction in the Human Behavioral Sciences"
+    lecture: seconde-main
 cree: 2026-10-31
 modifie: 2026-10-31
 ---

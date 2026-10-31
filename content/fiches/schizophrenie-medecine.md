@@ -3,11 +3,23 @@ terme: schizophrénie
 discipline: medecine
 confusion: jargon-opaque
 statut: propose
+preuve: documentee
 resume: >
   « Esprit scindé » : le nom fait croire à un dédoublement de la personnalité,
   qui n’a rien à voir. Le Japon l’a renommé en 2002, avec des effets mesurés.
+accroche: "Au Japon, après le changement de nom, la part des patients informés de leur diagnostic passe de 36,7 % à 69,7 % en trois ans."
 suggestions:
   - trouble de l’intégration
+sources:
+  - auteur: "Mitsumoto Sato"
+    annee: 2006
+    titre: "Renaming schizophrenia: a Japanese perspective"
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC1472254
+    lecture: originale
+precedents:
+  - lieu: Japon
+    annee: 2002
+    description: "la Société japonaise de psychiatrie et de neurologie remplace « maladie de l’esprit scindé » par un terme signifiant « trouble de l’intégration »"
 cree: 2026-10-31
 modifie: 2026-10-31
 ---

@@ -3,10 +3,22 @@ terme: normal
 discipline: philosophie
 confusion: faux-ami-courant
 statut: pointe
+preuve: documentee
 resume: >
   « Normal » glisse sans prévenir de « fréquent » à « souhaitable » : une
   description devient une prescription sans que personne ne l’ait décidé.
 suggestions: []
+sources:
+  - auteur: "Georges Canguilhem"
+    annee: 1966
+    titre: "Le normal et le pathologique"
+    lecture: seconde-main
+  - auteur: "Ian Hacking"
+    annee: 1990
+    titre: "The Taming of Chance"
+    lecture: seconde-main
+motifs:
+  - normal-et-naturel
 cree: 2026-10-31
 modifie: 2026-10-31
 ---

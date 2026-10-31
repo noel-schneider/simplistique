@@ -9,6 +9,7 @@ import { getChantier, getChantiers } from '@/lib/content/chantiers'
 import { getFiches } from '@/lib/content/fiches'
 import { rendreMarkdown } from '@/lib/content/markdown'
 import { chargerTaxonomies } from '@/lib/content/taxonomies'
+import { typographier } from '@/lib/typographie'
 
 type Params = { params: Promise<{ slug: string }> }
 
@@ -53,8 +54,8 @@ export default async function PageChantier({ params }: Params) {
     <article>
       {chantier.demonstration && <BandeauDemonstration />}
       <header className="mb-8 space-y-4 border-b border-stone-200 pb-6">
-        <h1 className="text-3xl font-semibold tracking-tight">{chantier.nom}</h1>
-        <p className="text-lg leading-relaxed text-stone-700">{chantier.resume}</p>
+        <h1 className="text-3xl font-semibold tracking-tight">{typographier(chantier.nom)}</h1>
+        <p className="text-lg leading-relaxed text-stone-700">{typographier(chantier.resume)}</p>
         <Link
           href={`/fiches?discipline=${chantier.discipline}`}
           className="text-sm text-stone-600 underline hover:text-stone-900"
@@ -83,11 +84,11 @@ export default async function PageChantier({ params }: Params) {
                   href={`/fiches/${fiche.slug}`}
                   className="font-medium underline hover:text-stone-600"
                 >
-                  {fiche.terme}
+                  {typographier(fiche.terme)}
                 </Link>
                 <BadgeStatut statut={fiche.statut} nom={nomStatut(fiche.statut)} />
               </p>
-              <p className="text-sm text-stone-600">{fiche.resume}</p>
+              <p className="text-sm text-stone-600">{typographier(fiche.resume)}</p>
             </div>
           ))
         )}

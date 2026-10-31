@@ -3,11 +3,22 @@ terme: nombre imaginaire
 discipline: mathematiques
 confusion: nom-historique
 statut: propose
+preuve: documentee
 resume: >
   Nom donné par dénigrement à des nombres aussi réels que les autres. Gauss
   jugeait déjà ce vocabulaire responsable de leur réputation d’obscurité.
+accroche: "Gauss écrit que l’obscurité entourant les nombres imaginaires tient à une terminologie mal adaptée."
 suggestions:
   - nombre latéral
+sources:
+  - auteur: "René Descartes"
+    annee: 1637
+    titre: "La Géométrie"
+    lecture: seconde-main
+  - auteur: "Carl Friedrich Gauss"
+    annee: 1831
+    objet: "mémoire sur les résidus biquadratiques, vers 1831"
+    lecture: seconde-main
 cree: 2026-10-31
 modifie: 2026-10-31
 ---

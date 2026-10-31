@@ -3,11 +3,22 @@ terme: statistiquement significatif
 discipline: statistiques
 confusion: faux-ami-courant
 statut: propose
+preuve: mesuree
 resume: >
   « Significatif » veut dire « important » dans la langue courante ; en
   statistiques, il veut seulement dire « difficile à attribuer au hasard ».
+accroche: "Une prédiction juste dans 52 % des cas, à peine mieux qu’un pile ou face, peut être « statistiquement significative »."
 suggestions:
   - statistiquement discernable
+sources:
+  - auteur: "Wasserstein, Schirm et Lazar"
+    annee: 2019
+    titre: "Moving to a World Beyond “p < 0.05”"
+    lecture: seconde-main
+  - auteur: "Amrhein, Greenland et McShane"
+    annee: 2019
+    titre: "Scientists rise up against statistical significance"
+    lecture: seconde-main
 cree: 2026-10-31
 modifie: 2026-10-31
 ---

@@ -3,6 +3,7 @@ terme: salaire net
 discipline: travail
 confusion: polysemie-externe
 statut: pointe
+preuve: intuition
 resume: >
   Net de quoi ? La fiche de paie française affiche plusieurs « nets » officiels,
   et aucun ne correspond forcément à ce qui arrive sur le compte.

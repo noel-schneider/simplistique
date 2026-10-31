@@ -1,0 +1,14 @@
+- slug: intuition
+  nom: Intuition d’auteur
+  description: >
+    L’analyse vient de l’auteur de la fiche, sans spécialiste cité pour la
+    soutenir.
+- slug: documentee
+  nom: Documentée par des spécialistes
+  description: >
+    Un ou plusieurs spécialistes de la discipline ont écrit que ce nom pose
+    problème.
+- slug: mesuree
+  nom: Mesurée
+  description: >
+    Une enquête ou une expérience chiffre la confusion chez de vrais lecteurs.

@@ -91,6 +91,26 @@ describe('rendreMarkdown', () => {
   })
 })
 
+describe('rendreMarkdown : typographie', () => {
+  it('pose les insécables dans le texte', async () => {
+    const html = await rendreMarkdown('Vraiment ? « Oui » : 30 %')
+    expect(html).toContain('Vraiment\u202F?')
+    expect(html).toContain('«\u202FOui\u202F»\u00A0:')
+    expect(html).toContain('30\u202F%')
+  })
+
+  it('ne touche ni au code en ligne ni aux blocs de code', async () => {
+    const html = await rendreMarkdown('`a ?` et\n\n```\nb !\n```\n')
+    expect(html).toContain('<code>a ?</code>')
+    expect(html).toContain('b !')
+  })
+
+  it('garde des identifiants de titre à espaces ordinaires', async () => {
+    const html = await rendreMarkdown('## Quoi ? Pourquoi')
+    expect(html).toContain('id="quoi--pourquoi"')
+  })
+})
+
 describe('listerTitres', () => {
   it('liste les titres de niveau 2 dans l\'ordre', () => {
     const md = '# Titre\n\n## Pourquoi c\'est confus\n\ntexte\n\n## Risques\n\ntexte'

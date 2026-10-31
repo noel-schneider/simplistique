@@ -3,6 +3,8 @@ import Link from 'next/link'
 const LIENS = [
   { href: '/manifeste', libelle: 'Manifeste' },
   { href: '/fiches', libelle: 'Fiches' },
+  { href: '/motifs', libelle: 'Motifs' },
+  { href: '/proposer', libelle: 'Proposer' },
   { href: '/contribuer', libelle: 'Contribuer' },
 ] as const
 
