@@ -7,6 +7,7 @@ preuve: documentee
 resume: >
   « Esprit scindé » : le nom fait croire à un dédoublement de la personnalité,
   qui n’a rien à voir. Le Japon l’a renommé en 2002, avec des effets mesurés.
+accroche: "Au Japon, après le changement de nom, la part des patients informés de leur diagnostic passe de 36,7 % à 69,7 % en trois ans."
 suggestions:
   - trouble de l’intégration
 sources:

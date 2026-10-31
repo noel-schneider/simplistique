@@ -7,6 +7,7 @@ preuve: documentee
 resume: >
   Terme issu de loups captifs réunis artificiellement. Dans la nature, une
   meute est une famille, et ses « alphas » sont simplement les parents.
+accroche: "Dans la nature, une meute de loups est une famille : ses « alphas » sont simplement les parents."
 suggestions:
   - mâle reproducteur / femelle reproductrice
 sources:

@@ -7,6 +7,7 @@ preuve: mesuree
 resume: >
   Quand l’inflation baisse, les prix ne baissent pas : ils montent moins vite.
   Une part importante du public comprend l’inverse.
+accroche: "Quand l’inflation baisse, les prix montent moins vite, mais un peu plus d’un tiers des personnes interrogées croient qu’ils ont baissé."
 suggestions:
   - les prix augmentent moins vite
 sources:

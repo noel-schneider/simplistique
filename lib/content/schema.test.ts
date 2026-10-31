@@ -125,3 +125,18 @@ describe('precedents dans le schéma', () => {
     expect(schema.safeParse(avec(2002.5)).success).toBe(false)
   })
 })
+
+describe('accroche dans le schéma', () => {
+  it('accepte une accroche de 140 caractères et la rogne', () => {
+    const r = schema.safeParse({ ...BASE, accroche: `  ${'a'.repeat(140)}\n` })
+    expect(r.success && r.data.accroche).toBe('a'.repeat(140))
+  })
+
+  it('refuse une accroche de plus de 140 caractères', () => {
+    expect(message({ ...BASE, accroche: 'a'.repeat(141) })).toMatch(/accroche/)
+  })
+
+  it('refuse une accroche vide', () => {
+    expect(message({ ...BASE, accroche: '  ' })).toMatch(/accroche/)
+  })
+})

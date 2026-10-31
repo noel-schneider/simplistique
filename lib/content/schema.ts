@@ -73,6 +73,8 @@ export type FicheMeta = {
   precedents: Precedent[]
   resume: string
   suggestions: string[]
+  /** Une phrase-choc factuelle pour l’accueil et le partage. Absent = fiche jamais mise à la une. */
+  accroche?: string
   /** Le slug d’un chantier de la même discipline, ou rien. */
   chantier?: string
   /** Slugs des motifs transversaux que la fiche illustre. Absent = aucun. */
@@ -86,6 +88,7 @@ export type FicheMeta = {
 export type Fiche = FicheMeta & { corps: string }
 
 export const LONGUEUR_MAX_RESUME = 240
+export const LONGUEUR_MAX_ACCROCHE = 140
 
 export type ChantierMeta = {
   slug: string
@@ -232,6 +235,7 @@ export function creerSchemaFiche(
       // du budget de 240 pour rien.
       resume: z.string().trim().min(1).max(LONGUEUR_MAX_RESUME),
       suggestions: z.array(z.string().min(1)),
+      accroche: z.string().trim().min(1).max(LONGUEUR_MAX_ACCROCHE).optional(),
       // Pas un `z.enum` : l'appariement à vérifier porte sur deux champs à la
       // fois — le chantier doit exister ET relever de la même discipline — ce
       // qu'un enum sur le seul champ ne sait pas dire. Et `z.enum` exige une

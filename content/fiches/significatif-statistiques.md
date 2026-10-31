@@ -7,6 +7,7 @@ preuve: mesuree
 resume: >
   « Significatif » veut dire « important » dans la langue courante ; en
   statistiques, il veut seulement dire « difficile à attribuer au hasard ».
+accroche: "Une prédiction juste dans 52 % des cas, à peine mieux qu’un pile ou face, peut être « statistiquement significative »."
 suggestions:
   - statistiquement discernable
 sources:

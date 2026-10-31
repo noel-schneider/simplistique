@@ -7,6 +7,7 @@ preuve: documentee
 resume: >
   Un allèle « dominant » n’est ni plus fort, ni meilleur, ni plus fréquent : il
   s’exprime, c’est tout. Le Japon a déjà renommé la paire en 2017.
+accroche: "Un allèle « dominant » n’est ni plus fort ni plus fréquent : en 2017, le Japon a déjà renommé la paire."
 suggestions:
   - manifeste / latent
 sources:

@@ -7,6 +7,7 @@ preuve: documentee
 resume: >
   Nom donné par dénigrement à des nombres aussi réels que les autres. Gauss
   jugeait déjà ce vocabulaire responsable de leur réputation d’obscurité.
+accroche: "Gauss écrit que l’obscurité entourant les nombres imaginaires tient à une terminologie mal adaptée."
 suggestions:
   - nombre latéral
 sources:

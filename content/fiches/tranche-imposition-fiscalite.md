@@ -7,6 +7,7 @@ preuve: mesuree
 resume: >
   « Passer dans la tranche supérieure » ne fait pas payer plus d’impôt sur tout
   le revenu : seuls les euros au-dessus du seuil sont taxés au taux supérieur.
+accroche: "En 2024, 49 % des Britanniques interrogés croyaient que le taux supérieur s’applique à tout le revenu."
 suggestions:
   - part du revenu taxée à X %
 sources:

@@ -8,6 +8,7 @@ resume: >
   Deux dates presque identiques sur les étiquettes, l’une de sécurité, l’autre
   de qualité. Moins d’un Européen sur deux sait les distinguer, et des tonnes
   d’aliments partent à la poubelle.
+accroche: "Selon un Eurobaromètre de 2015, 47 % des Européens comprennent la mention « à consommer de préférence avant »."
 suggestions:
   - pour une dégustation optimale, avant… / peut être consommé après cette date
   - meilleur avant… / souvent bon après

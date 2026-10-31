@@ -7,6 +7,7 @@ preuve: documentee
 resume: >
   Le mot « confiance » promet une certitude que l’intervalle ne donne pas : il
   mesure l’incertitude, et ne dit pas où se trouve la vraie valeur.
+accroche: "Andrew Gelman écrit que l’intervalle de confiance ne devrait pas inspirer confiance, puisqu’il mesure une incertitude."
 suggestions:
   - intervalle de compatibilité
   - intervalle d’incertitude

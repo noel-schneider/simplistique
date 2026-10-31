@@ -77,6 +77,7 @@ export function getIndex(
     preuve: fiche.preuve,
     resume: fiche.resume,
     suggestions: fiche.suggestions,
+    accroche: fiche.accroche,
     chantier: fiche.chantier,
     demonstration: fiche.demonstration,
   }))
