@@ -1,140 +1,140 @@
 - slug: mathematiques
   nom: Mathématiques
   famille: sciences
-  couleur: '#e8703a'
+  couleur: '#c50677'
   description: >
     Discipline ancienne et très stable, donc terrain privilégié de la
     simplistique : ses concepts ne bougent plus guère.
 - slug: comptabilite
   nom: Comptabilité
   famille: societe
-  couleur: '#3b82c4'
+  couleur: '#5559df'
   description: >
     Vocabulaire quotidien de millions de personnes, bâti sur des mots courants
     détournés de leur sens.
 - slug: theorie-musicale
   nom: Théorie musicale
   famille: pratiques
-  couleur: '#9a6fd4'
+  couleur: '#9b6ae4'
   description: >
     Terminologie sédimentée sur des siècles, avec des couches de vocabulaire
     qui se contredisent.
 - slug: escalade
   nom: Escalade
   famille: pratiques
-  couleur: '#3fa08a'
+  couleur: '#409c7d'
   description: >
     Discipline jeune au jargon encore mouvant, où les termes se fixent en ce
     moment même.
 - slug: statistiques
   nom: Statistiques
   famille: sciences
-  couleur: '#c2417a'
+  couleur: '#883daf'
   description: >
     Discipline outil de toutes les sciences empiriques, dont le vocabulaire
     déborde dans la presse et le débat public, avec ses contresens.
 - slug: systemique
   nom: Systémique
   famille: sciences
-  couleur: '#d4a017'
+  couleur: '#5f92a3'
   description: >
     Étude des systèmes et de leurs boucles, partagée entre l'automatique, la
     biologie et l'écologie, chacune avec ses habitudes de vocabulaire.
 - slug: droit
   nom: Droit
   famille: societe
-  couleur: '#6b7a8f'
+  couleur: '#9b3988'
   description: >
     Vocabulaire fixé par les textes, où un mot mal choisi se retrouve gravé
     dans la loi et dans le débat politique.
 - slug: philosophie
   nom: Philosophie
   famille: societe
-  couleur: '#8a6d3b'
+  couleur: '#966226'
   description: >
     Les mots que la philosophie analyse sont souvent ceux de tout le monde,
     et leurs ambiguïtés passent dans chaque argument.
 - slug: biologie
   nom: Biologie
   famille: sciences
-  couleur: '#4a9d3f'
+  couleur: '#4a8a30'
   description: >
     Discipline foisonnante, dont certains couples de termes datent du milieu
     du XXe siècle et sont encore discutés.
 - slug: psychologie
   nom: Psychologie
   famille: sciences
-  couleur: '#d65c5c'
+  couleur: '#953e32'
   description: >
     Vocabulaire hérité en partie de la clinique et de la psychanalyse,
     réemployé par la psychologie scientifique.
 - slug: economie
   nom: Économie
   famille: societe
-  couleur: '#2f8fa8'
+  couleur: '#8682b7'
   description: >
     Termes techniques que chacun manipule au quotidien sans toujours savoir
     ce qu'ils découpent.
 - slug: informatique
   nom: Informatique
   famille: sciences
-  couleur: '#5b6ee1'
+  couleur: '#4076f5'
   description: >
     Discipline jeune, dont les noms ont parfois été choisis pour ne pas froisser
     un décideur plutôt que pour décrire.
 - slug: physique
   nom: Physique
   famille: sciences
-  couleur: '#1f6f8b'
+  couleur: '#12687a'
   description: >
     Vocabulaire hérité de théories abandonnées, comme le calorique, que
     les découvertes suivantes n'ont pas pris la peine de renommer.
 - slug: medecine
   nom: Médecine
   famille: sciences
-  couleur: '#b5485d'
+  couleur: '#be6f72'
   description: >
     Les noms de maladies sont lus par les patients autant que par les
     soignants, et un mauvais nom peut aggraver la stigmatisation.
 - slug: fiscalite
   nom: Fiscalité
   famille: quotidien
-  couleur: '#7a5c9e'
+  couleur: '#745693'
   description: >
     Le vocabulaire que chaque contribuable lit une fois par an sur son avis
     d'impôt, et que peu comprennent vraiment.
 - slug: banque
   nom: Banque
   famille: quotidien
-  couleur: '#3d7d5a'
+  couleur: '#106f4c'
   description: >
     Les mots des relevés de compte et des plaquettes tarifaires, où un terme
     flou se paie parfois en frais.
 - slug: alimentation
   nom: Alimentation
   famille: quotidien
-  couleur: '#c9772b'
+  couleur: '#c56298'
   description: >
     Les mentions des étiquettes, lues en quelques secondes au supermarché,
     et dont le sens décide de ce qu'on mange ou de ce qu'on jette.
 - slug: meteorologie
   nom: Météorologie
   famille: quotidien
-  couleur: '#4a8fc9'
+  couleur: '#438fcd'
   description: >
     Des prévisions consultées chaque jour par des millions de personnes,
     dans un vocabulaire de probabilités que presque personne n'a appris.
 - slug: sante
   nom: Santé et assurance maladie
   famille: quotidien
-  couleur: '#a8566f'
+  couleur: '#be1506'
   description: >
     Le vocabulaire des remboursements de soins, que chaque patient croise
     sans l'avoir choisi.
 - slug: travail
   nom: Travail
   famille: quotidien
-  couleur: '#8c7a4a'
+  couleur: '#8e7f56'
   description: >
     Les mots de la fiche de paie et du contrat, qui décident de ce que
     chacun croit gagner.
