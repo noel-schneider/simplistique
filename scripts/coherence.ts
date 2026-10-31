@@ -61,7 +61,7 @@ export function verifierCoherence(fiche: Fiche): Avertissement[] {
   for (const source of fiche.sources) {
     if (source.lecture === 'seconde-main') {
       avertissements.push(
-        `source de seconde main à relire : ${source.auteur} (${source.annee}), « ${source.titre} »`,
+        `source de seconde main à relire : ${source.auteur} (${source.annee}), « ${source.titre ?? source.objet} »`,
       )
     }
   }

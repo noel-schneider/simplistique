@@ -12,7 +12,7 @@ suggestions:
 sources:
   - auteur: "Mitsumoto Sato"
     annee: 2006
-    titre: "Propos sur le changement de nom de la schizophrénie au Japon (World Psychiatry)"
+    titre: "Renaming schizophrenia: a Japanese perspective"
     url: https://pmc.ncbi.nlm.nih.gov/articles/PMC1472254
     lecture: originale
 cree: 2026-10-31

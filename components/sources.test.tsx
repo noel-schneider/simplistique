@@ -19,6 +19,21 @@ describe('Sources', () => {
     expect(screen.getByText(/The Concept of Mass/)).toBeInTheDocument()
   })
 
+  it('rend le titre réel en <cite>', () => {
+    const { container } = render(<Sources sources={[base]} />)
+    expect(container.querySelector('cite')).toHaveTextContent('The Concept of Mass')
+  })
+
+  it('rend l’objet sans <cite>, et lie l’objet quand il n’y a pas de titre', () => {
+    const { container } = render(
+      <Sources
+        sources={[{ auteur: 'Bernanke', annee: 2010, objet: 'propos sur la Fed', lecture: 'seconde-main', url: 'https://exemple.org/b' }]}
+      />,
+    )
+    expect(container.querySelector('cite')).toBeNull()
+    expect(screen.getByRole('link', { name: 'propos sur la Fed' })).toHaveAttribute('href', 'https://exemple.org/b')
+  })
+
   it('met le titre en lien quand url existe, sinon non', () => {
     const { rerender } = render(<Sources sources={[{ ...base, url: 'https://exemple.org/okun' }]} />)
     expect(screen.getByRole('link', { name: /The Concept of Mass/ })).toHaveAttribute(

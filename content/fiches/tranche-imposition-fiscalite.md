@@ -12,7 +12,7 @@ suggestions:
 sources:
   - auteur: "Tax Policy Associates"
     annee: 2024
-    titre: "Half the British public doesn’t understand income tax: new data"
+    objet: "sondage sur la compréhension des tranches d’impôt"
     url: https://taxpolicy.org.uk/2024/07/05/half-the-british-public-doesnt-understand-income-tax-new-data/
     lecture: seconde-main
 cree: 2026-10-31

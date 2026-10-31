@@ -12,7 +12,7 @@ suggestions:
 sources:
   - auteur: "Karl Pearson"
     annee: 1920
-    titre: "Notes on the History of Correlation (Biometrika)"
+    titre: "Notes on the History of Correlation"
     lecture: seconde-main
 cree: 2026-10-31
 modifie: 2026-10-31

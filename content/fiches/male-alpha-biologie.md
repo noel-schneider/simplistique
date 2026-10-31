@@ -16,7 +16,7 @@ sources:
     lecture: seconde-main
   - auteur: "David Mech"
     annee: 1999
-    titre: "Alpha status, dominance, and division of labor in wolf packs (Canadian Journal of Zoology)"
+    titre: "Alpha status, dominance, and division of labor in wolf packs"
     url: https://pubs.usgs.gov/publication/1001725
     lecture: seconde-main
 cree: 2026-10-31

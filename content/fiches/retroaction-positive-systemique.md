@@ -13,7 +13,7 @@ suggestions:
 sources:
   - auteur: "Mark Milanick"
     annee: 2020
-    titre: "Confusing Science Vocabulary: When Negative Is Positive! (Journal of College Science Teaching)"
+    titre: "Confusing Science Vocabulary: When Negative Is Positive!"
     url: https://www.nsta.org/journal-college-science-teaching/journal-college-science-teaching-januaryfebruary-2020/confusing
     lecture: originale
 cree: 2026-10-31

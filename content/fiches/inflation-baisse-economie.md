@@ -12,7 +12,7 @@ suggestions:
 sources:
   - auteur: "Runge, da Silva Gomes et Hughes"
     annee: 2022
-    titre: "Enquête YouGov (NIESR) sur la compréhension d’un titre annonçant une baisse de l’inflation"
+    objet: "enquête YouGov réalisée pour le NIESR sur un titre annonçant une baisse de l’inflation"
     lecture: seconde-main
 cree: 2026-10-31
 modifie: 2026-10-31

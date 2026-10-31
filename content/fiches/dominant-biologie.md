@@ -12,11 +12,11 @@ suggestions:
 sources:
   - auteur: "Société japonaise de génétique"
     annee: 2017
-    titre: "Remplacement des termes japonais pour « dominant » et « récessif »"
+    objet: "remplacement des termes japonais pour « dominant » et « récessif »"
     lecture: seconde-main
   - auteur: "Rosemary Redfield"
     annee: 2012
-    titre: "Article sur la dominance, relation et non propriété de l’allèle (PLoS Biology)"
+    titre: "“Why Do We Have to Learn This Stuff?” — A New Genetics for 21st Century Students"
     lecture: seconde-main
 cree: 2026-10-31
 modifie: 2026-10-31

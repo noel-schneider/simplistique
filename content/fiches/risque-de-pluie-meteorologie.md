@@ -13,7 +13,7 @@ suggestions:
 sources:
   - auteur: "Gerd Gigerenzer et coll."
     annee: 2005
-    titre: "A 30% chance of rain tomorrow (Risk Analysis)"
+    titre: "A 30% chance of rain tomorrow"
     url: https://econpapers.repec.org/RePEc:wly:riskan:v:25:y:2005:i:3:p:623-629
     lecture: seconde-main
 cree: 2026-10-31

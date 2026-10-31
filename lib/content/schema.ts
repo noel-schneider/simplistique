@@ -14,7 +14,10 @@ export const LECTURES = ['originale', 'seconde-main'] as const satisfies readonl
 export type Source = {
   auteur: string
   annee: number
-  titre: string
+  /** Titre réel de l’œuvre. Ne jamais y mettre une description ni un nom de revue. */
+  titre?: string
+  /** Description de la référence, quand on n’en connaît pas le titre exact. */
+  objet?: string
   url?: string
   lecture: Lecture
 }
@@ -142,13 +145,20 @@ function creerSchemaSource() {
   // (+ 1 pour un ouvrage annoncé), sans valeur figée dans le code.
   const anneeMax = new Date().getFullYear() + 1
 
-  return z.strictObject({
-    auteur: z.string().min(1),
-    annee: z.number().int().min(ANNEE_MIN_SOURCE).max(anneeMax),
-    titre: z.string().min(1),
-    url: urlWeb.optional(),
-    lecture: z.enum(LECTURES),
-  })
+  return z
+    .strictObject({
+      auteur: z.string().min(1),
+      annee: z.number().int().min(ANNEE_MIN_SOURCE).max(anneeMax),
+      titre: z.string().min(1).optional(),
+      objet: z.string().min(1).optional(),
+      url: urlWeb.optional(),
+      lecture: z.enum(LECTURES),
+    })
+    // Un titre inventé serait affiché comme un titre réel : sans titre exact,
+    // on décrit la référence dans `objet`. L’un des deux au moins est requis.
+    .refine((source) => source.titre !== undefined || source.objet !== undefined, {
+      message: 'source sans titre ni objet : donner le titre réel, ou à défaut une description dans « objet »',
+    })
 }
 
 export function creerSchemaFiche(

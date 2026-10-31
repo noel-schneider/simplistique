@@ -12,11 +12,11 @@ suggestions:
 sources:
   - auteur: "Wasserstein, Schirm et Lazar"
     annee: 2019
-    titre: "Numéro spécial sur l’abandon de « statistically significant » (The American Statistician)"
+    titre: "Moving to a World Beyond “p < 0.05”"
     lecture: seconde-main
   - auteur: "Amrhein, Greenland et McShane"
     annee: 2019
-    titre: "Tribune sur la « significativité statistique » (Nature)"
+    titre: "Scientists rise up against statistical significance"
     lecture: seconde-main
 cree: 2026-10-31
 modifie: 2026-10-31

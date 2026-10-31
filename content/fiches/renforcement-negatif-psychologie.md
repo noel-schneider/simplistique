@@ -12,7 +12,7 @@ suggestions:
 sources:
   - auteur: "Murray Sidman"
     annee: 2006
-    titre: "Propos sur le concept de renforcement négatif (The Behavior Analyst)"
+    titre: "The Distinction Between Positive and Negative Reinforcement: Some Additional Considerations"
     url: https://pmc.ncbi.nlm.nih.gov/articles/PMC2223177/
     lecture: originale
 cree: 2026-10-31

@@ -149,7 +149,7 @@ describe('verifierCorpus', () => {
     // Les sources de seconde main sont listées à dessein à chaque vérification :
     // c’est la file de relecture. Tout autre avertissement reste une anomalie.
     const autres = verifierCorpus(getFiches(DOSSIER_CONTENU)).filter(
-      (a) => !/source/.test(a.message),
+      (a) => !/^source de seconde main/.test(a.message),
     )
     expect(autres).toEqual([])
   })

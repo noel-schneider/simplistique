@@ -12,7 +12,7 @@ suggestions:
 sources:
   - auteur: "Lev Okun"
     annee: 1989
-    titre: "The Concept of Mass (Physics Today)"
+    titre: "The Concept of Mass"
     url: https://faculty.washington.edu/seattle/physics544/Eismc2/1989%20Okun%20Physics%20Today.pdf
     lecture: originale
 cree: 2026-10-31

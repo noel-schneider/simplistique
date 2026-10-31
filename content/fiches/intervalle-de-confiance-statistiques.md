@@ -13,7 +13,7 @@ suggestions:
 sources:
   - auteur: "Andrew Gelman et Sander Greenland"
     annee: 2019
-    titre: "Are confidence intervals better termed “uncertainty intervals”? (BMJ)"
+    titre: "Are confidence intervals better termed “uncertainty intervals”?"
     url: https://sites.stat.columbia.edu/gelman/research/published/uncertainty_intervals.pdf
     lecture: originale
 cree: 2026-10-31

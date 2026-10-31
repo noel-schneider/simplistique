@@ -11,7 +11,7 @@ suggestions: []
 sources:
   - auteur: "Paul Rozin"
     annee: 2005
-    titre: "The Meaning of “Natural” (Psychological Science)"
+    titre: "The Meaning of “Natural”"
     lecture: seconde-main
   - auteur: "G. E. Moore"
     annee: 1903

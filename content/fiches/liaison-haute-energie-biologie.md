@@ -12,11 +12,11 @@ suggestions:
 sources:
   - auteur: "Hill et Morales"
     annee: 1951
-    titre: "Discussion de la liaison à haute énergie (Journal of the American Chemical Society)"
+    titre: "On “High Energy Phosphate Bonds” of Biochemical Interest"
     lecture: seconde-main
   - auteur: "Dreyfus et coll."
     annee: 2012
-    titre: "Students’ reasoning about “high-energy bonds” and ATP: a vision of interdisciplinary education"
+    titre: "Students’ Interdisciplinary Reasoning about “High-Energy Bonds” and ATP"
     url: https://arxiv.org/abs/1209.0994
     lecture: originale
 cree: 2026-10-31

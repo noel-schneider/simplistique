@@ -14,11 +14,14 @@ export function Sources({ sources }: { sources: Source[] }) {
             {source.auteur} ({source.annee}),{' '}
             {source.url ? (
               <a href={source.url} className="underline hover:text-stone-900">
-                {source.titre}
+                {source.titre ? <cite>{source.titre}</cite> : source.objet}
               </a>
+            ) : source.titre ? (
+              <cite>{source.titre}</cite>
             ) : (
-              source.titre
+              source.objet
             )}
+            {source.titre && source.objet && <> — {source.objet}</>}
             {source.lecture === 'seconde-main' && (
               <span className="ml-2 text-xs text-stone-500">(lue de seconde main)</span>
             )}

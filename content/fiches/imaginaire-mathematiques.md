@@ -16,7 +16,7 @@ sources:
     lecture: seconde-main
   - auteur: "Carl Friedrich Gauss"
     annee: 1831
-    titre: "Mémoire sur les résidus biquadratiques"
+    objet: "mémoire sur les résidus biquadratiques, vers 1831"
     lecture: seconde-main
 cree: 2026-10-31
 modifie: 2026-10-31

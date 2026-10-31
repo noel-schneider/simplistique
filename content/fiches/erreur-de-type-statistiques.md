@@ -13,7 +13,7 @@ suggestions:
 sources:
   - auteur: "Tom Stafford"
     annee: 2015
-    titre: "Propos sur les erreurs de type I et de type II (Mind Hacks)"
+    objet: "propos sur les erreurs de type I et de type II"
     lecture: seconde-main
 cree: 2026-10-31
 modifie: 2026-10-31

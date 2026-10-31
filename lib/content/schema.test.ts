@@ -48,6 +48,18 @@ describe('preuve et sources dans le schéma', () => {
     expect(r.sources).toHaveLength(2)
   })
 
+  it('refuse une source sans titre ni objet', () => {
+    const sansTitre: Record<string, unknown> = { ...SOURCE }
+    delete sansTitre.titre
+    expect(message({ ...BASE, sources: [sansTitre] })).toMatch(/titre ni objet/)
+  })
+
+  it('accepte une source avec objet seul', () => {
+    const objetSeul: Record<string, unknown> = { ...SOURCE, objet: 'propos sur la Fed' }
+    delete objetSeul.titre
+    expect(schema.safeParse({ ...BASE, sources: [objetSeul] }).success).toBe(true)
+  })
+
   it('refuse une source sans lecture', () => {
     const sansLecture: Record<string, unknown> = { ...SOURCE }
     delete sansLecture.lecture

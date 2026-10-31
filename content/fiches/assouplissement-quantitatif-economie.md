@@ -12,11 +12,11 @@ suggestions:
 sources:
   - auteur: "Ben Bernanke"
     annee: 2010
-    titre: "Propos sur l’emploi de l’expression « quantitative easing » pour la politique de la Fed"
+    objet: "propos sur l’emploi de l’expression « quantitative easing » pour la politique de la Fed"
     lecture: seconde-main
   - auteur: "Silvana Tenreyro"
     annee: 2023
-    titre: "Propos sur l’image de la planche à billets et l’échange d’actifs"
+    objet: "propos sur l’image de la planche à billets et l’échange d’actifs"
     lecture: seconde-main
 cree: 2026-10-31
 modifie: 2026-10-31

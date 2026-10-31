@@ -11,7 +11,7 @@ suggestions: []
 sources:
   - auteur: "Evelyn Lamb"
     annee: 2013
-    titre: "Can a Closed Set Be Open? (Scientific American)"
+    titre: "Can a Closed Set Be Open?"
     url: https://www.scientificamerican.com/blog/roots-of-unity/can-a-closed-set-be-open-can-an-open-set-be-closed-when-math-and-language-collide
     lecture: originale
 cree: 2026-10-31

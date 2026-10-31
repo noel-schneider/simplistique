@@ -14,15 +14,15 @@ suggestions:
 sources:
   - auteur: "Parlement européen et Conseil"
     annee: 2011
-    titre: "Règlement (UE) n° 1169/2011 (INCO)"
+    objet: "règlement INCO (n° 1169/2011)"
     lecture: seconde-main
   - auteur: "Commission européenne"
     annee: 2015
-    titre: "Eurobaromètre : compréhension de la mention « à consommer de préférence avant »"
+    objet: "Eurobaromètre sur la compréhension de la mention « à consommer de préférence avant »"
     lecture: seconde-main
   - auteur: "Commission européenne"
     annee: 2018
-    titre: "Estimation de la part du gaspillage alimentaire liée au marquage des dates"
+    objet: "estimation de la part du gaspillage alimentaire liée au marquage des dates"
     lecture: seconde-main
 cree: 2026-10-31
 modifie: 2026-10-31

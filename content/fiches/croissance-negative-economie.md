@@ -13,7 +13,7 @@ suggestions:
 sources:
   - auteur: "Mathias Couturier"
     annee: 2009
-    titre: "Tribune sur l’expression « croissance négative » (Reporterre)"
+    titre: "Croissance négative ou décroissance"
     lecture: seconde-main
 cree: 2026-10-31
 modifie: 2026-10-31

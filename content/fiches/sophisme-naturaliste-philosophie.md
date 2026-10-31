@@ -17,7 +17,7 @@ sources:
     lecture: seconde-main
   - auteur: "William Frankena"
     annee: 1939
-    titre: "The Naturalistic Fallacy (Mind)"
+    titre: "The Naturalistic Fallacy"
     lecture: seconde-main
   - auteur: "Bernard Williams"
     annee: 1985

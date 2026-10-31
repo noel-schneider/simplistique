@@ -13,15 +13,15 @@ suggestions:
 sources:
   - auteur: "Ernst Mayr"
     annee: 1961
-    titre: "Cause and Effect in Biology (Science)"
+    titre: "Cause and Effect in Biology"
     lecture: seconde-main
   - auteur: "Laland et coll."
     annee: 2011
-    titre: "Remise en cause de la distinction entre causes proximales et ultimes (Science)"
+    titre: "Cause and Effect in Biology Revisited: Is Mayr’s Proximate–Ultimate Dichotomy Still Useful?"
     lecture: seconde-main
   - auteur: "Scott-Phillips, Dickins et West"
     annee: 2011
-    titre: "Défense de la distinction entre causes proximales et ultimes (Perspectives on Psychological Science)"
+    titre: "Evolutionary Theory and the Ultimate–Proximate Distinction in the Human Behavioral Sciences"
     lecture: seconde-main
 cree: 2026-10-31
 modifie: 2026-10-31

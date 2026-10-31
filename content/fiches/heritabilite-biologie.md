@@ -11,7 +11,7 @@ suggestions: []
 sources:
   - auteur: "David S. Moore et David Shenk"
     annee: 2016
-    titre: "The Heritability Fallacy (WIREs Cognitive Science)"
+    titre: "The Heritability Fallacy"
     url: https://scholarship.claremont.edu/pitzer_fac_pub/193
     lecture: seconde-main
 cree: 2026-10-31
