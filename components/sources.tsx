@@ -1,4 +1,5 @@
 import type { Source } from '@/lib/content/schema'
+import { typographier } from '@/lib/typographie'
 
 export function Sources({ sources }: { sources: Source[] }) {
   if (sources.length === 0) return null
@@ -14,14 +15,14 @@ export function Sources({ sources }: { sources: Source[] }) {
             {source.auteur} ({source.annee}),{' '}
             {source.url ? (
               <a href={source.url} className="underline hover:text-stone-900">
-                {source.titre ? <cite>{source.titre}</cite> : source.objet}
+                {source.titre ? <cite>{typographier(source.titre)}</cite> : source.objet && typographier(source.objet)}
               </a>
             ) : source.titre ? (
-              <cite>{source.titre}</cite>
+              <cite>{typographier(source.titre)}</cite>
             ) : (
-              source.objet
+              source.objet && typographier(source.objet)
             )}
-            {source.titre && source.objet && <> — {source.objet}</>}
+            {source.titre && source.objet && <> — {typographier(source.objet)}</>}
             {source.lecture === 'seconde-main' && (
               <span className="ml-2 text-xs text-stone-500">(lue de seconde main)</span>
             )}

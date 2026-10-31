@@ -8,6 +8,7 @@ import { getFiches } from '@/lib/content/fiches'
 import { rendreMarkdown } from '@/lib/content/markdown'
 import { getMotif, getMotifs } from '@/lib/content/motifs'
 import { chargerTaxonomies } from '@/lib/content/taxonomies'
+import { typographier } from '@/lib/typographie'
 
 type Params = { params: Promise<{ slug: string }> }
 
@@ -48,8 +49,8 @@ export default async function PageMotif({ params }: Params) {
   return (
     <article>
       <header className="mb-8 space-y-4 border-b border-stone-200 pb-6">
-        <h1 className="text-3xl font-semibold tracking-tight">{motif.nom}</h1>
-        <p className="text-lg leading-relaxed text-stone-700">{motif.resume}</p>
+        <h1 className="text-3xl font-semibold tracking-tight">{typographier(motif.nom)}</h1>
+        <p className="text-lg leading-relaxed text-stone-700">{typographier(motif.resume)}</p>
       </header>
 
       <Prose html={await rendreMarkdown(motif.corps)} />
@@ -65,14 +66,14 @@ export default async function PageMotif({ params }: Params) {
                 href={`/fiches/${fiche.slug}`}
                 className="font-medium underline hover:text-stone-600"
               >
-                {fiche.terme}
+                {typographier(fiche.terme)}
               </Link>
               <span className="text-sm text-stone-500">
                 {nomDe(taxonomies.disciplines, fiche.discipline)}
               </span>
               <BadgeStatut statut={fiche.statut} nom={nomDe(taxonomies.statuts, fiche.statut)} />
             </p>
-            <p className="text-sm text-stone-600">{fiche.resume}</p>
+            <p className="text-sm text-stone-600">{typographier(fiche.resume)}</p>
           </div>
         ))}
       </section>

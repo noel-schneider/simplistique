@@ -12,4 +12,8 @@ describe('contenuImagePartage', () => {
   it('retombe sur le résumé sans accroche', () => {
     expect(contenuImagePartage(BASE, 'Droit').phrase).toBe('Le résumé.')
   })
+  it('pose les insécables françaises sur les textes de l’image', () => {
+    const c = contenuImagePartage({ ...BASE, accroche: 'Vraiment ?' }, 'Droit')
+    expect(c.phrase).toBe('Vraiment\u202F?')
+  })
 })

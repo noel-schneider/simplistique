@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { getIndex } from '@/lib/content/fiches'
 import { fichesALaUne } from '@/lib/accueil'
 import { chargerTaxonomies } from '@/lib/content/taxonomies'
+import { typographier } from '@/lib/typographie'
 
 export default function Accueil() {
   const fiches = getIndex()
@@ -48,12 +49,12 @@ export default function Accueil() {
           <ul className="grid gap-4 sm:grid-cols-3">
             {alaUne.map((fiche) => (
               <li key={fiche.slug} className="flex flex-col rounded border border-stone-200 p-4">
-                <p className="flex-1 leading-relaxed text-stone-900">{fiche.accroche}</p>
+                <p className="flex-1 leading-relaxed text-stone-900">{fiche.accroche && typographier(fiche.accroche)}</p>
                 <Link
                   href={`/fiches/${fiche.slug}`}
                   className="mt-3 text-sm text-stone-600 underline underline-offset-2 hover:text-stone-900"
                 >
-                  {fiche.terme}
+                  {typographier(fiche.terme)}
                   <span className="text-stone-500"> · {nomDiscipline.get(fiche.discipline) ?? fiche.discipline}</span>
                 </Link>
               </li>

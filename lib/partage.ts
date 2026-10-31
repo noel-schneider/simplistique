@@ -1,4 +1,5 @@
 import type { FicheMeta } from './content/schema'
+import { typographier } from './typographie'
 
 /**
  * Textes de l’image de partage d’une fiche. L’accroche prime : c’est la phrase
@@ -9,8 +10,8 @@ export function contenuImagePartage(
   nomDiscipline: string,
 ): { titre: string; phrase: string; pied: string } {
   return {
-    titre: fiche.terme,
-    phrase: fiche.accroche ?? fiche.resume,
+    titre: typographier(fiche.terme),
+    phrase: typographier(fiche.accroche ?? fiche.resume),
     pied: `Simplistique · ${nomDiscipline}`,
   }
 }

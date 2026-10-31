@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { getFiches } from '@/lib/content/fiches'
 import { getMotifs } from '@/lib/content/motifs'
+import { typographier } from '@/lib/typographie'
 
 export const metadata: Metadata = {
   title: 'Motifs',
@@ -31,13 +32,13 @@ export default function PageMotifs() {
                   href={`/motifs/${motif.slug}`}
                   className="text-lg font-medium underline hover:text-stone-600"
                 >
-                  {motif.nom}
+                  {typographier(motif.nom)}
                 </Link>
                 <span className="text-sm text-stone-500">
                   {nombre} fiche{nombre > 1 ? 's' : ''}
                 </span>
               </p>
-              <p className="text-sm text-stone-600">{motif.resume}</p>
+              <p className="text-sm text-stone-600">{typographier(motif.resume)}</p>
             </li>
           )
         })}
