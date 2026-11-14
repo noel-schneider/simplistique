@@ -138,3 +138,11 @@
   description: >
     Les mots de la fiche de paie et du contrat, qui décident de ce que
     chacun croit gagner.
+- slug: construction
+  nom: Construction
+  famille: societe
+  couleur: '#1b7f4f'
+  description: >
+    Le vocabulaire des chantiers, fixé par la loi et repris tel quel par les
+    projets informatiques, que chaque particulier découvre le jour où il fait
+    construire ou rénover.
